@@ -10,10 +10,14 @@ import { useForm } from "react-hook-form";
 import { joinSchema } from "@/packages/zod";
 import { Join } from '@/packages/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useState } from 'react';
 export default function Home() {
 
   const router=useRouter();
+  const pathname=usePathname();
+  const [name,setName]=useState("");
+  const [room,setRoom]=useState("");
   const form=useForm<Join>({
     resolver:zodResolver(joinSchema),
     defaultValues:{
@@ -42,11 +46,47 @@ export default function Home() {
     }
   }
 
+  function joinRoom(){
+    console.log(room+"-"+name);
+    history.pushState({name:name,roomId:room},"",pathname+"localhost:3001/chat");
+    router.push("/chat");
+  }
+
   return (
     <div className="grid grid-cols-2 gap-4 p-12">
       <div>
-        This is going to contain an intro
+        <Card className='w-[400px]'>
+          <CardHeader>
+            <CardTitle>Join a Room</CardTitle>
+            <CardDescription>Fill in the chat room details to join</CardDescription>
+          </CardHeader>
+          <CardContent>
+          <div className="grid w-full items-center gap-4">
+            <div className="flex flex-col space-y-1.5">
+              <Label htmlFor="name">Name</Label>
+              <Input 
+              onChange={(e)=>{
+                setName(e.target.value)
+              }}
+              value={name} id="name" placeholder="Your username" />
+            </div>
+            <div className="flex flex-col space-y-1.5">
+            <Label htmlFor="id">Chatid</Label>
+              <Input 
+              onChange={(e)=>{
+                setRoom(e.target.value)
+              }}
+              value={room} id="id" placeholder="Id of your chat room" />
+            </div>
+          </div>
+      </CardContent>
+      <CardFooter>
+        <Button onClick={joinRoom} className='w-full'>Join/Create Chat</Button>
+      </CardFooter>
+        </Card>
       </div>
+
+      {/* register form */}
       <div className="grid justify-items-center p-4">
       <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
