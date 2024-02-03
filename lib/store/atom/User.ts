@@ -1,9 +1,15 @@
 import { atom } from "recoil";
 
-export const userState=atom({
+
+export interface userState{
+    name?:string,
+    roomId?:string
+}
+
+export const userState=atom<userState>({
     key:"userState",
     default:{
-        name:null,
-        roomId:null
+        name:undefined,
+        roomId:undefined
     }
 })
