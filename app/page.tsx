@@ -12,9 +12,13 @@ import { Join } from '@/packages/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { userState } from '@/lib/store/atom/User';
+import { wsState } from '@/lib/store/atom/Socket';
 export default function Home() {
-
+  const wsConnection=useRecoilValue(wsState);
   const router=useRouter();
+  const setUser=useSetRecoilState(userState);
   const pathname=usePathname();
   const [name,setName]=useState("");
   const [room,setRoom]=useState("");
@@ -26,6 +30,8 @@ export default function Home() {
       email:""
     }
   });
+
+  console.log(wsConnection);
 
   async function onSubmit(values:Join){
     console.log(values);
@@ -49,12 +55,16 @@ export default function Home() {
   function joinRoom(){
     console.log(room+"-"+name);
     history.pushState({name:name,roomId:room},"",pathname+"localhost:3001/chat");
+    setUser({
+      name:name,
+      roomId:room
+    })
     router.push("/chat");
   }
 
   return (
     <div className="grid grid-cols-2 gap-4 p-12">
-      <div>
+      <div className='ml-12 p-4'>
         <Card className='w-[400px]'>
           <CardHeader>
             <CardTitle>Join a Room</CardTitle>
