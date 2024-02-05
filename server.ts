@@ -2,7 +2,7 @@ import express from 'express';
 import next from 'next';
 import http from 'http';
 import cors from 'cors';
-import userRouter from './server/route/index'
+import userRouter from './server/routes/index'
 import { WebSocketServer } from 'ws';
 import {ws} from './server/socket/index'
 const port=3000;
@@ -31,7 +31,7 @@ app.prepare().then(()=>{
         return handle(req,res);
     })
     server.listen(port,()=>{
-        console.log("listening on port 3000, ws connected!");
+        console.log("listening on port 3000, ws server connected!");
     })
 }).catch((err:Error)=>{
     console.log(err);
