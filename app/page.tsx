@@ -23,7 +23,7 @@ export default function Home() {
   const setToken=useSetRecoilState(tokenState);
   const token=useRecoilValue(tokenState);
   const pathname=usePathname();
-  const [name,setName]=useState("");
+  const [email,setEmail]=useState("");
   const [room,setRoom]=useState("");
   const form=useForm<Join>({
     resolver:zodResolver(joinSchema),
@@ -61,7 +61,7 @@ export default function Home() {
 
   function joinRoom(){
     setUser({
-      name:name,
+      name:email,
       roomId:room
     });
     if(token)
@@ -81,12 +81,12 @@ export default function Home() {
           <CardContent>
           <div className="grid w-full items-center gap-4">
             <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="emailId">Email</Label>
               <Input 
               onChange={(e)=>{
-                setName(e.target.value)
+                setEmail(e.target.value)
               }}
-              value={name} id="name" placeholder="Your username" />
+              value={email} id="email" placeholder="Enter your email id" />
             </div>
             <div className="flex flex-col space-y-1.5">
             <Label htmlFor="id">Chatid</Label>
