@@ -1,8 +1,10 @@
 import express from 'express';
 import { PrismaClient} from '@prisma/client'
-
+import { auth } from '@/auth';
+import { NextApiRequest,NextApiResponse } from 'next';
 const router=express.Router();
 const prisma=new PrismaClient()
+
 
 router.post("/createUser",async (req,res)=>{
     const {name,email,password}=req.body;
