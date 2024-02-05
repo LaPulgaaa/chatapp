@@ -32,7 +32,7 @@ router.post("/createUser",async (req,res)=>{
 })
 
 router.get("/getUser",async(req,res)=>{
-    
+    console.log("get all users")
     try{
         const allUser=await prisma.user.findMany({});
         res.json({
@@ -45,4 +45,27 @@ router.get("/getUser",async(req,res)=>{
 
 })
 
+router.get("/findUser/:email",async(req,res)=>{
+    const {email}=req.params;
+
+    try{
+        const user=await prisma.user.findFirst({
+            where:{
+                email
+            }
+        })
+        if(user!==undefined)
+        {
+            res.status(200).json({
+                msg:"found user!!",
+                user
+            });
+        }
+        else
+        res.status(404).send("Not found!!");
+    }catch(err)
+    {
+        res.status(400).send("server error!!")
+    }
+})
 export default router;
