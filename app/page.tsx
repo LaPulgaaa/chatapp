@@ -15,10 +15,13 @@ import { useState } from 'react';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { userState } from '@/lib/store/atom/User';
 import { wsState } from '@/lib/store/atom/Socket';
+import { tokenState } from '@/lib/store/atom/Token';
 export default function Home() {
   const wsConnection=useRecoilValue(wsState);
   const router=useRouter();
   const setUser=useSetRecoilState(userState);
+  const setToken=useSetRecoilState(tokenState);
+  const token=useRecoilValue(tokenState);
   const pathname=usePathname();
   const [name,setName]=useState("");
   const [room,setRoom]=useState("");
@@ -43,9 +46,13 @@ export default function Home() {
           'Content-Type':"application/json"
         }
       })
-      console.log(await resp.json());
-      if(resp.status==201)
-      router.push('/chat');
+      // console.log(await resp.json());
+      const {token}=await resp.json();
+      if(token!==undefined)
+      {
+        setToken(token);
+        alert("User created successfully")
+      }
     }catch(err)
     {
       console.log(err);
@@ -53,13 +60,14 @@ export default function Home() {
   }
 
   function joinRoom(){
-    console.log(room+"-"+name);
-    history.pushState({name:name,roomId:room},"",pathname+"localhost:3001/chat");
     setUser({
       name:name,
       roomId:room
-    })
+    });
+    if(token)
     router.push("/chat");
+    else
+    alert("Have you logged in or signed up??")
   }
 
   return (
