@@ -34,7 +34,7 @@ export default function Home() {
     }
   });
 
-  console.log(wsConnection);
+  
 
   async function onSubmit(values:Join){
     console.log(values);
@@ -59,7 +59,7 @@ export default function Home() {
     }
   }
 
-  function joinRoom(){
+  async function joinRoom(){
     setUser({
       name:email,
       roomId:room
@@ -67,7 +67,27 @@ export default function Home() {
     if(token)
     router.push("/chat");
     else
-    alert("Have you logged in or signed up??")
+    {
+      
+      try{
+        const resp=await fetch(`http://localhost:3000/user/findUser/${email}`);
+        if(resp.status==200)
+        {
+          const {token,user}=await resp.json();
+          console.log(user)
+          console.log(token)
+          setToken(token);
+          router.push("/chat");
+        }
+        else if(resp.status==404)
+        {
+          alert("Looks like you are new here!! Please sign to join chat!")
+        }
+      }catch(err)
+      {
+        console.log(err);
+      }
+    }
   }
 
   return (
