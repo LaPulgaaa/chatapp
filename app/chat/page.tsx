@@ -13,7 +13,10 @@ export type RecievedMessage={
     type:string,
     payload:{
         roomId:string,
-        message:string
+        message:{
+            content:string,
+            user:string
+        }
     }
 }
 const imagesource="https://avatars.githubusercontent.com/u/123243429?v=4";
@@ -61,7 +64,10 @@ export default function Chat(){
             type:"message",
             payload:{
                 roomId:user.roomId!,
-                message
+                message:{
+                    content:message,
+                    user:user.name
+                }
             }
         }
         setMessage("")
