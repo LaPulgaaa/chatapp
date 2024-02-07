@@ -18,7 +18,7 @@ router.post("/createUser",async (req,res)=>{
                 password:password
             }
         })
-        const token=jwt.sign(user,process.env.ACCESS_TOKEN_SECRET!,{expiresIn:"1h"});
+        const token=jwt.sign(user,process.env.ACCESS_TOKEN_SECRET!,{expiresIn:"3h"});
         console.log(token)
         res.status(201).json({
             message:"created new user",
@@ -54,11 +54,14 @@ router.get("/findUser/:email",async(req,res)=>{
                 email
             }
         })
-        if(user!==undefined)
+        if(user!==undefined && user!==null)
         {
+            const token=jwt.sign(user,process.env.ACCESS_TOKEN_SECRET!,{expiresIn:"3h"});
+            console.log(token)
             res.status(200).json({
                 msg:"found user!!",
-                user
+                user,
+                token
             });
         }
         else
