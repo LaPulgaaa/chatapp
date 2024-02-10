@@ -82,7 +82,7 @@ export default function Chat(){
     
 
     return <div className="h-lvh mx-32 pb-48">
-         <ScrollArea className="m-4 h-full rounded-md border">
+         <ScrollArea id="chatbox" className="m-4 h-full rounded-md border ">
             {chatComp}
          </ScrollArea>
         <div className="flex">
