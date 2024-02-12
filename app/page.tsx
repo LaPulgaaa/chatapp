@@ -191,18 +191,3 @@ export default function Home() {
     </div>
   );
 }
-
-// <div className="grid w-full items-center gap-4">
-// <div className="flex flex-col space-y-1.5">
-//   <Label htmlFor="name">Name</Label>
-//   <Input id="name" placeholder="Your username" />
-// </div>
-// <div className="flex flex-col space-y-1.5">
-//   <Label htmlFor="email">Email</Label>
-//   <Input id="email" placeholder="Your email address" />
-// </div>
-// <div className="flex flex-col space-y-1.5">
-//   <Label htmlFor="password">Password</Label>
-//   <Input id="password" placeholder="Your password" />
-// </div>
-// </div>

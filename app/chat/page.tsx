@@ -48,6 +48,7 @@ export default function Chat(){
         }
         return ()=>{ws.close();}
     },[])
+    
     if(wsInstance===undefined)
     {
          return <div className="grid justify-center">Loading</div>
