@@ -42,7 +42,12 @@ export function ws(wss:WebSocketServer){
 
         })
         ws.on("close",()=>{
-            console.log("someone left this room");
+            // console.log("someone left this room");
+            RedisSubscriptionManager.get_instance().unsubscribe(wsId.toString(),users[wsId].roomId);
+            RedisSubscriptionManager.get_instance().addChatMessage(users[wsId].roomId,{
+                content:"someone just left the room",
+                user:"pulgabot"
+            })
         })
         
     })
