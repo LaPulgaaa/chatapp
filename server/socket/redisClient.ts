@@ -66,6 +66,22 @@ export class RedisSubscriptionManager{
         }
     }
 
+    unsubscribe(userId:string,room:string){
+        this.subscription.set(userId,this.subscription.get(userId)?.filter((id)=>id!==room)||[]);
+        if(this.subscription.get(userId)?.length==0){
+            this.subscription.delete(userId);
+        }
+        delete this.reverseSubscription.get(room)?.userId;
+
+        if(!this.reverseSubscription.get(room)||
+        Object.keys(this.reverseSubscription.get(room)||{}).length===0){
+            console.log("unsubscribing from room "+room);
+            this.subscriber.unsubscribe(room);
+            this.reverseSubscription.delete(room);
+        }
+
+    }
+
     async addChatMessage(roomId:string,message:{content:string,user:string}){
         this.publisher.publish(roomId,JSON.stringify({
             type:"message",
