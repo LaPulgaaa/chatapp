@@ -49,11 +49,11 @@ export default function Chat(){
         return ()=>{ws.close();}
     },[])
 
-    if(wsInstance===undefined)
-    {
-         return <div className="grid justify-center">Loading</div>
-    }
-
+    // if(wsInstance===undefined)
+    // {
+    //      return <div className="grid justify-center">Loading</div>
+    // }
+    if(wsInstance!==undefined)
     wsInstance.onmessage=function(event){
         const data=JSON.parse(event.data);
         console.log(data) 
