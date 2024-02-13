@@ -19,12 +19,11 @@ import { tokenState } from '@/lib/store/atom/Token';
 export default function Home() {
   const wsConnection=useRecoilValue(wsState);
   const router=useRouter();
-  const setUser=useSetRecoilState(userState);
+
   const setToken=useSetRecoilState(tokenState);
   const token=useRecoilValue(tokenState);
   const pathname=usePathname();
-  const [email,setEmail]=useState("");
-  const [room,setRoom]=useState("");
+
   const form=useForm<Join>({
     resolver:zodResolver(joinSchema),
     defaultValues:{
@@ -59,70 +58,10 @@ export default function Home() {
     }
   }
 
-  async function joinRoom(){
-    setUser({
-      name:email,
-      roomId:room
-    });
-    if(token)
-    router.push("/chat");
-    else
-    {
-      
-      try{
-        const resp=await fetch(`http://localhost:3000/user/findUser/${email}`);
-        if(resp.status==200)
-        {
-          const {token,user}=await resp.json();
-          console.log(user)
-          console.log(token)
-          setToken(token);
-          router.push("/chat");
-        }
-        else if(resp.status==404)
-        {
-          alert("Looks like you are new here!! Please sign to join chat!")
-        }
-      }catch(err)
-      {
-        console.log(err);
-      }
-    }
-  }
 
   return (
     <div className="grid grid-cols-2 gap-4 p-12">
-      <div className='ml-12 p-4'>
-        <Card className='w-[400px]'>
-          <CardHeader>
-            <CardTitle>Join a Room</CardTitle>
-            <CardDescription>Fill in the chat room details to join</CardDescription>
-          </CardHeader>
-          <CardContent>
-          <div className="grid w-full items-center gap-4">
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="emailId">Email</Label>
-              <Input 
-              onChange={(e)=>{
-                setEmail(e.target.value)
-              }}
-              value={email} id="email" placeholder="Enter your email id" />
-            </div>
-            <div className="flex flex-col space-y-1.5">
-            <Label htmlFor="id">Chatid</Label>
-              <Input 
-              onChange={(e)=>{
-                setRoom(e.target.value)
-              }}
-              value={room} id="id" placeholder="Id of your chat room" />
-            </div>
-          </div>
-      </CardContent>
-      <CardFooter>
-        <Button onClick={joinRoom} className='w-full'>Join/Create Chat</Button>
-      </CardFooter>
-        </Card>
-      </div>
+     
 
       {/* register form */}
       <div className="grid justify-items-center p-4">
