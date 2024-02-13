@@ -1,14 +1,13 @@
 import {z} from 'zod';
 
 export const joinSchema=z.object({
-    name:z.string({
+    username:z.string({
         required_error:"Username is required",
         invalid_type_error:"name must be a string"
     }).min(2,{message:"username must be atleast 2 characters"}),
     password:z.string({
         required_error:"password is required"
     }).min(5,{message:"password should of min 5 digits"}),
-    email:z.string().email({message:"not a valid email address"})
 })
 
 export type Join=z.infer<typeof joinSchema>;

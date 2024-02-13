@@ -56,8 +56,8 @@ export default function login(){
   }
 
 
-    return  <div className='ml-12 p-4 flex justify-center'>
-    <Card className='w-[500px] p-12'>
+    return  <div className='m-24 flex justify-center'>
+    <Card className='w-[500px] p-6'>
       <CardHeader>
         <CardTitle>Login</CardTitle>
         <CardDescription>Fill in the details to join your peers! </CardDescription>
