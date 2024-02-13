@@ -13,25 +13,29 @@ export default function login(){
 
     const setToken=useSetRecoilState(tokenState);
     const token=useRecoilValue(tokenState);
-    const [email,setEmail]=useState("");
+    const [username,setUsername]=useState("");
     const setUser=useSetRecoilState(userState);
-    const [room,setRoom]=useState("");
+    const [password,setPassword]=useState("");
     const router=useRouter();
 
 
   async function joinRoom(){
     console.log("button clicked")
-    setUser({
-      name:email,
-      roomId:room
-    });
+    
     if(token)
     router.push("/chat");
     else
     {
       
       try{
-        const resp=await fetch(`http://localhost:3000/user/findUser/${email}`);
+        const resp=await fetch(`http://localhost:3000/user/login`,{
+          method:"POST",
+          body:JSON.stringify({
+            username,
+            password
+          }),
+
+        });
         if(resp.status==200)
         {
           const {token,user}=await resp.json();
@@ -53,33 +57,34 @@ export default function login(){
 
 
     return  <div className='ml-12 p-4 flex justify-center'>
-    <Card className='w-[400px]'>
+    <Card className='w-[500px] p-12'>
       <CardHeader>
-        <CardTitle>Join a Room</CardTitle>
-        <CardDescription>Fill in the chat room details to join</CardDescription>
+        <CardTitle>Login</CardTitle>
+        <CardDescription>Fill in the details to join your peers! </CardDescription>
       </CardHeader>
       <CardContent>
       <div className="grid w-full items-center gap-4">
         <div className="flex flex-col space-y-1.5">
-          <Label htmlFor="emailId">Email</Label>
+          <Label htmlFor="username">Username</Label>
           <Input 
           onChange={(e)=>{
-            setEmail(e.target.value)
+            setUsername(e.target.value)
           }}
-          value={email} id="email" placeholder="Enter your email id" />
+          value={username} id="email" placeholder="Username" />
         </div>
         <div className="flex flex-col space-y-1.5">
-        <Label htmlFor="id">Chatid</Label>
+        <Label htmlFor="password">Password</Label>
           <Input 
+          type="password"
           onChange={(e)=>{
-            setRoom(e.target.value)
+            setPassword(e.target.value)
           }}
-          value={room} id="id" placeholder="Id of your chat room" />
+          value={password} id="password" placeholder="Password" />
         </div>
       </div>
   </CardContent>
   <CardFooter>
-    <Button onClick={joinRoom} className='w-full'>Join/Create Chat</Button>
+    <Button onClick={joinRoom} className='w-full'>Log In</Button>
   </CardFooter>
     </Card>
   </div>
