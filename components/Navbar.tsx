@@ -19,7 +19,7 @@ export default function Navbar(){
          }}
          variant={"ghost"}>Logout</Button>:<Button variant="ghost" onClick={()=>router.push("/login")}>LogIn</Button>}
         <Button onClick={()=>{
-            
+            router.push("/signup")
         }}>Signup</Button>
         </div>
     </div>
