@@ -6,7 +6,10 @@ import jwt from 'jsonwebtoken'
 const router=express.Router();
 const prisma=new PrismaClient()
 
-
+type UserInfo={
+    username:string,
+    password:string
+}
 // router.post("/createUser",async (req,res)=>{
 //     const {name,email,password}=req.body;
     
@@ -46,9 +49,32 @@ const prisma=new PrismaClient()
 // })
 
 
+router.post("/signup",async(req,res)=>{
+    const {username,password}:UserInfo=req.body;
+
+    try{
+        const new_member=await prisma.member.create({
+            data:{
+                username,
+                password
+            }
+        })
+        const token=jwt.sign(new_member,process.env.ACCESS_TOKEN_SECRET!,{expiresIn:"3h"});
+        res.status(201).json({
+            msg:"created new user",
+            member:new_member,
+            token
+        })
+    }catch(err)
+    {
+        res.status(500).send("Server error!!")
+    }
+
+})
+
 
 router.post("/login",async(req,res)=>{
-    const {username,password}=req.body;
+    const {username,password}:UserInfo=req.body;
 
     try{
         const member=await prisma.member.findFirst({
