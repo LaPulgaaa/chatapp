@@ -17,9 +17,9 @@ export default function Navbar(){
             resetToken();
             router.push("/")
          }}
-         variant={"ghost"}>Logout</Button>:<Button variant="ghost">LogIn</Button>}
+         variant={"ghost"}>Logout</Button>:<Button variant="ghost" onClick={()=>router.push("/login")}>LogIn</Button>}
         <Button onClick={()=>{
-            router.push("/login")
+            
         }}>Signup</Button>
         </div>
     </div>
