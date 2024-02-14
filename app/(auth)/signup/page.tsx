@@ -58,11 +58,11 @@ export default function signup(){
     
 
     
-    return <div className="flex justify-center p-24">
+    return <div className="flex justify-center p-12">
     {/* register form */}
     <Form {...form}>
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-      <Card className="w-[500px]">
+    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 p-12">
+      <Card className="w-[500px] p-6">
         <CardHeader>
           <CardTitle>Sign Up to start chatting</CardTitle>
           <CardDescription>Your peers are waiting for you!</CardDescription>
