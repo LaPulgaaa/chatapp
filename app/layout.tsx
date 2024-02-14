@@ -4,6 +4,7 @@ import { Inter as FontSans } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import RecoilContextProvider from "@/components/providers/RecoilContextProvider";
+import { ThemeProvider } from "@/components/theme-provider";
 // const inter = Inter({ subsets: ["latin"] });
 import { cn } from "../lib/utils"
  
@@ -31,11 +32,16 @@ export default function RootLayout({
             "min-h-screen bg-background font-sans antialiased",
             fontSans.variable
           )}>
-            
+            <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+            >
             <Navbar/>
             {children}
-            
-        </body>
+            </ThemeProvider>
+            </body>
         </RecoilContextProvider>
       
     </html>
