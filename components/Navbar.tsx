@@ -18,17 +18,18 @@ export default function Navbar(){
         <h2 onClick={()=>router.push("/")}>chatcity</h2>
         <div className="flex justify-between">
         {token!==undefined?<Button
+        className="mx-2"
          onClick={()=>{
             resetToken();
             router.push("/")
          }}
          variant={"ghost"}>Logout</Button>:<Button variant="ghost" onClick={()=>router.push("/login")}>LogIn</Button>}
-        <Button
+        {!token?<Button
         className="px-2 mx-6"
         variant={"ghost"}
          onClick={()=>{
             router.push("/signup")
-        }}>Signup</Button>
+        }}>Signup</Button>:''}
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <Button variant="outline" size={"icon"}>
