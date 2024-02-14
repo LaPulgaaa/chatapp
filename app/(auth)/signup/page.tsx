@@ -34,6 +34,7 @@ export default function signup(){
     });
 
     async function onSubmit(values:Join){
+      console.log(values)
         try{
           const resp=await fetch("http://localhost:3000/user/signup",{
             method:"POST",
@@ -48,6 +49,7 @@ export default function signup(){
           {
             setToken(token);
             alert("User created successfully")
+            router.push("/chat");
           }
         }catch(err)
         {
