@@ -1,7 +1,6 @@
 import express from 'express';
 import { PrismaClient} from '@prisma/client'
-import { auth } from '@/auth';
-import { NextApiRequest,NextApiResponse } from 'next';
+
 import jwt from 'jsonwebtoken'
 const router=express.Router();
 const prisma=new PrismaClient()
@@ -51,7 +50,7 @@ type UserInfo={
 
 router.post("/signup",async(req,res)=>{
     const {username,password}:UserInfo=req.body;
-
+    console.log(username);
     try{
         const new_member=await prisma.member.create({
             data:{
@@ -67,7 +66,7 @@ router.post("/signup",async(req,res)=>{
         })
     }catch(err)
     {
-        res.status(500).send("Server error!!")
+        res.status(500).send(err)
     }
 
 })
@@ -98,6 +97,23 @@ router.post("/login",async(req,res)=>{
         res.status(404).send("User not found!!");
     }catch(err){
         res.status(404).send("Could not find user!!")
+    }
+})
+
+router.delete("/eraseAll",async(req,res)=>{
+    try{
+        const status=await prisma.member.deleteMany({});
+        if(status!==undefined)
+        {
+            res.status(200).json({
+                msg:"all the member has been deleted successfully!",
+                status
+            })
+        }
+    }catch(err)
+    {
+        console.log(err)
+        res.status(400).send("error deleting members!")
     }
 })
 export default router;
