@@ -11,7 +11,6 @@ import { Join } from '@/packages/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { usePathname, useRouter } from 'next/navigation';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { userState } from '@/lib/store/atom/User';
 import { wsState } from '@/lib/store/atom/Socket';
 import { tokenState } from '@/lib/store/atom/Token';
 
