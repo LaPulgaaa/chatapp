@@ -24,3 +24,14 @@ export const messageSchema=z.object({
 })
 
 export type Message=z.infer<typeof messageSchema>;
+
+export const createRoomSchema=z.object({
+    name:z.string({
+        required_error:"enter a valid name"
+    }).min(1),
+    discription:z.string({
+        required_error:"discription should be atleast 1 character."
+    }).min(6).max(50)
+})
+
+export type RoomType=z.infer<typeof createRoomSchema>;
