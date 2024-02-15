@@ -1,3 +1,15 @@
+import { Button } from "@/components/ui/button";
+
+
+
 export default function Home(){
-    return <div>This is the home page.</div>
+    return <div className="mx-8 my-4">
+        <div className="flex justify-between">
+        <h3 className="scroll-m-20 p-2 text-2xl font-semibold tracking-tigh">
+            Catch up on chats you missed...
+        </h3>
+        <Button>+ New</Button>
+        </div>
+        
+    </div>
 }
