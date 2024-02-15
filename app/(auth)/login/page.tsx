@@ -56,7 +56,10 @@ export default function login(){
   }
 
 
-    return  <div className='m-24 flex justify-center'>
+    return  <div className='m-18 flex  flex-col items-center'>
+      <h2 className="scroll-m-20 border-b pb-2 m-6 text-3xl font-semibold tracking-tight first:mt-0 ">
+        Welcome Back !
+      </h2>
     <Card className='w-[500px] p-6'>
       <CardHeader>
         <CardTitle>Login</CardTitle>
@@ -84,8 +87,9 @@ export default function login(){
       </div>
   </CardContent>
   <CardFooter>
-    <Button onClick={joinRoom} className='w-full'>Log In</Button>
+    <Button onClick={joinRoom} className='w-full'>Log in</Button>
   </CardFooter>
     </Card>
+    <Button variant={"link"} onClick={()=>router.push("/signup")}>Don't have an account ?</Button>
   </div>
 }

@@ -59,10 +59,13 @@ export default function signup(){
     
 
     
-    return <div className="flex justify-center p-12">
+    return <div className="flex flex-col items-center p-6">
     {/* register form */}
+    <h2 className='scroll-m-20 border-b pb-2 m-6 text-3xl font-semibold tracking-tight first:mt-0 '>
+      Welcome to chatcity !
+    </h2>
     <Form {...form}>
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 p-12">
+    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 p-6">
       <Card className="w-[500px] p-6">
         <CardHeader>
           <CardTitle>Sign Up to start chatting</CardTitle>
@@ -99,11 +102,13 @@ export default function signup(){
             />
             </CardContent>
         <CardFooter>
-          <Button type='submit' className="w-full">Join</Button>
+          <Button type='submit' className="w-full">Sign up</Button>
         </CardFooter>
         </Card>
           </form>
       </Form>
-
+              <Button variant={"link"} onClick={()=>router.push("/login")}>
+                Already have an account?
+              </Button>
   </div>
 }
