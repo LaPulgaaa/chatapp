@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-
+import CreateRoom from "@/components/CreateRoom";
 
 
 export default function Home(){
@@ -8,7 +8,7 @@ export default function Home(){
         <h3 className="scroll-m-20 p-2 text-2xl font-semibold tracking-tigh">
             Catch up on chats you missed...
         </h3>
-        <Button>+ New</Button>
+        <CreateRoom/>
         </div>
         
     </div>
