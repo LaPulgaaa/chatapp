@@ -1,5 +1,5 @@
 import { Avatar,AvatarFallback } from "./ui/avatar"
-import type { RecievedMessage } from "@/app/chat/page"
+import type { RecievedMessage } from "@/app/home/chat/page"
 import { userState } from "@/lib/store/atom/User"
 import { useRecoilValue } from "recoil"
 export default function Message({data}:{data:RecievedMessage}){
