@@ -107,8 +107,8 @@ export default function signup(){
         </Card>
           </form>
       </Form>
-              <Button variant={"link"} onClick={()=>router.push("/login")}>
-                Already have an account?
-              </Button>
+      <Button variant={"link"} onClick={()=>router.push("/login")}>
+        Already have an account?
+      </Button>
   </div>
 }
