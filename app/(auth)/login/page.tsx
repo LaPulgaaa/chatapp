@@ -23,7 +23,7 @@ export default function login(){
     console.log("button clicked")
     
     if(token)
-    router.push("/chat");
+    router.push("/home");
     else
     {
       
@@ -38,11 +38,11 @@ export default function login(){
         });
         if(resp.status==200)
         {
-          const {token,user}=await resp.json();
-          console.log(user)
+          const {token,member}=await resp.json();
+          console.log(member)
           console.log(token)
           setToken(token);
-          router.push("/chat");
+          router.push("/home");
         }
         else if(resp.status==404)
         {

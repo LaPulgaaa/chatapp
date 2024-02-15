@@ -49,7 +49,7 @@ export default function signup(){
           {
             setToken(token);
             alert("User created successfully")
-            router.push("/chat");
+            router.push("/home");
           }
         }catch(err)
         {
