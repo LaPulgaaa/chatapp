@@ -5,16 +5,15 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useSetRecoilState,useRecoilValue  } from "recoil";
-import { userState } from "@/lib/store/atom/User";
 import { useRouter } from "next/navigation";
 import { tokenState } from "@/lib/store/atom/Token";
+import { userDetails } from "@/lib/store/atom/userDetails";
 
 export default function login(){
-
+    const setUserDetails=useSetRecoilState(userDetails);
     const setToken=useSetRecoilState(tokenState);
     const token=useRecoilValue(tokenState);
     const [username,setUsername]=useState("");
-    const setUser=useSetRecoilState(userState);
     const [password,setPassword]=useState("");
     const router=useRouter();
 
@@ -41,6 +40,7 @@ export default function login(){
           const {token,member}=await resp.json();
           console.log(member)
           console.log(token)
+          setUserDetails(member);
           setToken(token);
           router.push("/home");
         }
