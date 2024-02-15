@@ -62,7 +62,7 @@ export default function signup(){
     return <div className="flex flex-col items-center p-6">
     {/* register form */}
     <h2 className='scroll-m-20 border-b pb-2 m-6 text-3xl font-semibold tracking-tight first:mt-0 '>
-      Welcome to chatcity !
+      Welcome to chat.city !
     </h2>
     <Form {...form}>
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 p-6">

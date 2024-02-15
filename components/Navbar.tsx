@@ -15,7 +15,7 @@ export default function Navbar(){
     const router=useRouter();
     const token=useRecoilValue(tokenState);
     return <div className="p-4 font-bold flex justify-between cursor-pointer">
-        <h2 onClick={()=>router.push("/")}>chatcity</h2>
+        <h2 onClick={()=>router.push("/")}>chat.city</h2>
         <div className="flex justify-between">
         {token!==undefined?<Button
         className="mx-2"
