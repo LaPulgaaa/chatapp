@@ -36,7 +36,7 @@ model Message {
 model Chat {
   id String @id @default(uuid())
   name String
-
+  discription String
   messages Message[]
 
   createdAt DateTime @default(now())
