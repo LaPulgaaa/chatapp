@@ -1,7 +1,7 @@
 'use client'
 import { useForm } from "react-hook-form";
 import { Button } from "./ui/button";
-import {Dialog,DialogContent,DialogDescription,DialogFooter,DialogHeader,DialogTitle,DialogTrigger,} 
+import {Dialog,DialogClose,DialogContent,DialogDescription,DialogFooter,DialogHeader,DialogTitle,DialogTrigger,} 
 from "@/components/ui/dialog";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { RoomType, createRoomSchema } from "@/packages/zod";
@@ -10,7 +10,6 @@ import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 
 export default function CreateRoom(){
-
     const form=useForm<RoomType>({
         resolver:zodResolver(createRoomSchema),
         defaultValues:{
@@ -66,7 +65,9 @@ export default function CreateRoom(){
 
                                 />
                                 <DialogFooter className="mt-3">
-                                <Button type='submit' className="w-full">Create room</Button>
+                                    <DialogClose asChild>
+                                        <Button type='submit' className="w-full">Create room</Button>
+                                    </DialogClose>
                                 </DialogFooter>
                                     
 

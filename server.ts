@@ -2,7 +2,7 @@ import express from 'express';
 import next from 'next';
 import http from 'http';
 import cors from 'cors';
-import userRouter from './server/routes/index'
+import userRouter from './server/routes/user'
 import { WebSocketServer } from 'ws';
 import {ws} from './server/socket/index'
 const port=3000;
