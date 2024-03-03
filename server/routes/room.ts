@@ -50,9 +50,8 @@ router.get("/subscribedChats/:memberId",async(req,res)=>{
 router.post("/createChat",async(req,res)=>{
     //The Message Schema serves as relational schema b/w Member and 
     // Chat schema. We create chat table and the create a message row
-    // with a certain message to link Member and Chat model together .
+    // with a certain message to link Member and Chat model together 
     const {name,discription,memberId}:CreateRoomSchema=req.body;
-
     try
     {
         const new_room=await prisma.chat.create({
@@ -61,14 +60,17 @@ router.post("/createChat",async(req,res)=>{
             discription
         }
         })
+        console.log(new_room);
         // this "opcode" creates a link b/w chat model and member model
         const chat_opcode=await prisma.message.create({
             data:{
-                memberId,
+                content:`chat_${memberId}`,
                 chatId:new_room.id,
-                content:`chat_${memberId}`
+                memberId:memberId
+                
             }
         })
+        console.log(chat_opcode);
         res.status(201).json({
             msg:"created a new room",
             created_chat:new_room,
@@ -76,6 +78,9 @@ router.post("/createChat",async(req,res)=>{
         })
     }catch(err)
     {
+        console.log(err)
         res.status(400).send("internal server error.")
     }
 })
+
+export default router;

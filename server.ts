@@ -2,7 +2,8 @@ import express from 'express';
 import next from 'next';
 import http from 'http';
 import cors from 'cors';
-import userRouter from './server/routes/user'
+import userRouter from './server/routes/user';
+import chatRouter from './server/routes/room';
 import { WebSocketServer } from 'ws';
 import {ws} from './server/socket/index'
 const port=3000;
@@ -26,7 +27,8 @@ app.prepare().then(()=>{
     }
     app.use(cors(corsOptions));
     app.use(express.json());
-    app.use("/user",userRouter)
+    app.use("/user",userRouter);
+    app.use('/chat',chatRouter);
     app.all("*",(req,res)=>{
         return handle(req,res);
     })
