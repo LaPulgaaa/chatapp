@@ -11,7 +11,7 @@ type CreateRoomSchema={
     memberId:string
 }
 
-router.get("/allRooms",async(req,res)=>{
+router.get("/allChats",async(req,res)=>{
     try{
         const chats=prisma.chat.findMany({});
         res.status(200).json({
@@ -25,7 +25,7 @@ router.get("/allRooms",async(req,res)=>{
     }
 })
 
-router.get("/subscribedRoom/:memberId",async(req,res)=>{
+router.get("/subscribedChats/:memberId",async(req,res)=>{
     const {memberId}=req.params;
     try{
         const message_subscribed_room=prisma.message.findMany({
