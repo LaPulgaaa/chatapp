@@ -8,8 +8,11 @@ import { RoomType, createRoomSchema } from "@/packages/zod";
 import { Form,FormControl,FormDescription,FormField,FormLabel,FormItem,FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
+import { useRecoilValue } from "recoil";
+import { userDetails } from "@/lib/store/atom/userDetails";
 
 export default function CreateRoom(){
+    const member_data=useRecoilValue(userDetails);
     const form=useForm<RoomType>({
         resolver:zodResolver(createRoomSchema),
         defaultValues:{
@@ -17,9 +20,25 @@ export default function CreateRoom(){
             discription:""
         }
     })
-
+    console.log(member_data);
     async function onSubmit(values:RoomType){
-        console.log(values);
+        try{
+            const resp=await fetch("localhost:3000/createChat",{
+                method:"POST",
+                body:JSON.stringify({
+                    name:values.name,
+                    discription:values.discription,
+                    memberId:member_data.uuid
+                })
+            })
+            if(resp.status===400)
+            alert("Error creating chat.")
+            else
+            console.log(resp);
+        }catch(err)
+        {
+            console.log(err);
+        }
     }
     return(
         <Dialog>

@@ -47,9 +47,18 @@ router.post("/createChat",async(req,res)=>{
             discription
         }
         })
+        // this "opcode" creates a link b/w chat model and member model
+        const chat_opcode=await prisma.message.create({
+            data:{
+                memberId,
+                chatId:new_room.id,
+                content:`chat_${memberId}`
+            }
+        })
         res.status(201).json({
             msg:"created a new room",
-            new_room
+            created_chat:new_room,
+            created_opcode:chat_opcode
         })
     }catch(err)
     {

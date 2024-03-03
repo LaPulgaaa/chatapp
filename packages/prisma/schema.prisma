@@ -31,6 +31,8 @@ model Message {
   createdAt DateTime @default(now())
 
   deleted Boolean @default(false)
+
+  @@unique([memberId,chatId])
 }
 
 model Chat {
