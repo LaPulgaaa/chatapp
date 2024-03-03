@@ -3,7 +3,7 @@ import { atom } from "recoil";
 interface UserDetails{
     username?:string,
     password?:string,
-    uuid?:string
+    id?:string
 }
 
 export const userDetails=atom<UserDetails>({
@@ -11,6 +11,6 @@ export const userDetails=atom<UserDetails>({
     default:{
         username:undefined,
         password:undefined,
-        uuid:undefined
+        id:undefined
     }
 })

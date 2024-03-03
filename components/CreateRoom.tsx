@@ -20,25 +20,33 @@ export default function CreateRoom(){
             discription:""
         }
     })
-    console.log(member_data);
+    
     async function onSubmit(values:RoomType){
-        try{
-            const resp=await fetch("localhost:3000/createChat",{
-                method:"POST",
-                body:JSON.stringify({
-                    name:values.name,
-                    discription:values.discription,
-                    memberId:member_data.uuid
-                })
-            })
-            if(resp.status===400)
-            alert("Error creating chat.")
-            else
-            console.log(resp);
-        }catch(err)
+        if(member_data.id)
         {
-            console.log(err);
+            try{
+                const resp=await fetch("http://localhost:3000/chat/createChat",{
+                    method:"POST",
+                    body:JSON.stringify({
+                        name:values.name,
+                        discription:values.discription,
+                        memberId:member_data.id!
+                    }),
+                    headers:{
+                        'Content-Type':"application/json"
+                    }
+                })
+                if(resp.status===400)
+                alert("Error creating chat.")
+                else
+                console.log(resp);
+            }catch(err)
+            {
+                console.log(err);
+            }
         }
+        else
+        console.log("member_id is not defined");
     }
     return(
         <Dialog>
