@@ -16,7 +16,7 @@ const fontSans = FontSans({
 
 
 export const metadata: Metadata = {
-  title: "xulip",
+  title: "chat.city",
   description: "chat like there is no tommorow.",
 };
 
