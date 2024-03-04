@@ -35,3 +35,16 @@ export const createRoomSchema=z.object({
 })
 
 export type RoomType=z.infer<typeof createRoomSchema>;
+
+export const UserChatResponseSchema=z.array(
+    z.object({
+            createdAt:z.string(),
+            deleted:z.boolean(),
+            discription:z.string(),
+            id:z.string(),
+            name:z.string()
+        }),
+    
+)
+
+export type ChatReponse=z.infer<typeof UserChatResponseSchema>;

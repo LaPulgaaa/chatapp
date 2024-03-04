@@ -9,8 +9,8 @@ export default function ChatLayout({children}:{children:React.ReactNode}){
     const token=useRecoilValue(tokenState);
     const router=useRouter();
     
-    if(token===undefined)
-    router.push("/");
+    // if(token===undefined)
+    // router.push("/");
 
     return <section>{children}</section>
 
