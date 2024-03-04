@@ -1,6 +1,6 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
-
+import type { ChatReponse } from '@/packages/zod';
 
 const router=express.Router();
 const prisma=new PrismaClient();
@@ -27,8 +27,10 @@ router.get("/allChats",async(req,res)=>{
 
 router.get("/subscribedChats/:memberId",async(req,res)=>{
     const {memberId}=req.params;
+    
     try{
-        const message_subscribed_room=prisma.message.findMany({
+        let joined_rooms=[];
+        const message_subscribed_room=await prisma.message.findMany({
             where:{
                 content:`chat_${memberId}`
             },
@@ -36,9 +38,13 @@ router.get("/subscribedChats/:memberId",async(req,res)=>{
                 chat:true
             }
         })
+        
+        for(let i=0;i<message_subscribed_room.length;i++){
+            joined_rooms.push(message_subscribed_room[i].chat)
+        }
         res.status(200).json({
             msg:"subscribed room found",
-            data:message_subscribed_room
+            raw_data:joined_rooms
         })
     }catch(err)
     {
