@@ -36,7 +36,7 @@ router.post("/signup",async(req,res)=>{
 
 router.post("/login",async(req,res)=>{
     const {username,password}:UserInfo=req.body;
-
+    console.log(username+""+password);
     try{
         const member=await prisma.member.findFirst({
             where:{
