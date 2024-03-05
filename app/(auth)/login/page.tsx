@@ -25,7 +25,6 @@ export default function login(){
     router.push("/home");
     else
     {
-      
       try{
         const resp=await fetch(`http://localhost:3000/user/login`,{
           method:"POST",
@@ -33,6 +32,9 @@ export default function login(){
             username,
             password
           }),
+          headers:{
+            'Content-Type':"application/json"
+          }
 
         });
         if(resp.status==200)
