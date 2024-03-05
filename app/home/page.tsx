@@ -31,7 +31,7 @@ export default function Home(){
     },[])
 
     const RoomsComponents=rooms?.map((room)=>{
-        return <div key={room.id} className="p-3 bg-white rounded-md text-black m-1 cursor-pointer hover:bg-stone-200">
+        return <div key={room.id} className="p-3 bg-white rounded-md text-black m-1 cursor-pointer hover:bg-stone-200 border-2">
             <div className="flex justify-between">
             <h5 className="border-l-2 text-xl font-semibold scroll-m-20 tracking-light pl-2">{room.name}</h5>
             <p>{room.createdAt.substring(0,room.createdAt.indexOf("T"))}</p>
