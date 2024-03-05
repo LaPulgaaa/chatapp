@@ -47,4 +47,20 @@ export const UserChatResponseSchema=z.array(
     
 )
 
+export const ChatMessagesResponseSchema=z.array(
+    z.object({
+        chatId:z.string(),
+        content:z.string(),
+        createdAt:z.string(),
+        deleted:z.boolean(),
+        id:z.string(),
+        memberId:z.string(),
+        sender:z.object({
+            id:z.string(),
+            password:z.string(),
+            username:z.string()
+        })
+    })
+)
+export type ChatMessageData=z.infer<typeof ChatMessagesResponseSchema>;
 export type ChatReponse=z.infer<typeof UserChatResponseSchema>;
