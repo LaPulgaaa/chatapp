@@ -8,7 +8,9 @@ import { useEffect, useState } from "react";
 import { UserChatResponseSchema } from "@/packages/zod";
 import type { ChatReponse } from "@/packages/zod";
 import { UserStateChats } from "@/lib/store/atom/chats";
+import { useRouter } from "next/navigation";
 export default function Home(){
+    const router=useRouter();
     const profile_info=useRecoilValue(userDetails);
     const [rooms,setRooms]=useRecoilState(UserStateChats)
     const [loader,setLoader]=useState(true);
@@ -31,7 +33,12 @@ export default function Home(){
     },[])
 
     const RoomsComponents=rooms?.map((room)=>{
-        return <div key={room.id} className="p-3 bg-white rounded-md text-black m-1 cursor-pointer hover:bg-stone-200 border-2">
+        return <div key={room.id} 
+        className="p-3 bg-white rounded-md text-black m-1 cursor-pointer hover:bg-stone-200 border-2"
+        onClick={()=>{
+            router.push(`/home/chat/${room.id}`)
+        }}
+        >
             <div className="flex justify-between">
             <h5 className="border-l-2 text-xl font-semibold scroll-m-20 tracking-light pl-2">{room.name}</h5>
             <p>{room.createdAt.substring(0,room.createdAt.indexOf("T"))}</p>
