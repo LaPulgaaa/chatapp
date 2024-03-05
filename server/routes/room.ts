@@ -89,4 +89,31 @@ router.post("/createChat",async(req,res)=>{
     }
 })
 
+router.get("/getMessage/:chatId",async(req,res)=>{
+    const id=req.params.chatId;
+    try{
+        const data=await prisma.chat.findUnique({
+            where:{
+                id
+            },
+            select:{
+                messages:{
+                    include:{
+                        sender:true
+                    }
+                }
+            }
+        });
+        // console.log(data)
+        res.status(200).json({
+            msg:"chats successfully fetched!",
+            raw_data:data
+        })
+
+    }catch(err)
+    {
+        console.log(err);
+        res.status(400).send(err);
+    }
+})
 export default router;
