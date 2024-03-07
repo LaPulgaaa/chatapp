@@ -6,17 +6,14 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useSetRecoilState,useRecoilValue  } from "recoil";
 import { useRouter } from "next/navigation";
-import { tokenState } from "@/lib/store/atom/Token";
 import { userDetails } from "@/lib/store/atom/userDetails";
 
 export default function login(){
     const setUserDetails=useSetRecoilState(userDetails);
-    const setToken=useSetRecoilState(tokenState);
-    const token=useRecoilValue(tokenState);
     const [username,setUsername]=useState("");
     const [password,setPassword]=useState("");
     const router=useRouter();
-
+    const token=window.localStorage.getItem("token");
 
   async function joinRoom(){
     console.log("button clicked")
@@ -42,8 +39,8 @@ export default function login(){
           const {token,member}=await resp.json();
           console.log(member)
           console.log(token)
+          window.localStorage.setItem("token",token);
           setUserDetails(member);
-          setToken(token);
           router.push("/home");
         }
         else if(resp.status==404)
