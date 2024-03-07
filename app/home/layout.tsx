@@ -6,12 +6,11 @@ import { useRecoilValue } from "recoil"
 
 
 export default function ChatLayout({children}:{children:React.ReactNode}){
-    const token=useRecoilValue(tokenState);
+    const token=window.localStorage.getItem("token")
     const router=useRouter();
     
-    // if(token===undefined)
+    // if(token===null)
     // router.push("/");
-
     return <section>{children}</section>
 
 }

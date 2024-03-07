@@ -12,16 +12,13 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { usePathname, useRouter } from 'next/navigation';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { wsState } from '@/lib/store/atom/Socket';
-import { tokenState } from '@/lib/store/atom/Token';
+
 
 
 export default function signup(){
     
     const wsConnection=useRecoilValue(wsState);
     const router=useRouter();
-
-    const setToken=useSetRecoilState(tokenState);
-    const token=useRecoilValue(tokenState);
     const pathname=usePathname();
 
     const form=useForm<Join>({
@@ -45,7 +42,7 @@ export default function signup(){
           const {token}=await resp.json();
           if(token!==undefined)
           {
-            setToken(token);
+            window.localStorage.setItem("token",token);
             alert("User created successfully")
             router.push("/home");
           }
