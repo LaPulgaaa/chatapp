@@ -9,11 +9,18 @@ import { UserChatResponseSchema } from "@/packages/zod";
 import type { ChatReponse } from "@/packages/zod";
 import { UserStateChats } from "@/lib/store/atom/chats";
 import { useRouter } from "next/navigation";
+import { wsState } from "@/lib/store/atom/Socket";
 export default function Home(){
     const router=useRouter();
     const profile_info=useRecoilValue(userDetails);
     const [rooms,setRooms]=useRecoilState(UserStateChats)
     const [loader,setLoader]=useState(true);
+    const setWs=useSetRecoilState(wsState);
+    const ws=useRecoilValue(wsState);
+    console.log(ws);
+    console.log(rooms);
+    
+    console.log("the json web token",localStorage.getItem("token"));
     useEffect(()=>{
         async function get_user_chats(){
             try{
@@ -30,6 +37,16 @@ export default function Home(){
             }
         }
         get_user_chats()
+    },[])
+
+    useEffect(()=>{
+        const ws=new WebSocket("ws://localhost:3000");
+        ws.onopen=function(){
+            console.log("user is online.");
+            setWs(ws);
+        }
+        return ()=>ws.close();
+
     },[])
 
     const RoomsComponents=rooms?.map((room)=>{
