@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 export default function Chat({params}:{params:{slug:string}}){
     const [messages,setMessages]=useState<ChatMessageData>();
-    console.log(messages)
+
     useEffect(()=>{
         async function fetch_messages(){
             try{
