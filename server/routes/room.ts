@@ -27,7 +27,7 @@ router.get("/allChats",async(req,res)=>{
 
 router.get("/subscribedChats/:memberId",async(req,res)=>{
     const {memberId}=req.params;
-    
+    console.log(memberId)
     try{
         let joined_rooms=[];
         const message_subscribed_room=await prisma.message.findMany({
@@ -38,8 +38,10 @@ router.get("/subscribedChats/:memberId",async(req,res)=>{
                 chat:true
             }
         })
-        
+        // 84125d60-ad70-43bc-8607-78359026bb67
+        console.log(message_subscribed_room);
         for(let i=0;i<message_subscribed_room.length;i++){
+            // console.log(message_subscribed_room[i].chat.name);
             joined_rooms.push(message_subscribed_room[i].chat)
         }
         res.status(200).json({
