@@ -27,7 +27,6 @@ export default function Chat({params}:{params:{slug:string}}){
     const [chat,setChat]=useState<RecievedMessage[]>([]);
     const creds=useRecoilValue(userDetails);
     const [ws,setWs]=useRecoilState(wsState);
-    console.log(ws);
     useEffect(()=>{
         async function fetch_messages(){
             try{

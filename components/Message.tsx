@@ -4,7 +4,6 @@ import { userDetails } from "@/lib/store/atom/userDetails";
 import { useRecoilValue } from "recoil"
 export default function Message({data}:{data:RecievedMessage}){
     const {username}=useRecoilValue(userDetails);
-    console.log(username+"--"+data.payload.message.user)
     return <div key={Math.floor(Math.random()*100000)} className={`flex m-4  p-2 rounded-full ${data.payload.message.user===username?'justify-end':data.payload.message.user==='mybot'?' justify-center':''}  `}>
     <Avatar className={`w-[35px] h-[35px] mr-2 border-slate-400 mt-1 p-4 ${data.payload.message.user===username?'hidden':''}`}>
         

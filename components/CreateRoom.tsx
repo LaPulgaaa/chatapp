@@ -44,7 +44,6 @@ export default function CreateRoom(){
                 {
                     const {created_chat}=await resp.json();
                     setRooms([created_chat,...rooms]);
-                    console.log(resp);
                 }
             }catch(err)
             {

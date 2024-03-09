@@ -18,11 +18,9 @@ export default function Home(){
     const setWs=useSetRecoilState(wsState);
     const ws=useRecoilValue(wsState);
     const id=profile_info.id;
-    console.log("the json web token",localStorage.getItem("token"));
     useEffect(()=>{
         async function get_user_chats(){
             try{
-                console.log(id)
                 const resp=await fetch(`http://localhost:3000/chat/subscribedChats/${id}`);
                 //TODO:add zod here before using the returned data
                 const {raw_data}=await resp.json();
@@ -38,7 +36,7 @@ export default function Home(){
         get_user_chats()
     },[id])
 
-
+   
 
     const RoomsComponents=rooms?.map((room)=>{
         return <div key={room.id} 
