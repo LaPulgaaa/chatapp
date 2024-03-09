@@ -17,14 +17,13 @@ export default function Home(){
     const [loader,setLoader]=useState(true);
     const setWs=useSetRecoilState(wsState);
     const ws=useRecoilValue(wsState);
-    console.log(ws);
-    console.log(rooms);
-    
+    const id=profile_info.id;
     console.log("the json web token",localStorage.getItem("token"));
     useEffect(()=>{
         async function get_user_chats(){
             try{
-                const resp=await fetch(`http://localhost:3000/chat/subscribedChats/${profile_info.id}`);
+                console.log(id)
+                const resp=await fetch(`http://localhost:3000/chat/subscribedChats/${id}`);
                 //TODO:add zod here before using the returned data
                 const {raw_data}=await resp.json();
                 const data=UserChatResponseSchema.parse(raw_data);
@@ -37,17 +36,9 @@ export default function Home(){
             }
         }
         get_user_chats()
-    },[])
+    },[id])
 
-    useEffect(()=>{
-        const ws=new WebSocket("ws://localhost:3000");
-        ws.onopen=function(){
-            console.log("user is online.");
-            setWs(ws);
-        }
-        return ()=>ws.close();
 
-    },[])
 
     const RoomsComponents=rooms?.map((room)=>{
         return <div key={room.id} 

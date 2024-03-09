@@ -2,8 +2,11 @@ import express from 'express';
 import { PrismaClient} from '@prisma/client'
 
 import jwt from 'jsonwebtoken'
+import authenticate from '../middleware/authenticate';
+import { createClient } from 'redis';
 const router=express.Router();
-const prisma=new PrismaClient()
+const prisma=new PrismaClient();
+const redis=createClient();
 
 type UserInfo={
     username:string,
@@ -60,6 +63,25 @@ router.post("/login",async(req,res)=>{
     }catch(err){
         res.status(404).send("Could not find user!!")
     }
+})
+
+router.get("/getCreds",authenticate,async(req,res)=>{
+    try{
+        await redis.connect();
+        const creds=await redis.get("user");
+        if(creds!==null)
+        {
+            res.status(201).json({
+            msg:"jwt token valid",
+            data:JSON.parse(creds!)
+            })
+        }
+        else
+        res.status(200).send("user not found");
+    }catch(err){
+        res.status(400).send("internal server error.");
+    }
+    redis.disconnect();
 })
 
 router.delete("/eraseAll",async(req,res)=>{
