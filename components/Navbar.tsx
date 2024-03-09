@@ -13,7 +13,6 @@ export default function Navbar(){
     const {setTheme}=useTheme();
     const router=useRouter();
     const [token,setToken]=useState(window.localStorage.getItem("token"));
-    console.log(token)
     return <div className="p-4 font-bold flex justify-between cursor-pointer">
         <h2 onClick={()=>router.push("/")}>chat.city</h2>
         <div className="flex justify-between">

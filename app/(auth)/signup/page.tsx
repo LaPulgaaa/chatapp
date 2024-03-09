@@ -38,7 +38,6 @@ export default function signup(){
               'Content-Type':"application/json"
             }
           })
-          // console.log(await resp.json());
           const {token}=await resp.json();
           if(token!==undefined)
           {

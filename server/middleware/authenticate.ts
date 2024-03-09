@@ -6,7 +6,6 @@ const redisClient=createClient();
 
 export default function authenticate(req:Request,res:Response,next:NextFunction){
     const authheader=req.headers.authorization;
-    // console.log(authheader)
     
     if(authheader!==undefined){
         const token=authheader.split(" ")[1];

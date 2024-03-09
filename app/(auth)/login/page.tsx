@@ -16,7 +16,6 @@ export default function login(){
     const token=window.localStorage.getItem("token");
 
   async function joinRoom(){
-    console.log("button clicked")
     
     if(token)
     router.push("/home");
@@ -37,8 +36,6 @@ export default function login(){
         if(resp.status==200)
         {
           const {token,member}=await resp.json();
-          console.log(member)
-          console.log(token)
           window.localStorage.setItem("token",token);
           setUserDetails(member);
           router.push("/home");
@@ -49,7 +46,7 @@ export default function login(){
         }
       }catch(err)
       {
-        console.log(err);
+        console.log(err)
       }
     }
   }

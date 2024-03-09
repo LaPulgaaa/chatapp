@@ -29,8 +29,6 @@ export default function Chat(){
     const [message,setMessage]=useState("");
     const [chat,setChat]=useState<RecievedMessage[]>([]);
     const [wsInstance,setWsInstance]=useRecoilState(wsState);
-    
-    // console.log(chat);
     useEffect(()=>{
         
         ws=new WebSocket("ws://localhost:3000");
@@ -56,7 +54,6 @@ export default function Chat(){
     if(wsInstance!==undefined)
     wsInstance.onmessage=function(event){
         const data=JSON.parse(event.data);
-        console.log(data) 
         setChat([...chat,data]);
        }
 
