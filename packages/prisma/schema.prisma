@@ -32,7 +32,6 @@ model Message {
 
   deleted Boolean @default(false)
 
-  @@unique([memberId,chatId])
 }
 
 model Chat {

@@ -1,7 +1,8 @@
 
 import { WebSocketServer } from 'ws';
 import { RedisSubscriptionManager } from './redisClient';
-
+import { PrismaClient } from '@prisma/client';
+const prisma=new PrismaClient();
 
 const users:{
     [wsId:string]:{
@@ -12,12 +13,11 @@ const users:{
 
 let count=0;
 export function ws(wss:WebSocketServer){
-    
- wss.on("connection",(ws,req:Request)=>{
-    const wsId=count++;
+ wss.on("connection", (ws,req:Request)=>{
+        const wsId=count++;
         console.log("connection made")
-
-        ws.on("message",(message:string)=>{
+        
+        ws.on("message",async(message:string)=>{
             const data=JSON.parse(`${message}`);
             console.log(data);
             if(data.type==="join")
@@ -38,6 +38,14 @@ export function ws(wss:WebSocketServer){
                 const roomId=users[wsId].roomId;
                 const message=data.payload.message;
                 RedisSubscriptionManager.get_instance().addChatMessage(roomId,message);
+                const added_msg=await prisma.message.create({
+                    data:{
+                        content:message.content,
+                        chatId:roomId,
+                        memberId:message.id
+                    }
+                })
+                console.log(added_msg)
             }
 
         })
