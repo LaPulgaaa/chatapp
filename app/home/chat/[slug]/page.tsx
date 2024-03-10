@@ -83,7 +83,8 @@ export default function Chat({params}:{params:{slug:string}}){
                 roomId:params.slug,
                 message:{
                     content:compose,
-                    user:creds.username
+                    user:creds.username,
+                    id:creds.id
                 }
             }
         }
