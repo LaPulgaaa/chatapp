@@ -11,6 +11,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useRecoilState, useRecoilValue} from "recoil";
 import { wsState } from "@/lib/store/atom/Socket";
 import { userDetails } from "@/lib/store/atom/userDetails";
+import { useRouter } from "next/navigation";
 export type RecievedMessage={
     type:string,
     payload:{
@@ -27,6 +28,7 @@ export default function Chat({params}:{params:{slug:string}}){
     const [chat,setChat]=useState<RecievedMessage[]>([]);
     const creds=useRecoilValue(userDetails);
     const [ws,setWs]=useRecoilState(wsState);
+    const router=useRouter();
     useEffect(()=>{
         async function fetch_messages(){
             try{
@@ -101,7 +103,10 @@ export default function Chat({params}:{params:{slug:string}}){
         return <Inbox data={message}/>
     })
 
-    return <div className="h-svh pb-24 ">
+    return <div className="h-svh pb-32 ">
+            <Button className="ml-4"
+            onClick={()=>router.push("/home")}
+            >Back  </Button>
             <ScrollArea id="chatbox" className="m-4 h-full flex flex-col pb-8  rounded-md border">
                 {InboxComponent}
                 {RealtimeChats}
