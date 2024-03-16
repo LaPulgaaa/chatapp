@@ -12,6 +12,7 @@ import { useRecoilState, useRecoilValue} from "recoil";
 import { wsState } from "@/lib/store/atom/Socket";
 import { userDetails } from "@/lib/store/atom/userDetails";
 import { useRouter } from "next/navigation";
+import { ChevronLeftIcon } from "lucide-react";
 export type RecievedMessage={
     type:string,
     payload:{
@@ -104,9 +105,9 @@ export default function Chat({params}:{params:{slug:string}}){
     })
 
     return <div className="h-svh pb-32 ">
-            <Button className="ml-4"
+            <Button variant={`outline`} size={`icon`} className="ml-4"
             onClick={()=>router.push("/home")}
-            >Back  </Button>
+            ><ChevronLeftIcon/></Button>
             <ScrollArea id="chatbox" className="m-4 h-full flex flex-col pb-8  rounded-md border">
                 {InboxComponent}
                 {RealtimeChats}
