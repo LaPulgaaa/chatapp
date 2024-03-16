@@ -41,14 +41,14 @@ export default function Home(){
 
     const RoomsComponents=rooms?.map((room)=>{
         return <div key={room.id} 
-        className="p-3 bg-white rounded-md text-black m-1 cursor-pointer hover:bg-stone-200 border-2"
+        className="p-3 dark:bg-white rounded-md dark:text-black m-1 cursor-pointer hover:bg-stone-300 border-2 ease-out duration-300 transition-all"
         onClick={()=>{
             router.push(`/home/chat/${room.id}`)
         }}
         >
             <div className="flex justify-between">
             <h5 className="border-l-2 text-xl font-semibold scroll-m-20 tracking-light pl-2">{room.name}</h5>
-            <p>{room.createdAt.substring(0,room.createdAt.indexOf("T"))}</p>
+            <p className="hidden md:block">{room.createdAt.substring(0,room.createdAt.indexOf("T"))}</p>
             </div>
             
             <p className="border-l-2 pl-6 italic">{room.discription}</p>
@@ -57,10 +57,10 @@ export default function Home(){
     if(loader===true){
         <div className="flex text-center ">Loading...</div>
     }
-    return <div className="ml-8 my-4 grid grid-cols-5 divide-x-2 h-full pb-24 m-2">
+    return <div className="ml-8 my-4 grid md:grid-cols-5  h-full pb-24 m-2">
             <Sidebar/>
-        <div className="col-span-4 mr-4 ml-2">
-            <div className="flex justify-between">
+        <div className="md:col-span-4 mr-4 ml-2 pt-2">
+            <div className="grid grid-cols md:flex w-inherit justify-between">
             <h4 className="scroll-m-20 p-2 text-2xl font-semibold tracking-tigh">
                 Catch up on missed chats!
             </h4>
