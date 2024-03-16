@@ -57,7 +57,7 @@ export default function CreateRoom(){
     return(
         <Dialog>
             <DialogTrigger asChild>
-                <Button >+ New</Button>
+                <Button className="w-[150px]">+ New</Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px] p-6">
                 <DialogHeader>
