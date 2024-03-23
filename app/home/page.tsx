@@ -1,7 +1,6 @@
 "use client"
 import { Button } from "@/components/ui/button";
 import CreateRoom from "@/components/CreateRoom";
-import { Dialog,DialogTrigger } from "@/components/ui/dialog";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { userDetails } from "@/lib/store/atom/userDetails";
 import { useEffect, useState } from "react";
