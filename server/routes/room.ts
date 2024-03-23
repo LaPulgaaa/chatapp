@@ -105,15 +105,60 @@ router.get("/getMessage/:chatId",async(req,res)=>{
                 }
             }
         });
-        res.status(200).json({
-            msg:"chats successfully fetched!",
+        if(data!==null)
+        {
+            res.status(200).json({
+            msg:"successfull",
             raw_data:data
-        })
-
+            })
+        }
+        else
+        {
+            res.status(200).json({
+                msg:"not_successfull"
+            })
+        }
     }catch(err)
     {
         console.log(err);
         res.status(400).send(err);
     }
 })
+
+router.post("/joinChat",async(req,res)=>{
+    const {roomId,memberId}=req.body;
+    try{
+        const room=await prisma.chat.findUnique({
+            where:{
+                id:roomId
+            }
+        })
+        if(room!=null)
+        {
+            const room_opcode=await prisma.message.create({
+                data:{
+                    content:`chat_${memberId}`,
+                    memberId,
+                    chatId:room.id
+                }
+            })
+            res.status(201).json({
+                msg:"Joined new room",
+                raw_data:room,
+                raw_opcode:room_opcode
+            })
+        }
+        else{
+            res.status(200).json({
+                msg:"Room not found"
+            })
+        }
+    }catch(err)
+    {
+        res.status(500).json({
+            msg:err
+        })
+    }
+})
+
 export default router;
