@@ -12,7 +12,8 @@ import { useRecoilState, useRecoilValue} from "recoil";
 import { wsState } from "@/lib/store/atom/Socket";
 import { userDetails } from "@/lib/store/atom/userDetails";
 import { useRouter } from "next/navigation";
-import { ChevronLeftIcon } from "lucide-react";
+import { ChevronLeftIcon, ListEndIcon,} from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 export type RecievedMessage={
     type:string,
     payload:{
@@ -22,6 +23,20 @@ export type RecievedMessage={
             user:string
         }
     }
+}
+
+function get_opcode_id(id?:string,messages?:ChatMessageData):string | undefined{
+    if(id===undefined || messages===undefined)
+    return undefined;
+    const target_opcode=`chat_${id}`;
+    const data=messages.messages;
+    for(let i=0;i<data.length;i++)
+    {
+        if(data[i].content===target_opcode){
+            return data[i].id;
+        }
+    }
+    return undefined;
 }
 export default function Chat({params}:{params:{slug:string}}){
     const [messages,setMessages]=useState<ChatMessageData>();
@@ -95,6 +110,33 @@ export default function Chat({params}:{params:{slug:string}}){
         ws!.send(JSON.stringify(data));
     }
 
+    async function leaveRoom(){
+        const opcode_id=get_opcode_id(creds.id,messages);
+        if(opcode_id===undefined)
+        return;
+
+        try{
+            const resp=await fetch(`http://localhost:3000/chat/leaveChat`,{
+                method:'DELETE',
+                body:JSON.stringify({
+                    memberId:creds.id,
+                    chatId:params.slug,
+                    id:opcode_id
+                }),
+                headers:{
+                    'Content-Type':"application/json"
+                }
+            })
+            if(resp.status===204)
+            {
+                router.push("/home");
+            }
+        }catch(err){
+            console.log(err)
+            alert("could not leave room!")
+        }
+    }
+
     if(messages===undefined)
     {
         return <div>Loading....</div>
@@ -105,9 +147,29 @@ export default function Chat({params}:{params:{slug:string}}){
     })
 
     return <div className="h-svh pb-32 ">
-            <Button variant={`outline`} size={`icon`} className="ml-4"
-            onClick={()=>router.push("/home")}
-            ><ChevronLeftIcon/></Button>
+            <div className="flex justify-between">
+                <Button variant={`outline`} size={`icon`} className="ml-4"
+                    onClick={()=>router.push("/home")}
+                    ><ChevronLeftIcon/>
+                </Button>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button size={`icon`} variant={`outline`} className="mr-4">
+                            <ListEndIcon/>
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={leaveRoom} className="cursor-pointer">
+                            Leave Room
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                           Delete Chat
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+                
+            </div>
+            
             <ScrollArea id="chatbox" className="m-4 h-full flex flex-col pb-8  rounded-md border">
                 {InboxComponent}
                 {RealtimeChats}
