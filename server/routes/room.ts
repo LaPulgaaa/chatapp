@@ -27,7 +27,6 @@ router.get("/allChats",async(req,res)=>{
 
 router.get("/subscribedChats/:memberId",async(req,res)=>{
     const {memberId}=req.params;
-    console.log(memberId)
     try{
         let joined_rooms=[];
         const message_subscribed_room=await prisma.message.findMany({
@@ -38,8 +37,6 @@ router.get("/subscribedChats/:memberId",async(req,res)=>{
                 chat:true
             }
         })
-        // 84125d60-ad70-43bc-8607-78359026bb67
-        console.log(message_subscribed_room);
         for(let i=0;i<message_subscribed_room.length;i++){
             joined_rooms.push(message_subscribed_room[i].chat)
         }
@@ -67,7 +64,6 @@ router.post("/createChat",async(req,res)=>{
             discription
         }
         })
-        console.log(new_room);
         // this "opcode" creates a link b/w chat model and member model
         const chat_opcode=await prisma.message.create({
             data:{
@@ -77,7 +73,6 @@ router.post("/createChat",async(req,res)=>{
                 
             }
         })
-        console.log(chat_opcode);
         res.status(201).json({
             msg:"created a new room",
             created_chat:new_room,
@@ -155,6 +150,33 @@ router.post("/joinChat",async(req,res)=>{
         }
     }catch(err)
     {
+        res.status(500).json({
+            msg:err
+        })
+    }
+})
+
+router.delete("/leaveChat",async(req,res)=>{
+    const {id}=req.body;
+    try{
+        const room=await prisma.message.delete({
+            where:{
+                id
+            }
+        })
+        if(room){
+            res.status(204).json({
+                msg:'User left the room',
+                raw_data:room
+            })
+        }
+        else
+        {
+            res.status(200).json({
+                msg:"could not delete room"
+            })
+        }
+    }catch(err){
         res.status(500).json({
             msg:err
         })
