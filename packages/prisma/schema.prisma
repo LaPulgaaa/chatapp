@@ -16,6 +16,19 @@ model Member{
   password String
 
   messages Message[]
+
+  directory Directory[]
+}
+
+model Directory{
+  id Int @id @default(autoincrement())
+  
+  chat_id String
+  after DateTime @default(now())
+
+  userId String
+  user Member @relation(fields: [userId],references: [id])
+
 }
 
 model Message {
