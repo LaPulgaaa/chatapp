@@ -57,7 +57,6 @@ export class RedisSubscriptionManager{
                 try{
                     Object.values(this.reverseSubscription.get(roomId)||{}).forEach(({ws})=>{
                         ws.send(payload);
-                        console.log("send message")
                     })
                 }catch(err)
                 {

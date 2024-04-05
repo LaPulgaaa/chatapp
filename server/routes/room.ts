@@ -31,7 +31,8 @@ router.get("/subscribedChats/:memberId",async(req,res)=>{
         let joined_rooms=[];
         const message_subscribed_room=await prisma.message.findMany({
             where:{
-                content:`chat_${memberId}`
+                content:`chat_${memberId}`,
+                deleted:false
             },
             include:{
                 chat:true
@@ -134,7 +135,7 @@ router.post("/joinChat",async(req,res)=>{
                 data:{
                     content:`chat_${memberId}`,
                     memberId,
-                    chatId:room.id
+                    chatId:room.id,
                 }
             })
             res.status(201).json({
@@ -159,9 +160,12 @@ router.post("/joinChat",async(req,res)=>{
 router.delete("/leaveChat",async(req,res)=>{
     const {id}=req.body;
     try{
-        const room=await prisma.message.delete({
+        const room=await prisma.message.update({
             where:{
                 id
+            },
+            data:{
+                deleted:true
             }
         })
         if(room){
