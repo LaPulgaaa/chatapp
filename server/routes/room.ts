@@ -88,15 +88,32 @@ router.post("/createChat",async(req,res)=>{
     }
 })
 
-router.get("/getMessage/:chatId",async(req,res)=>{
-    const id=req.params.chatId;
+router.post("/getMessage",async(req,res)=>{
+    const creds:{chat_id:string,user_id:string}=req.body;
     try{
+        const date=await prisma.directory.findFirst({
+            where:{
+                AND:[
+                    {userId:creds.user_id},
+                    {chat_id:creds.chat_id}
+                ]
+            },
+            select:{
+                after:true
+            }
+        })
         const data=await prisma.chat.findUnique({
             where:{
-                id
+                id:creds.chat_id
             },
             select:{
                 messages:{
+                    where:{
+                        createdAt:{
+                            // new Date is to address backward compatability.
+                            gt:date?.after ?? new Date('2002-01-28') 
+                        }
+                    },
                     include:{
                         sender:true
                     }

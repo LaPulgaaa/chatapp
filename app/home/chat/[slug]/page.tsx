@@ -48,7 +48,16 @@ export default function Chat({params}:{params:{slug:string}}){
     useEffect(()=>{
         async function fetch_messages(){
             try{
-                const resp=await fetch(`http://localhost:3000/chat/getMessage/${params.slug}`);
+                const resp=await fetch(`http://localhost:3000/chat/getMessage`,{
+                    method:'POST',
+                    body:JSON.stringify({
+                        chat_id:params.slug,
+                        user_id:creds.id
+                    }),
+                    headers:{
+                        'Content-Type':"application/json"
+                    }
+                });
                 const {raw_data}=await resp.json();
                 const data=ChatMessagesResponseSchema.parse(raw_data);
                 // Parse this data using zod.
@@ -58,7 +67,8 @@ export default function Chat({params}:{params:{slug:string}}){
             }catch(err)
             {
                 alert(err);
-                console.log(err)
+                console.log(err);
+                router.back();
             }
         }
         fetch_messages();
