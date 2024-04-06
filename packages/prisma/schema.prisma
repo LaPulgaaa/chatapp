@@ -29,6 +29,7 @@ model Directory{
   userId String
   user Member @relation(fields: [userId],references: [id])
 
+  @@unique([chat_id,userId])
 }
 
 model Message {
