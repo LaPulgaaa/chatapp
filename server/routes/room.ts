@@ -66,7 +66,13 @@ router.post("/createChat",async(req,res)=>{
                     discription,
                 }
             });
-            
+            await tx.directory.create({
+                data:{
+                    chat_id:new_room.id,
+                    userId:memberId,
+                    after:new_room.createdAt
+                }
+            })
             const chat_opcode=await tx.message.create({
                 data:{
                     content:`chat_${memberId}`,
