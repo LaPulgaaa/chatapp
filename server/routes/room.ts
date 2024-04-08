@@ -97,15 +97,16 @@ router.post("/createChat",async(req,res)=>{
 router.post("/getMessage",async(req,res)=>{
     const creds:{chat_id:string,user_id:string}=req.body;
     try{
-        const date=await prisma.directory.findFirst({
+        const directory=await prisma.directory.findFirst({
             where:{
                 AND:[
                     {userId:creds.user_id},
-                    {chat_id:creds.chat_id}
+                    {chat_id:creds.chat_id},
                 ]
             },
             select:{
-                after:true
+                after:true,
+                id:true
             }
         })
         const data=await prisma.chat.findUnique({
@@ -117,7 +118,7 @@ router.post("/getMessage",async(req,res)=>{
                     where:{
                         createdAt:{
                             // new Date is to address backward compatability.
-                            gt:date?.after ?? new Date('2002-01-28') 
+                            gte:directory?.after ?? new Date('2002-01-28') 
                         }
                     },
                     include:{
@@ -130,7 +131,8 @@ router.post("/getMessage",async(req,res)=>{
         {
             res.status(200).json({
             msg:"successfull",
-            raw_data:data
+            raw_data:data,
+            directory_id:directory?.id
             })
         }
         else
@@ -163,10 +165,19 @@ router.post("/joinChat",async(req,res)=>{
                     chatId:room.id,
                 }
             })
+            const directory=await prisma.directory.create({
+                data:{
+                    userId:memberId,
+                    chat_id:roomId,
+                    after:new Date()
+                }
+            })
+
             res.status(201).json({
                 msg:"Joined new room",
                 raw_data:room,
-                raw_opcode:room_opcode
+                raw_opcode:room_opcode,
+                directory_id:directory.id
             })
         }
         else{
@@ -212,4 +223,28 @@ router.delete("/leaveChat",async(req,res)=>{
     }
 })
 
+router.patch("/updateFrom",async(req,res)=>{
+    const {date,user_id,chat_id,did}:{date:Date,user_id:string,chat_id:string,did:number}=req.body;
+
+    try{
+        const updated_directory=await prisma.directory.update({
+            where:{
+                AND:[{userId:user_id},{chat_id:chat_id}],
+                id:did
+            },
+            data:{
+                after:date
+            }
+            
+        })
+        res.status(200).json({
+            msg:"timeline updated successfully",
+            data:updated_directory
+        })
+    }catch(err)
+    {
+        console.log(err);
+        res.send("internal server error!")
+    }
+})
 export default router;

@@ -31,7 +31,6 @@ export default function JoinRoomDialog(){
             {
                 console.log("room found");
                 const room_info=raw_resp.raw_data;
-                console.log(raw_resp.raw_opcode);
                 setRoom([room_info,...room]);
                 router.push(`/home/chat/${room_info.id}`)
             }

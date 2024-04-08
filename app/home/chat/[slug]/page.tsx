@@ -44,6 +44,7 @@ export default function Chat({params}:{params:{slug:string}}){
     const [chat,setChat]=useState<RecievedMessage[]>([]);
     const creds=useRecoilValue(userDetails);
     const [ws,setWs]=useRecoilState(wsState);
+    const [did,setDid]=useState<number>();
     const router=useRouter();
     useEffect(()=>{
         async function fetch_messages(){
@@ -58,7 +59,9 @@ export default function Chat({params}:{params:{slug:string}}){
                         'Content-Type':"application/json"
                     }
                 });
-                const {raw_data}=await resp.json();
+                const {raw_data,directory_id}=await resp.json();
+                setDid(directory_id);
+
                 const data=ChatMessagesResponseSchema.parse(raw_data);
                 // Parse this data using zod.
                 setMessages(data);
@@ -119,7 +122,34 @@ export default function Chat({params}:{params:{slug:string}}){
         setCompose("")
         ws!.send(JSON.stringify(data));
     }
+    async function deleteChat(){
+        if(did===undefined)
+        {
+            alert("This chat does not support this feature.")
+            return;
+        }
+        else{
+            const resp=await fetch('http://localhost:3000/chat/updateFrom',{
+                method:'PATCH',
+                body:JSON.stringify({
+                    date:new Date(),
+                    did:did,
+                    user_id:creds.id,
+                    chat_id:params.slug
+                }),
+                headers:{
+                    'Content-Type':"application/json"
+                }
+            })
+            if(resp.status===200)
+            {
+                setChat([]);
+                setMessages({messages:[]})
+                alert("Chat cleaned!")
+            }
+        }
 
+    }
     async function leaveRoom(){
         const opcode_id=get_opcode_id(creds.id,messages);
         if(opcode_id===undefined)
@@ -172,7 +202,7 @@ export default function Chat({params}:{params:{slug:string}}){
                         <DropdownMenuItem onClick={leaveRoom} className="cursor-pointer">
                             Leave Room
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={deleteChat} className="cursor-pointer">
                            Delete Chat
                         </DropdownMenuItem>
                     </DropdownMenuContent>
