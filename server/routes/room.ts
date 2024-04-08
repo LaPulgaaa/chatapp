@@ -117,8 +117,7 @@ router.post("/getMessage",async(req,res)=>{
                 messages:{
                     where:{
                         createdAt:{
-                            // new Date is to address backward compatability.
-                            gte:directory?.after ?? new Date('2002-01-28') 
+                            gte:directory?.after
                         }
                     },
                     include:{
