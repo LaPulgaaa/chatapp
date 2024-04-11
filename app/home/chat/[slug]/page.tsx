@@ -186,7 +186,7 @@ export default function Chat({params}:{params:{slug:string}}){
         return <Inbox data={message}/>
     })
 
-    return <div className="h-svh pb-32 ">
+    return <div className="h-svh pb-24 mt-4">
             <div className="flex justify-between">
                 <Button variant={`outline`} size={`icon`} className="ml-4"
                     onClick={()=>router.push("/home")}

@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useSetRecoilState,useRecoilValue  } from "recoil";
 import { useRouter } from "next/navigation";
 import { userDetails } from "@/lib/store/atom/userDetails";
+import Navbar from "@/components/Navbar";
 
 export default function login(){
     const setUserDetails=useSetRecoilState(userDetails);
@@ -52,7 +53,9 @@ export default function login(){
   }
 
 
-    return  <div className='m-18 flex  flex-col items-center'>
+    return  <div>
+      <Navbar/>
+      <div className='m-18 flex  flex-col items-center'>
       <h2 className="scroll-m-20 border-b pb-2 m-6 text-3xl font-semibold tracking-tight first:mt-0 ">
         Welcome Back !
       </h2>
@@ -88,4 +91,5 @@ export default function login(){
     </Card>
     <Button variant={"link"} onClick={()=>router.push("/signup")}>Don't have an account ?</Button>
   </div>
+    </div>
 }

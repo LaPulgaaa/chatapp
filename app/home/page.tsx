@@ -10,6 +10,7 @@ import { UserStateChats } from "@/lib/store/atom/chats";
 import { useRouter } from "next/navigation";
 import { wsState } from "@/lib/store/atom/Socket";
 import Sidebar from "@/components/Sidebar";
+import Navbar from "@/components/Navbar";
 export default function Home(){
     const router=useRouter();
     const profile_info=useRecoilValue(userDetails);
@@ -56,16 +57,19 @@ export default function Home(){
     if(loader===true){
         <div className="flex text-center ">Loading...</div>
     }
-    return <div className="ml-8 my-4 grid md:grid-cols-5  h-full pb-24 m-2">
-            <Sidebar/>
-        <div className="md:col-span-4 mr-4 ml-2 pt-2">
-            <div className="grid grid-cols md:flex w-inherit justify-between">
-            <h4 className="scroll-m-20 p-2 text-2xl font-semibold tracking-tigh">
-                Catch up on missed chats!
-            </h4>
-            <CreateRoom/>
+    return <div>
+        <Navbar/>
+        <div className="ml-8 my-4 grid md:grid-cols-5  h-full pb-24 m-2">
+                <Sidebar/>
+                <div className="md:col-span-4 mr-4 ml-2 pt-2">
+                    <div className="grid grid-cols md:flex w-inherit justify-between">
+                    <h4 className="scroll-m-20 p-2 text-2xl font-semibold tracking-tigh">
+                        Catch up on missed chats!
+                    </h4>
+                    <CreateRoom/>
+                    </div>
+                    {RoomsComponents}
+                </div>
             </div>
-            {RoomsComponents}
-        </div>
     </div>
 }

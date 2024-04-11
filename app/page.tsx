@@ -1,5 +1,6 @@
 "use client"
 
+import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { ArrowRightCircleIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -7,7 +8,9 @@ export default function Home() {
   const router=useRouter()
   
   return (
-    <div className="grid justify-items-center m-48">
+    <div>
+      <Navbar/>
+      <div className="grid justify-items-center m-48">
       <h1 className="italic scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-7xl">
         Chiller's Chat
       </h1>
@@ -28,5 +31,7 @@ export default function Home() {
       </Button>
       </div>
     </div>
+    </div>
+    
   );
 }

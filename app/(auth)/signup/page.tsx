@@ -12,6 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { usePathname, useRouter } from 'next/navigation';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { wsState } from '@/lib/store/atom/Socket';
+import Navbar from '@/components/Navbar';
 
 
 
@@ -54,7 +55,9 @@ export default function signup(){
     
 
     
-    return <div className="flex flex-col items-center p-6">
+    return <div>
+      <Navbar/>
+      <div className="flex flex-col items-center p-6">
     {/* register form */}
     <h2 className='scroll-m-20 border-b pb-2 m-6 text-3xl font-semibold tracking-tight first:mt-0 '>
       Welcome to chat.city !
@@ -106,4 +109,5 @@ export default function signup(){
         Already have an account?
       </Button>
   </div>
+    </div>
 }
