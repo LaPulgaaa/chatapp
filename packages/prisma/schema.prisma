@@ -18,6 +18,8 @@ model Member{
   messages Message[]
 
   directory Directory[]
+
+  deleted Boolean @default(false)
 }
 
 model Directory{

@@ -44,7 +44,8 @@ router.post("/login",async(req,res)=>{
         const member=await prisma.member.findFirst({
             where:{
                 username,
-                password
+                password,
+                deleted:false
             }
         })
 
