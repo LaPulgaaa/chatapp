@@ -13,6 +13,7 @@ import { wsState } from "@/lib/store/atom/Socket";
 import { userDetails } from "@/lib/store/atom/userDetails";
 import { useRouter } from "next/navigation";
 import { ChevronLeftIcon, ListEndIcon,} from "lucide-react";
+import { DarkLight } from "@/components/DarkLight";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 export type RecievedMessage={
     type:string,
@@ -192,6 +193,7 @@ export default function Chat({params}:{params:{slug:string}}){
                     onClick={()=>router.push("/home")}
                     ><ChevronLeftIcon/>
                 </Button>
+                <div className="flex mr-2">
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button size={`icon`} variant={`outline`} className="mr-4">
@@ -207,7 +209,9 @@ export default function Chat({params}:{params:{slug:string}}){
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
-                
+                <DarkLight/>
+                </div>
+                               
             </div>
             
             <ScrollArea id="chatbox" className="m-4 h-full flex flex-col pb-8  rounded-md border">
