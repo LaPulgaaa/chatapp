@@ -15,6 +15,11 @@ model Member{
   username String
   password String
 
+  about String?
+  status String?
+  favorite String[]
+  avatarurl String?
+
   messages Message[]
 
   directory Directory[]
