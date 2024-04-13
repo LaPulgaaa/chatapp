@@ -68,3 +68,14 @@ export type ChatMessageData=z.infer<typeof ChatMessagesResponseSchema>;
 export type UnitMessage=z.infer<typeof UnitMessageSchema>;
 
 export type ChatReponse=z.infer<typeof UserChatResponseSchema>;
+
+export const member_profile_schema=z.object({
+    username:z.string(),
+    password:z.string(),
+    about:z.string().optional(),
+    favorite:z.array(z.string()),
+    status:z.string(),
+    avatarurl:z.string().optional(),
+})
+
+export type MemberProfile=z.infer<typeof member_profile_schema>;
