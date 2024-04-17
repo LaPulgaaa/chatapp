@@ -1,6 +1,7 @@
+import {z} from 'zod';
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
-import type { ChatReponse } from '@/packages/zod';
+
 
 const router=express.Router();
 const prisma=new PrismaClient();

@@ -1,9 +1,12 @@
+import {z} from 'zod';
 import express from 'express';
 import { PrismaClient} from '@prisma/client'
-
 import jwt from 'jsonwebtoken'
-import authenticate from '../middleware/authenticate';
 import { createClient } from 'redis';
+
+import authenticate from '../middleware/authenticate';
+import { member_profile_schema } from '../../packages/zod';
+
 const router=express.Router();
 const prisma=new PrismaClient();
 const redis=createClient();
@@ -70,6 +73,7 @@ router.get("/getCreds",authenticate,async(req,res)=>{
     try{
         await redis.connect();
         const creds=await redis.get("user");
+        redis.disconnect();
         if(creds!==null)
         {
             res.status(201).json({
@@ -82,7 +86,7 @@ router.get("/getCreds",authenticate,async(req,res)=>{
     }catch(err){
         res.status(400).send("internal server error.");
     }
-    redis.disconnect();
+  
 })
 
 router.delete("/eraseAll",async(req,res)=>{
@@ -100,5 +104,48 @@ router.delete("/eraseAll",async(req,res)=>{
         console.log(err)
         res.status(400).send("error deleting members!")
     }
+})
+
+router.patch("/editProfile",async(req,res)=>{
+    console.log("inside here!")
+    const result=(z.intersection(
+        z.object({
+            id:z.string()
+        }),
+        member_profile_schema.omit({username:true,password:true})
+    )).safeParse(req.body);
+    
+    if(!result.success){
+        return res.status(400).json({
+            msg:"could not update field",
+            data:result.error
+        })
+    }
+
+    try{
+        const profile_fields=result.data;
+        const updated_profile=await prisma.member.update({
+            where:{
+                id:profile_fields.id,
+            },
+            data:{
+                about:profile_fields.about,
+                status:profile_fields.status,
+                favorite:profile_fields.favorite,
+                avatarurl:profile_fields.avatarurl
+            }
+        })
+        
+        res.status(200).json({
+            msg:"updated succesfully!",
+            data:updated_profile
+        })
+    }catch(err){
+        return res.status(500).json({
+            msg:"unexpected server error",
+            data:err
+        })
+    }
+
 })
 export default router;

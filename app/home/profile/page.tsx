@@ -4,7 +4,7 @@ import { useForm} from 'react-hook-form';
 import { member_profile_schema,MemberProfile } from '@/packages/zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { userDetails } from '@/lib/store/atom/userDetails';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { Avatar,AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Form,FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -12,9 +12,9 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { KeyboardEvent, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
-import { z,isDirty } from 'zod';
+import { z} from 'zod';
 export default function Profile(){
-    const user_details=useRecoilValue(userDetails);
+    const [user_details,setUser_details]=useRecoilState(userDetails);
     const form=useForm<Omit<MemberProfile,"favorite"> & {favorite:string}>({
         resolver:zodResolver(z.intersection(member_profile_schema.omit({favorite:true}),z.object({
             favorite:z.string()
@@ -30,15 +30,39 @@ export default function Profile(){
     })
     const {formState:{isDirty,isSubmitting}}=form;
     const disable=isSubmitting || !isDirty;
-    const [favorites,setFavorites]=useState(["football"]);
+    const [favorites,setFavorites]=useState(["user"]);
     
-    
-    function settings_change(){
+    console.log(user_details);
+    async function settings_change(values:Omit<MemberProfile,"favorite">&{favorite:string}){
+        // setUser_details({...values,favorite:favorites});
 
+        try{
+            const resp=await fetch(`http://localhost:3000/user/editProfile`,{
+                method:"PATCH",
+                body:JSON.stringify({
+                    id:user_details.id,
+                    about:values.about,
+                    favorite:favorites,
+                    status:values.status,
+                    avatarurl:values.avatarurl
+                }),
+                headers:{
+                    'Content-Type':"application/json"
+                }
+            })
+            if(resp.status===200)
+            {
+                const data=await resp.json();
+                console.log(data.data)
+                alert("Profile Updated Successfully!");
+            }
+        }catch(err){
+            console.log(err);
+        }
     }
 
     function handleAdd(e:KeyboardEvent){
-        if(e.key==="Enter"){
+        if(e.key===" "){
             console.log("Added one more itemz");
             console.log(form.getValues("favorite"))
             setFavorites([...favorites,form.getValues("favorite")]);
@@ -48,10 +72,11 @@ export default function Profile(){
 
     const favs_comps=favorites.map((item)=>{
         return(
-            <Badge className='mx-1'>{item}</Badge>
+            <Badge key={item.substring(0,2)} className='mx-1'>{item}</Badge>
         )
     })
-    const collection=<div className='flex mr-2'>{favs_comps}</div>
+    const collection=<div className='flex mr-2'>{favs_comps}</div>;
+
     return (
         <div className="m-8  mx-24">
             <div className='p-4 border-2 rounded-sm sticky my-2'>
@@ -67,7 +92,15 @@ export default function Profile(){
                         <AvatarFallback>{user_details.username?.substring(0,2)}</AvatarFallback>
                     </Avatar>
                     <div className=' ml-4'>
-                        <p className='leading-7 [&:not(:first-child)]:mt-6'>Profile Picture</p>
+                        <div className='flex mr-2 mb-4'>
+                            {
+                                (user_details.favorite ?? ["user"]).map((item)=>{
+                                    return(
+                                        <Badge key={item.substring(0,2)} className='mx-1'>{item}</Badge>
+                                    )
+                                })
+                            }
+                        </div>
                         <Button disabled={true} className=''>Upload Avatar</Button>
                     </div>
                 </div>
@@ -80,7 +113,7 @@ export default function Profile(){
                             <FormItem>
                                 <FormLabel>Username</FormLabel>
                                 <FormControl>
-                                    <Input type='text' placeholder='username' {...field}/>
+                                    <Input disabled={true} type='text' placeholder='username' {...field}/>
                                 </FormControl>
                                 <FormMessage/>
                             </FormItem>
