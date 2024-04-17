@@ -36,7 +36,11 @@ function InitUser(){
                 setUserDetails({
                     username:data.username,
                     password:data.password,
-                    id:data.id
+                    id:data.id,
+                    favorite:data.favorite,
+                    status:data.status,
+                    avatarurl:data.avatarurl,
+                    about:data.about
                 })
                 console.log(data);
             }
