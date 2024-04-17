@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "ts-node server.ts --port 3000 & next dev --port 3001",
+    "dev": "ts-node server.ts --port 3000",
     "build": "next build",
     "start": "NODE_ENV=production ts-node server.ts",
     "lint": "next lint",
