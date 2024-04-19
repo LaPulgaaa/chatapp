@@ -13,7 +13,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { KeyboardEvent, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { z} from 'zod';
+
+import { useRouter } from 'next/navigation';
 export default function Profile(){
+    const router=useRouter();
     const [user_details,setUser_details]=useRecoilState(userDetails);
     const form=useForm<Omit<MemberProfile,"favorite"> & {favorite:string}>({
         resolver:zodResolver(z.intersection(member_profile_schema.omit({favorite:true}),z.object({
@@ -60,7 +63,25 @@ export default function Profile(){
             console.log(err);
         }
     }
-
+    async function delete_account(){
+        try{
+            const resp=await fetch(`http://localhost:3000/user/deleteAccount/${user_details.id}`,{
+                method:'PATCH',
+                headers:{
+                    'Content-Type':"application/json"
+                }
+            });
+            const data=await resp.json();
+            if(resp.status==200){
+                setUser_details({});
+                router.push("/");
+                window.localStorage.clear();
+            }
+        }catch(err){
+            console.log(err);
+            alert("Could not delete account. Retry after some time.")
+        }
+    }
     function handleAdd(e:KeyboardEvent){
         if(e.key===" "){
             console.log("Added one more itemz");
@@ -194,6 +215,25 @@ export default function Profile(){
                         </div>
                     </form>
                 </Form>
+            </div>
+            <div className='p-4 rounded-sm border-2 my-2'>
+                <div className='border-b mb-2'>
+                    <h4 className='text-red-700 scroll-m-20 text-xl font-semibold tracking-tight first:mt-0'>
+                        Cautious!
+                    </h4>
+                    <p className='leading-7 [&:not(:first-child)]:mt-6"'>
+                        This action can not be undone.
+                    </p>
+                </div>
+                {/* eventually add a dialog for warning before actually making request. */}
+                <div className='flex justify-end '>
+                    <Button
+                    onClick={delete_account} 
+                    className='hover:text-red-600 hover:bg-stone-300 ease-out duration-300 transition-all'>
+                        Delete Account
+                    </Button>
+                </div>
+                
             </div>
 
         </div>

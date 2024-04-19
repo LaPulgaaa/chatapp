@@ -148,4 +148,29 @@ router.patch("/editProfile",async(req,res)=>{
     }
 
 })
+
+router.patch("/deleteAccount/:memberId",async(req,res)=>{
+    const id:string=req.params.memberId;
+    try{
+        const resp=await prisma.member.update({
+            where:{
+                id
+            },
+            data:{
+                deleted:true
+            }
+        })
+
+        res.status(200).json({
+            msg:"Account deleted. Thanks for using chat.com!",
+            data:resp.deleted
+        })
+    }catch(err){
+        console.log(err);
+        res.status(500).json({
+            msg:"could not delete account",
+            data:err
+        })
+    }
+})
 export default router;
