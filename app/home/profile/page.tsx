@@ -33,11 +33,11 @@ export default function Profile(){
     })
     const {formState:{isDirty,isSubmitting}}=form;
     const disable=isSubmitting || !isDirty;
-    const [favorites,setFavorites]=useState(["user"]);
+    const [favorites,setFavorites]=useState([...user_details.favorite!]);
     
     console.log(user_details);
     async function settings_change(values:Omit<MemberProfile,"favorite">&{favorite:string}){
-        // setUser_details({...values,favorite:favorites});
+        setUser_details({...values,favorite:favorites});
 
         try{
             const resp=await fetch(`http://localhost:3000/user/editProfile`,{
