@@ -25,10 +25,14 @@ export default function Home(){
                 const resp=await fetch(`http://localhost:3000/chat/subscribedChats/${id}`);
                 //TODO:add zod here before using the returned data
                 const {raw_data}=await resp.json();
-                const data=UserChatResponseSchema.parse(raw_data);
-                console.log(data);
-                setLoader(false);
-                setRooms(data);
+                if(Array.isArray(raw_data) && raw_data.length>0)
+                {
+                    const data=UserChatResponseSchema.parse(raw_data);
+                    console.log(data);
+                    setLoader(false);
+                    setRooms(data);
+                }
+                
             }catch(err)
             {
                 console.log(err);

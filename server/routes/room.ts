@@ -48,7 +48,11 @@ router.get("/subscribedChats/:memberId",async(req,res)=>{
         })
     }catch(err)
     {
-        res.status(400).send("Server could not find out your rooms!")
+        console.log(err);
+        res.status(200).json({
+            msg:"could not found",
+            raw_data:[]
+        })
     }
     
 })
