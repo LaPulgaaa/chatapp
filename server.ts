@@ -6,7 +6,7 @@ import userRouter from './server/routes/user';
 import chatRouter from './server/routes/room';
 import { WebSocketServer } from 'ws';
 import {ws} from './server/socket/index'
-const port=3000;
+const port=3001;
 const hostname='localhost';
 const dev=process.env.NODE_ENV !== 'production';
 const app=next({dev,hostname,port});
@@ -20,7 +20,7 @@ app.prepare().then(()=>{
    
     ws(wss);
     const corsOptions={
-        origin:"http://localhost:3001",
+        origin:"http://localhost:3000",
         methods:'GET,PUT,POST,DELETE,PATCH',
         credentials:true,
     
@@ -33,7 +33,7 @@ app.prepare().then(()=>{
         return handle(req,res);
     })
     server.listen(port,()=>{
-        console.log("listening on port 3000, ws server connected!");
+        console.log("listening on port 3001, ws server connected!");
     })
 }).catch((err:Error)=>{
     console.log(err);

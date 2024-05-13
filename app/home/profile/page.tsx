@@ -40,7 +40,7 @@ export default function Profile(){
         setUser_details({...values,favorite:favorites});
 
         try{
-            const resp=await fetch(`http://localhost:3000/user/editProfile`,{
+            const resp=await fetch(`http://localhost:3001/user/editProfile`,{
                 method:"PATCH",
                 body:JSON.stringify({
                     id:user_details.id,
@@ -65,7 +65,7 @@ export default function Profile(){
     }
     async function delete_account(){
         try{
-            const resp=await fetch(`http://localhost:3000/user/deleteAccount/${user_details.id}`,{
+            const resp=await fetch(`http://localhost:3001/user/deleteAccount/${user_details.id}`,{
                 method:'PATCH',
                 headers:{
                     'Content-Type':"application/json"

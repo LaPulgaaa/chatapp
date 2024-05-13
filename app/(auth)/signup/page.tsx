@@ -32,7 +32,7 @@ export default function signup(){
 
     async function onSubmit(values:Join){
         try{
-          const resp=await fetch("http://localhost:3000/user/signup",{
+          const resp=await fetch("http://localhost:3001/user/signup",{
             method:"POST",
             body:JSON.stringify(values),
             headers:{

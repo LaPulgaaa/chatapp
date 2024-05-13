@@ -25,7 +25,7 @@ function InitUser(){
 
     const init=async()=>{
         try{
-            const resp=await fetch("http://localhost:3000/user/getCreds",{
+            const resp=await fetch("http://localhost:3001/user/getCreds",{
                 headers:{
                     "Authorization":"Bearer " + localStorage.getItem("token")
                 }

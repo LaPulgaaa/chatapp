@@ -16,7 +16,7 @@ export default function JoinRoomDialog(){
     const router=useRouter();
     async function searchRoom(){
         try{
-            const resp=await fetch(`http://localhost:3000/chat/joinChat`,{
+            const resp=await fetch(`http://localhost:3001/chat/joinChat`,{
                 method:"POST",
                 body:JSON.stringify({
                     memberId:profile_info.id,

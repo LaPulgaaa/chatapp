@@ -23,7 +23,7 @@ export default function login(){
     else
     {
       try{
-        const resp=await fetch(`http://localhost:3000/user/login`,{
+        const resp=await fetch(`http://localhost:3001/user/login`,{
           method:"POST",
           body:JSON.stringify({
             username,

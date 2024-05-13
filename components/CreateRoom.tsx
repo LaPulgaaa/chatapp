@@ -27,7 +27,7 @@ export default function CreateRoom(){
         if(member_data.id)
         {
             try{
-                const resp=await fetch("http://localhost:3000/chat/createChat",{
+                const resp=await fetch("http://localhost:3001/chat/createChat",{
                     method:"POST",
                     body:JSON.stringify({
                         name:values.name,

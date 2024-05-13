@@ -50,7 +50,7 @@ export default function Chat({params}:{params:{slug:string}}){
     useEffect(()=>{
         async function fetch_messages(){
             try{
-                const resp=await fetch(`http://localhost:3000/chat/getMessage`,{
+                const resp=await fetch(`http://localhost:3001/chat/getMessage`,{
                     method:'POST',
                     body:JSON.stringify({
                         chat_id:params.slug,
@@ -80,7 +80,7 @@ export default function Chat({params}:{params:{slug:string}}){
 
     useEffect(()=>{
         
-        let ws=new WebSocket("ws://localhost:3000");
+        let ws=new WebSocket("ws://localhost:3001");
          
         ws.onopen=function(){
             console.log("connection open");
@@ -130,7 +130,7 @@ export default function Chat({params}:{params:{slug:string}}){
             return;
         }
         else{
-            const resp=await fetch('http://localhost:3000/chat/updateFrom',{
+            const resp=await fetch('http://localhost:3001/chat/updateFrom',{
                 method:'PATCH',
                 body:JSON.stringify({
                     date:new Date(),
@@ -157,7 +157,7 @@ export default function Chat({params}:{params:{slug:string}}){
         return;
 
         try{
-            const resp=await fetch(`http://localhost:3000/chat/leaveChat`,{
+            const resp=await fetch(`http://localhost:3001/chat/leaveChat`,{
                 method:'DELETE',
                 body:JSON.stringify({
                     memberId:creds.id,
