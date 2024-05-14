@@ -37,14 +37,14 @@ export default function signup(){
             body:JSON.stringify(values),
             headers:{
               'Content-Type':"application/json"
-            }
+            },
+            credentials:"include"
           })
-          const {token}=await resp.json();
-          if(token!==undefined)
+          if(resp.status==201)
           {
-            window.localStorage.setItem("token",token);
             alert("User created successfully")
             router.push("/home");
+            window.localStorage.setItem("token","valid");
           }
         }catch(err)
         {

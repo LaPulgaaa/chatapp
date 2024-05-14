@@ -1,7 +1,7 @@
 import {z} from 'zod';
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
-
+import authenticate from '../middleware/authenticate';
 
 const router=express.Router();
 const prisma=new PrismaClient();
@@ -12,7 +12,7 @@ type CreateRoomSchema={
     memberId:string
 }
 
-router.get("/allChats",async(req,res)=>{
+router.get("/allChats",authenticate,async(req,res)=>{
     try{
         const chats=prisma.chat.findMany({});
         res.status(200).json({
@@ -26,7 +26,7 @@ router.get("/allChats",async(req,res)=>{
     }
 })
 
-router.get("/subscribedChats/:memberId",async(req,res)=>{
+router.get("/subscribedChats/:memberId",authenticate,async(req,res)=>{
     const {memberId}=req.params;
     try{
         let joined_rooms=[];
@@ -57,7 +57,7 @@ router.get("/subscribedChats/:memberId",async(req,res)=>{
     
 })
 
-router.post("/createChat",async(req,res)=>{
+router.post("/createChat",authenticate,async(req,res)=>{
     //The Message Schema serves as relational schema b/w Member and 
     // Chat schema. We create chat table and the create a message row
     // with a certain message to link Member and Chat model together 
@@ -99,7 +99,7 @@ router.post("/createChat",async(req,res)=>{
     }
 })
 
-router.post("/getMessage",async(req,res)=>{
+router.post("/getMessage",authenticate,async(req,res)=>{
     const creds:{chat_id:string,user_id:string}=req.body;
     try{
         const directory=await prisma.directory.findFirst({
@@ -152,7 +152,7 @@ router.post("/getMessage",async(req,res)=>{
     }
 })
 
-router.post("/joinChat",async(req,res)=>{
+router.post("/joinChat",authenticate,async(req,res)=>{
     const {roomId,memberId}=req.body;
     try{
         const room=await prisma.chat.findUnique({
@@ -197,7 +197,7 @@ router.post("/joinChat",async(req,res)=>{
     }
 })
 
-router.delete("/leaveChat",async(req,res)=>{
+router.delete("/leaveChat",authenticate,async(req,res)=>{
     const {id}=req.body;
     try{
         const room=await prisma.message.update({
@@ -227,7 +227,7 @@ router.delete("/leaveChat",async(req,res)=>{
     }
 })
 
-router.patch("/updateFrom",async(req,res)=>{
+router.patch("/updateFrom",authenticate,async(req,res)=>{
     const {date,user_id,chat_id,did}:{date:Date,user_id:string,chat_id:string,did:number}=req.body;
 
     try{

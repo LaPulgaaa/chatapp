@@ -2,6 +2,7 @@ import express from 'express';
 import next from 'next';
 import http from 'http';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import userRouter from './server/routes/user';
 import chatRouter from './server/routes/room';
 import { WebSocketServer } from 'ws';
@@ -26,6 +27,7 @@ app.prepare().then(()=>{
     
     }
     app.use(cors(corsOptions));
+    app.use(cookieParser());
     app.use(express.json());
     app.use("/user",userRouter);
     app.use('/chat',chatRouter);

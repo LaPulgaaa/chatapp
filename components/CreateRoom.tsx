@@ -36,7 +36,8 @@ export default function CreateRoom(){
                     }),
                     headers:{
                         'Content-Type':"application/json"
-                    }
+                    },
+                    credentials:"include"
                 })
                 if(resp.status===400)
                 alert("Error creating chat.")

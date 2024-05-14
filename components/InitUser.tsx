@@ -7,7 +7,9 @@ export function InitUser(){
     const setUserDetails=useSetRecoilState(userDetails);
     const init=async()=>{
         try{
-            const resp=await fetch("http://localhost:3001/user/getCreds");
+            const resp=await fetch("http://localhost:3001/user/getCreds",{
+                credentials:"include"
+            });
             const {data}=await resp.json();
             if(resp.status===201)
             {

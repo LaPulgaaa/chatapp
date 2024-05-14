@@ -3,7 +3,7 @@ import { Card,CardContent,CardDescription,CardFooter,CardHeader,CardTitle } from
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSetRecoilState,useRecoilValue  } from "recoil";
 import { useRouter } from "next/navigation";
 import { userDetails } from "@/lib/store/atom/userDetails";
@@ -16,39 +16,40 @@ export default function login(){
     const router=useRouter();
     const token=window.localStorage.getItem("token");
 
-  async function joinRoom(){
-    
-    if(token)
-    router.push("/home");
-    else
-    {
-      try{
-        const resp=await fetch(`http://localhost:3001/user/login`,{
-          method:"POST",
-          body:JSON.stringify({
-            username,
-            password
-          }),
-          headers:{
-            'Content-Type':"application/json"
-          }
+    // a little shady
+    useEffect(()=>{
+      if(token==="valid")
+      router.push("/home");
+    },[])
 
-        });
-        if(resp.status==200)
-        {
-          const {token,member}=await resp.json();
-          window.localStorage.setItem("token",token);
-          setUserDetails(member);
-          router.push("/home");
-        }
-        else if(resp.status==404)
-        {
-          alert("Looks like you are new here!! Please sign to join chat!")
-        }
-      }catch(err)
+  async function joinRoom(){
+    try{
+      const resp=await fetch(`http://localhost:3001/user/login`,{
+        method:"POST",
+        body:JSON.stringify({
+          username,
+          password
+        }),
+        headers:{
+          'Content-Type':"application/json"
+        },
+        credentials:"include"
+
+      });
+      if(resp.status==200)
       {
-        console.log(err)
+        const {member}=await resp.json();
+        window.localStorage.setItem("token","valid");
+        setUserDetails(member);
+        router.push("/home");
       }
+      else if(resp.status==404)
+      {
+        alert("Looks like you are new here!! Please sign to join chat!")
+      }
+    }catch(err)
+    {
+      console.log(err)
     }
   }
 

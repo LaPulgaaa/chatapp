@@ -51,7 +51,8 @@ export default function Profile(){
                 }),
                 headers:{
                     'Content-Type':"application/json"
-                }
+                },
+                credentials:"include"
             })
             if(resp.status===200)
             {
@@ -69,7 +70,8 @@ export default function Profile(){
                 method:'PATCH',
                 headers:{
                     'Content-Type':"application/json"
-                }
+                },
+                credentials:"include"
             });
             const data=await resp.json();
             if(resp.status==200){

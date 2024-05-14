@@ -1,15 +1,13 @@
 import {z} from 'zod';
 import express from 'express';
 import { PrismaClient} from '@prisma/client'
-import jwt from 'jsonwebtoken'
-import { createClient } from 'redis';
+import jwt, { JwtPayload } from 'jsonwebtoken'
 
 import authenticate from '../middleware/authenticate';
 import { member_profile_schema } from '../../packages/zod';
 
 const router=express.Router();
 const prisma=new PrismaClient();
-const redis=createClient();
 
 type UserInfo={
     username:string,
@@ -27,10 +25,15 @@ router.post("/signup",async(req,res)=>{
             }
         })
         const token=jwt.sign(new_member,process.env.ACCESS_TOKEN_SECRET!,{expiresIn:"3h"});
+        res.cookie("token",token,{
+            sameSite:"lax",
+            maxAge:60*60*24*1000,
+            domain:"localhost",
+            httpOnly:true
+        })
         res.status(201).json({
             msg:"created new user",
             member:new_member,
-            token
         })
     }catch(err)
     {
@@ -55,11 +58,15 @@ router.post("/login",async(req,res)=>{
         if(member!==null)
         {
             const token=jwt.sign(member,process.env.ACCESS_TOKEN_SECRET!,{expiresIn:"3h"});
-
+            res.cookie("token",token,{
+                sameSite:"lax",
+                maxAge:60*60*3*1000,
+                domain:"localhost",
+                httpOnly:true
+            })
             res.status(200).json({
                 msg:"Logged in Successfully!!",
-                member,
-                token
+                member
             })
         }
         else
@@ -71,25 +78,25 @@ router.post("/login",async(req,res)=>{
 
 router.get("/getCreds",authenticate,async(req,res)=>{
     try{
-        await redis.connect();
-        const creds=await redis.get("user");
-        redis.disconnect();
-        if(creds!==null)
+        const token=req.cookies.token;
+        const creds=jwt.verify(token,process.env.ACCESS_TOKEN_SECRET!) as JwtPayload;
+        if(token!==null || token!==undefined)
         {
             res.status(201).json({
             msg:"jwt token valid",
-            data:JSON.parse(creds!)
+            data:creds
             })
         }
         else
         res.status(200).send("user not found");
     }catch(err){
+        console.log("error in this creds route.")
         res.status(400).send("internal server error.");
     }
   
 })
 
-router.delete("/eraseAll",async(req,res)=>{
+router.delete("/eraseAll",authenticate,async(req,res)=>{
     try{
         const status=await prisma.member.deleteMany({});
         if(status!==undefined)
@@ -106,7 +113,7 @@ router.delete("/eraseAll",async(req,res)=>{
     }
 })
 
-router.patch("/editProfile",async(req,res)=>{
+router.patch("/editProfile",authenticate,async(req,res)=>{
     console.log("inside here!")
     const result=(z.intersection(
         z.object({
@@ -149,7 +156,7 @@ router.patch("/editProfile",async(req,res)=>{
 
 })
 
-router.patch("/deleteAccount/:memberId",async(req,res)=>{
+router.patch("/deleteAccount/:memberId",authenticate,async(req,res)=>{
     const id:string=req.params.memberId;
     try{
         const resp=await prisma.member.update({

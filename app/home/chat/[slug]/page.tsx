@@ -58,7 +58,8 @@ export default function Chat({params}:{params:{slug:string}}){
                     }),
                     headers:{
                         'Content-Type':"application/json"
-                    }
+                    },
+                    credentials:"include"
                 });
                 const {raw_data,directory_id}=await resp.json();
                 setDid(directory_id);
@@ -140,7 +141,8 @@ export default function Chat({params}:{params:{slug:string}}){
                 }),
                 headers:{
                     'Content-Type':"application/json"
-                }
+                },
+                credentials:"include"
             })
             if(resp.status===200)
             {
@@ -166,7 +168,8 @@ export default function Chat({params}:{params:{slug:string}}){
                 }),
                 headers:{
                     'Content-Type':"application/json"
-                }
+                },
+                credentials:"include"
             })
             if(resp.status===204)
             {

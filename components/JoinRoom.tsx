@@ -24,7 +24,8 @@ export default function JoinRoomDialog(){
                 }),
                 headers:{
                     'Content-Type':"application/json"
-                }
+                },
+                credentials:"include"
             });
             const raw_resp=await resp.json();
             if(resp.status===201)

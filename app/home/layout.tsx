@@ -8,11 +8,6 @@ import { useRecoilValue, useSetRecoilState } from "recoil"
 
 
 export default function ChatLayout({children}:{children:React.ReactNode}){
-    const token=window.localStorage.getItem("token")
-    const router=useRouter();
-    
-    // if(token===null)
-    // router.push("/");
     return <section>
         <InitUser/>
         {children}
@@ -26,9 +21,7 @@ function InitUser(){
     const init=async()=>{
         try{
             const resp=await fetch("http://localhost:3001/user/getCreds",{
-                headers:{
-                    "Authorization":"Bearer " + localStorage.getItem("token")
-                }
+                credentials:"include"
             });
             const {data}=await resp.json();
             if(resp.status===201)
