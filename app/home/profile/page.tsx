@@ -15,6 +15,8 @@ import { Badge } from '@/components/ui/badge';
 import { z} from 'zod';
 
 import { useRouter } from 'next/navigation';
+import { ChevronLeftIcon } from 'lucide-react';
+import { DarkLight } from '@/components/DarkLight';
 export default function Profile(){
     const router=useRouter();
     const [user_details,setUser_details]=useRecoilState(userDetails);
@@ -102,6 +104,15 @@ export default function Profile(){
 
     return (
         <div className="m-8  mx-24">
+            <div className='flex justify-between'>
+            <Button variant={'outline'} size={'icon'} 
+            className=''
+            onClick={()=>router.push("/home")}
+            >
+                <ChevronLeftIcon/>
+            </Button>
+            <DarkLight/>
+            </div>
             <div className='p-4 border-2 rounded-sm sticky my-2'>
                 <h3 className="text-2xl pb-2 font-semibold  scroll-m-20 tracking-tight first:mt-0">
                     Profile

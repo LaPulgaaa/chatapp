@@ -225,6 +225,10 @@ export default function Chat({params}:{params:{slug:string}}){
                 className="ml-4" 
                 value={compose}
                 onChange={(e)=>setCompose(e.target.value)}
+                onKeyDown={(e)=>{
+                    if(e.key==="Enter")
+                    sendMessage();
+                }}
                 type="text" placeholder="Message"/>
                 <Button onClick={sendMessage} className="mx-4">Send</Button>
                 </div>
