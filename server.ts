@@ -5,6 +5,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import userRouter from './server/routes/user';
 import chatRouter from './server/routes/room';
+import { start_worker } from './server/workers';
 import { WebSocketServer } from 'ws';
 import {ws} from './server/socket/index'
 const port=3001;
@@ -37,6 +38,7 @@ app.prepare().then(()=>{
     server.listen(port,()=>{
         console.log("listening on port 3001, ws server connected!");
     })
+    start_worker();
 }).catch((err:Error)=>{
     console.log(err);
 })

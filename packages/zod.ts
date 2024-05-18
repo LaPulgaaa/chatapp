@@ -79,3 +79,12 @@ export const member_profile_schema=z.object({
 })
 
 export type MemberProfile=z.infer<typeof member_profile_schema>;
+
+export const worker_payload=z.object({
+    content:z.string(),
+    chatId:z.string(),
+    memberId:z.string()
+})
+
+//z.output is an alias for z.infer
+export type WorkerPayload=z.output<typeof worker_payload>;

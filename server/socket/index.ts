@@ -1,8 +1,8 @@
-
 import { WebSocketServer } from 'ws';
 import { RedisSubscriptionManager } from './redisClient';
-import { PrismaClient } from '@prisma/client';
-const prisma=new PrismaClient();
+import { createClient } from 'redis';
+
+const client=createClient();
 
 const users:{
     [wsId:string]:{
@@ -12,8 +12,11 @@ const users:{
 }={};
 
 let count=0;
-export function ws(wss:WebSocketServer){
- wss.on("connection", (ws,req:Request)=>{
+export async function ws(wss:WebSocketServer){
+ await client.connect();
+ wss.on("connection", async(ws,req:Request)=>{
+        
+
         const wsId=count++;
         console.log("connection made")
         
@@ -38,20 +41,18 @@ export function ws(wss:WebSocketServer){
                 const roomId=users[wsId].roomId;
                 const message=data.payload.message;
                 RedisSubscriptionManager.get_instance().addChatMessage(roomId,message);
-                const added_msg=await prisma.message.create({
-                    data:{
-                        content:message.content,
-                        chatId:roomId,
-                        memberId:message.id
-                    }
-                })
-                console.log(added_msg)
+
+                await client.lPush("message",JSON.stringify({
+                    content:message.content,
+                    chatId:roomId,
+                    memberId:message.id
+                }))
             }
 
         })
         ws.on("close",()=>{
             // console.log("someone left this room");
-            
+
             if(users[wsId]!==undefined)
             {
                 RedisSubscriptionManager.get_instance().unsubscribe(wsId.toString(),users[wsId].roomId);
