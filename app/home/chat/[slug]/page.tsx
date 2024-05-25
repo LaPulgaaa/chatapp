@@ -8,8 +8,7 @@ import Inbox from "@/components/Inbox";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useRecoilState, useRecoilValue} from "recoil";
-import { wsState } from "@/lib/store/atom/Socket";
+import { useRecoilValue} from "recoil";
 import { userDetails } from "@/lib/store/atom/userDetails";
 import { useRouter } from "next/navigation";
 import { ChevronLeftIcon, ListEndIcon,} from "lucide-react";
@@ -44,7 +43,7 @@ export default function Chat({params}:{params:{slug:string}}){
     const [compose,setCompose]=useState<string>("");
     const [chat,setChat]=useState<RecievedMessage[]>([]);
     const creds=useRecoilValue(userDetails);
-    const [ws,setWs]=useRecoilState(wsState);
+    const [ws,setWs]=useState<WebSocket>();
     const [did,setDid]=useState<number>();
     const router=useRouter();
     useEffect(()=>{
@@ -94,7 +93,11 @@ export default function Chat({params}:{params:{slug:string}}){
             ws.send(JSON.stringify(data));
             setWs(ws);
         }
-        return ()=>{ws.close();}
+        return ()=>{
+            if(ws.OPEN === 1){
+                ws.close();
+            }
+        }
     },[])
 
     if(ws!==undefined)

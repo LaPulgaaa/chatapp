@@ -8,7 +8,6 @@ import { UserChatResponseSchema } from "@/packages/zod";
 import type { ChatReponse } from "@/packages/zod";
 import { UserStateChats } from "@/lib/store/atom/chats";
 import { useRouter } from "next/navigation";
-import { wsState } from "@/lib/store/atom/Socket";
 import Sidebar from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
 export default function Home(){
@@ -16,8 +15,6 @@ export default function Home(){
     const profile_info=useRecoilValue(userDetails);
     const [rooms,setRooms]=useRecoilState(UserStateChats)
     const [loader,setLoader]=useState(true);
-    const setWs=useSetRecoilState(wsState);
-    const ws=useRecoilValue(wsState);
     const id=profile_info.id;
     useEffect(()=>{
         async function get_user_chats(){
