@@ -1,11 +1,11 @@
-import { PrismaClient } from "@prisma/client";
 import { createClient } from "redis";
+
 import { worker_payload } from "../../packages/zod";
 import type { WorkerPayload } from "../../packages/zod";
+import { prisma } from "../../packages/prisma/prisma_client";
 
 
 const client=createClient();
-const prisma=new PrismaClient();
 
 export async function start_worker(){
     console.log("start redis worker")

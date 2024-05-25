@@ -1,13 +1,12 @@
 import {z} from 'zod';
 import express from 'express';
-import { PrismaClient} from '@prisma/client'
 import jwt, { JwtPayload } from 'jsonwebtoken'
 
 import authenticate from '../middleware/authenticate';
 import { member_profile_schema } from '../../packages/zod';
+import { prisma } from '../../packages/prisma/prisma_client';
 
 const router=express.Router();
-const prisma=new PrismaClient();
 
 type UserInfo={
     username:string,
