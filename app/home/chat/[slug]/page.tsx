@@ -217,7 +217,7 @@ export default function Chat({params}:{params:{slug:string}}){
                                
             </div>
             
-            <ScrollArea id="chatbox" className="m-4 h-full flex flex-col pb-8  rounded-md border">
+            <ScrollArea id="chatbox" className="m-4 h-full flex flex-col pb-10  rounded-md border">
                 {InboxComponent}
                 {RealtimeChats}
                 <div className="absolute bottom-0 w-full mb-3 flex">
