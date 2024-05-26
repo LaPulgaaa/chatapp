@@ -6,7 +6,7 @@ import { Card,CardTitle,CardContent,CardHeader, CardDescription, CardFooter } fr
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
-import { joinSchema } from "@/packages/zod";
+import { join_schema } from "@/packages/zod";
 import { Join } from '@/packages/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { usePathname, useRouter } from 'next/navigation';
@@ -23,7 +23,7 @@ export default function signup(){
     const pathname=usePathname();
 
     const form=useForm<Join>({
-        resolver:zodResolver(joinSchema),
+        resolver:zodResolver(join_schema),
         defaultValues:{
         username:"",
         password:"",

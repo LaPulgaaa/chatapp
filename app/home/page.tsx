@@ -4,8 +4,7 @@ import CreateRoom from "@/components/CreateRoom";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { userDetails } from "@/lib/store/atom/userDetails";
 import { useEffect, useState } from "react";
-import { UserChatResponseSchema } from "@/packages/zod";
-import type { ChatReponse } from "@/packages/zod";
+import { user_chat_response_schema } from "@/packages/zod";
 import { UserStateChats } from "@/lib/store/atom/chats";
 import { useRouter } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
@@ -26,7 +25,7 @@ export default function Home(){
                 const {raw_data}=await resp.json();
                 if(Array.isArray(raw_data) && raw_data.length>0)
                 {
-                    const data=UserChatResponseSchema.parse(raw_data);
+                    const data=user_chat_response_schema.parse(raw_data);
                     console.log(data);
                     setLoader(false);
                     setRooms(data);

@@ -4,7 +4,7 @@ import { Button } from "./ui/button";
 import {Dialog,DialogClose,DialogContent,DialogDescription,DialogFooter,DialogHeader,DialogTitle,DialogTrigger,} 
 from "@/components/ui/dialog";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { RoomType, createRoomSchema } from "@/packages/zod";
+import { RoomType, create_room_schema } from "@/packages/zod";
 import { Form,FormControl,FormDescription,FormField,FormLabel,FormItem,FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
@@ -17,7 +17,7 @@ export default function CreateRoom(){
     const member_data=useRecoilValue(userDetails);
     const [rooms,setRooms]=useRecoilState(UserStateChats)
     const form=useForm<RoomType>({
-        resolver:zodResolver(createRoomSchema),
+        resolver:zodResolver(create_room_schema),
         defaultValues:{
             name:"",
             discription:""

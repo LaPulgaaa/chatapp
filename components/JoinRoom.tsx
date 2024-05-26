@@ -5,7 +5,6 @@ import { Label } from "./ui/label";
 import { Button } from "./ui/button";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { UserStateChats } from "@/lib/store/atom/chats";
-import { UserChatResponseSchema } from "@/packages/zod";
 import { useRouter } from "next/navigation";
 import { userDetails } from "@/lib/store/atom/userDetails";
 

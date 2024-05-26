@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Message from "@/components/Message";
 import type { ChatMessageData } from "@/packages/zod";
-import { ChatMessagesResponseSchema } from "@/packages/zod";
+import { chat_messages_response_schema } from "@/packages/zod";
 import Inbox from "@/components/Inbox";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -63,8 +63,7 @@ export default function Chat({params}:{params:{slug:string}}){
                 const {raw_data,directory_id}=await resp.json();
                 setDid(directory_id);
 
-                const data=ChatMessagesResponseSchema.parse(raw_data);
-                // Parse this data using zod.
+                const data=chat_messages_response_schema.parse(raw_data);
                 setMessages(data);
                 
                

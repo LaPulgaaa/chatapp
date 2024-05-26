@@ -1,6 +1,6 @@
 import {z} from 'zod';
 
-export const joinSchema=z.object({
+export const join_schema=z.object({
     username:z.string({
         required_error:"Username is required",
         invalid_type_error:"name must be a string"
@@ -10,10 +10,10 @@ export const joinSchema=z.object({
     }).min(5,{message:"password should of min 5 digits"}),
 })
 
-export type Join=z.infer<typeof joinSchema>;
+export type Join=z.infer<typeof join_schema>;
 
 
-export const messageSchema=z.object({
+export const message_schema=z.object({
     roomId:z.string({
         required_error:"no room to chat with!"
     }),
@@ -23,9 +23,9 @@ export const messageSchema=z.object({
     message:z.string().max(50,{message:"can not send message of length more than 50."})
 })
 
-export type Message=z.infer<typeof messageSchema>;
+export type Message=z.infer<typeof message_schema>;
 
-export const createRoomSchema=z.object({
+export const create_room_schema=z.object({
     name:z.string({
         required_error:"enter a valid name"
     }).min(1),
@@ -34,9 +34,9 @@ export const createRoomSchema=z.object({
     }).min(6).max(50)
 })
 
-export type RoomType=z.infer<typeof createRoomSchema>;
+export type RoomType=z.infer<typeof create_room_schema>;
 
-export const UserChatResponseSchema=z.array(
+export const user_chat_response_schema=z.array(
     z.object({
             createdAt:z.string(),
             deleted:z.boolean(),
@@ -47,7 +47,7 @@ export const UserChatResponseSchema=z.array(
     
 )
 
-export const UnitMessageSchema= z.object({
+export const unit_message_schema= z.object({
     chatId:z.string(),
     content:z.string(),
     createdAt:z.string(),
@@ -61,13 +61,13 @@ export const UnitMessageSchema= z.object({
     })
 })
 
-export const ChatMessagesResponseSchema=z.object({
-    messages:z.array(UnitMessageSchema)
+export const chat_messages_response_schema=z.object({
+    messages:z.array(unit_message_schema)
 })
-export type ChatMessageData=z.infer<typeof ChatMessagesResponseSchema>;
-export type UnitMessage=z.infer<typeof UnitMessageSchema>;
+export type ChatMessageData=z.infer<typeof chat_messages_response_schema>;
+export type UnitMessage=z.infer<typeof unit_message_schema>;
 
-export type ChatReponse=z.infer<typeof UserChatResponseSchema>;
+export type ChatReponse=z.infer<typeof user_chat_response_schema>;
 
 export const member_profile_schema=z.object({
     username:z.string(),
