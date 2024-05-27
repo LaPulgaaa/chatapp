@@ -1,12 +1,47 @@
 "use client"
 
+import { useEffect } from "react";
+
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { ArrowRightCircleIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { userDetails } from "@/lib/store/atom/userDetails";
+import {  useRecoilState } from "recoil";
 export default function Home() {
   const router=useRouter()
-  
+  // const setUserDetails=useSetRecoilState(userDetails);
+  const [userdetails,setUserDetails]=useRecoilState(userDetails);
+  useEffect(()=>{
+    async function is_cookie_alive(){
+      try{
+        const resp=await fetch("http://localhost:3001/user/me",{
+          credentials:"include"
+        });
+
+        const {msg,data}=await resp.json();
+
+        if(msg==="user identified"){
+          console.log("cookie still alive");
+
+          setUserDetails({
+            password:data.password,
+            id:data.id,
+            favorite:data.favorite,
+            status:data.status,
+            avatarurl:data.avatarurl,
+            username:data.username,
+            about:data.about
+          })
+          router.push("/home");
+        }
+      }catch(err){
+        console.log(err);
+      }
+    }
+    is_cookie_alive();
+  },[])
+
   return (
     <div>
       <Navbar/>

@@ -13,6 +13,22 @@ type UserInfo={
     password:string
 }
 
+router.get("/me",(req,res)=>{
+    const token=req.cookies.token;
+    if(token!==undefined){
+        const creds=jwt.verify(token,process.env.ACCESS_TOKEN_SECRET!) as JwtPayload;
+        res.json({
+            msg:"user identified",
+            data:creds
+        })
+    }
+    else{
+        res.status(200).json({
+            msg:"token expired"
+        })
+    }
+})
+
 router.post("/signup",async(req,res)=>{
     const {username,password}:UserInfo=req.body;
     console.log(username);
