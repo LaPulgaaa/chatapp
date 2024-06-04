@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "NODE_ENV=production ts-node server.ts",
     "lint": "next lint",
-    "prisma-generate": "npx prisma generate --schema=./packages/prisma/schema.prisma"
+    "dev:combined":"npm run dev & npx next dev",
+    "prisma:migrate":"npx prisma migrate deploy --schema=./packages/prisma/schema.prisma",
+    "prisma:generate": "npx prisma generate --schema=./packages/prisma/schema.prisma",
+    "dev:docker":"npm run prisma:generate && npm run prisma:migrate & npx next dev"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",
