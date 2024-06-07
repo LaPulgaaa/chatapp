@@ -1,0 +1,39 @@
+version: '3.8' # it specifies type of compose file schema not docker compose though it is now depracated
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: chat
+    restart: unless-stopped
+    container_name: chat_app
+    ports:
+      - 3000:3000
+    environment:
+      - DATABASE_URL=postgres://postgres:mysecretpassword@mypostgres:5432/postgres
+  
+  postgres:
+    image: postgres:15-alpine
+    container_name: mypostgres
+    restart: unless-stopped
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_PASSWORD=mysecretpassword
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=chat
+    volumes:
+      - ./myvol:/var/lib/postgresql/data:rw
+  
+  redis: 
+    image: redis:7.2.5-alpine3.20
+    container_name: myredis
+    restart: unless-stopped
+    ports:
+      - 6379:6379
+    
+volumes: 
+  myvol: 
+    driver: local # local-driver means volume is created on same docker host as the container
+                   # by using driver: flocker volume is created on external host and mounted via newtwork.
+
