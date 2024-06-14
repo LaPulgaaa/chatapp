@@ -7,10 +7,10 @@
     "build": "next build",
     "start": "NODE_ENV=production ts-node server.ts",
     "lint": "next lint",
-    "dev:combined":"npm run dev & npx next dev",
-    "prisma:migrate":"npx prisma migrate deploy --schema=./packages/prisma/schema.prisma",
+    "dev:combined": "npm run dev & npx next dev",
+    "prisma:migrate": "npx prisma migrate deploy --schema=./packages/prisma/schema.prisma",
     "prisma:generate": "npx prisma generate --schema=./packages/prisma/schema.prisma",
-    "dev:docker":"npm run prisma:generate && npm run prisma:migrate & npx next dev"
+    "dev:docker": "npm run prisma:generate && npm run prisma:migrate & npx next dev"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",
@@ -51,12 +51,16 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/supertest": "^6.0.2",
     "autoprefixer": "^10.0.1",
     "eslint": "^8",
     "eslint-config-next": "14.1.0",
     "postcss": "^8",
     "prisma": "^5.12.1",
+    "supertest": "^7.0.0",
     "tailwindcss": "^3.3.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^1.6.0",
+    "vitest-mock-extended": "^1.3.1"
   }
 }
