@@ -15,9 +15,11 @@ const app=next({dev,hostname,port});
 
 const handle=app.getRequestHandler();
 
+export let express_app: express.Express;
+
 app.prepare().then(()=>{
-    const app=express();
-    const server=http.createServer(app);
+    express_app=express();
+    const server=http.createServer(express_app);
     const wss=new WebSocketServer({server});
    
     ws(wss);
@@ -27,12 +29,12 @@ app.prepare().then(()=>{
         credentials:true,
     
     }
-    app.use(cors(corsOptions));
-    app.use(cookieParser());
-    app.use(express.json());
-    app.use("/user",userRouter);
-    app.use('/chat',chatRouter);
-    app.all("*",(req,res)=>{
+    express_app.use(cors(corsOptions));
+    express_app.use(cookieParser());
+    express_app.use(express.json());
+    express_app.use("/user",userRouter);
+    express_app.use('/chat',chatRouter);
+    express_app.all("*",(req,res)=>{
         return handle(req,res);
     })
     server.listen(port,()=>{
