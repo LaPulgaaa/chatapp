@@ -31,7 +31,7 @@ router.get("/me",(req,res)=>{
 
 router.post("/signup",async(req,res)=>{
     const {username,password}:UserInfo=req.body;
-    console.log(username);
+
     try{
         const new_member=await prisma.member.create({
             data:{
@@ -52,7 +52,10 @@ router.post("/signup",async(req,res)=>{
         })
     }catch(err)
     {
-        res.status(500).send(err)
+        console.log(err);
+        res.status(500).json({
+            msg:err
+        })
     }
 
 })
