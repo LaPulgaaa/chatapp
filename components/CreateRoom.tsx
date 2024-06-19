@@ -32,7 +32,7 @@ export default function CreateRoom(){
                     body:JSON.stringify({
                         name:values.name,
                         discription:values.discription,
-                        memberId:member_data.id!
+                        memberId:member_data.id
                     }),
                     headers:{
                         'Content-Type':"application/json"
