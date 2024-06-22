@@ -24,9 +24,9 @@ function InitUser(){
             const resp=await fetch("http://localhost:3001/user/getCreds",{
                 credentials:"include"
             });
-            const {data}=await resp.json();
+            const {raw_data}=await resp.json();
 
-            const clean_data = z.intersection
+            const data = z.intersection
             (
                 z.object({
                     id: z.string(),
@@ -36,21 +36,21 @@ function InitUser(){
                 }),
                 member_profile_schema.omit({about:true, avatarurl:true, status:true})
             )
-            .parse(data);
+            .parse(raw_data);
 
             // TODO: after safeParsing we can also logout the user, it would show jwt expired state.
             if(resp.status===201)
             {
                 setUserDetails({
-                    username:clean_data.username,
-                    password:clean_data.password,
-                    id:clean_data.id,
-                    favorite:clean_data.favorite,
-                    status:clean_data.status ?? "",
-                    avatarurl:clean_data.avatarurl ?? "",
-                    about:clean_data.about ?? ""
+                    username:data.username,
+                    password:data.password,
+                    id:data.id,
+                    favorite:data.favorite,
+                    status:data.status ?? "",
+                    avatarurl:data.avatarurl ?? "",
+                    about:data.about ?? ""
                 })
-                console.log(clean_data);
+                console.log(data);
             }
             
         }catch(err)
