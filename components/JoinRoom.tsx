@@ -35,7 +35,9 @@ export default function JoinRoomDialog(){
                 router.push(`/home/chat/${room_info.id}`)
             }
             else
-            console.log("not found");
+            {
+                alert("Room not found. Make sure the id is correct!!");
+            }
         }catch(err){
             console.log(err);
             alert(err);

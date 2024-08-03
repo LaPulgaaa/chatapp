@@ -42,12 +42,12 @@ export default function signup(){
           })
           if(resp.status==201)
           {
-            alert("User created successfully")
             router.push("/home");
             window.localStorage.setItem("token","valid");
           }
         }catch(err)
         {
+          alert("User signup failed!!")
           console.log(err);
         }
       }
