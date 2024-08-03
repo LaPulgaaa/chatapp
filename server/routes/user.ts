@@ -102,7 +102,7 @@ router.get("/getCreds",authenticate,async(req,res)=>{
         {
             res.status(201).json({
             msg:"jwt token valid",
-            data:creds
+            creds
             })
         }
         else
