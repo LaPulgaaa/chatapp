@@ -33,7 +33,7 @@ router.get("/subscribedChats/:memberId",authenticate,async(req,res)=>{
         const message_subscribed_room=await prisma.message.findMany({
             where:{
                 content:`chat_${memberId}`,
-                deleted:false
+                deleted:true
             },
             include:{
                 chat:true
@@ -82,7 +82,8 @@ router.post("/createChat",authenticate,async(req,res)=>{
                 data:{
                     content:`chat_${memberId}`,
                     chatId:new_room.id,
-                    memberId:memberId
+                    memberId:memberId,
+                    deleted: true
                 }
             })
             return [new_room,chat_opcode];
@@ -123,7 +124,8 @@ router.post("/getMessage",authenticate,async(req,res)=>{
                     where:{
                         createdAt:{
                             gte:directory?.after
-                        }
+                        },
+                        deleted: false
                     },
                     include:{
                         sender:true
@@ -167,6 +169,7 @@ router.post("/joinChat",authenticate,async(req,res)=>{
                     content:`chat_${memberId}`,
                     memberId,
                     chatId:room.id,
+                    deleted: true
                 }
             })
             const directory=await prisma.directory.create({
@@ -200,14 +203,11 @@ router.post("/joinChat",authenticate,async(req,res)=>{
 router.delete("/leaveChat",authenticate,async(req,res)=>{
     const {id}=req.body;
     try{
-        const room=await prisma.message.update({
+        const room=await prisma.message.delete({
             where:{
                 id
-            },
-            data:{
-                deleted:true
             }
-        })
+        });
         if(room){
             res.status(204).json({
                 msg:'User left the room',
