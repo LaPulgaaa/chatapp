@@ -39,6 +39,7 @@ export type RoomType=z.infer<typeof create_room_schema>;
 export const user_chat_response_schema=z.array(
     z.object({
             createdAt:z.string(),
+            lastmsgAt: z.string(),
             deleted:z.boolean(),
             discription:z.string(),
             id:z.string(),

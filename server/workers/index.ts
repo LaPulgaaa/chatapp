@@ -29,9 +29,20 @@ export async function start_worker(){
 
 async function process_msg(message:WorkerPayload){
     try{
-            await prisma.message.create({
-            data:message
-        })
+            const {createdAt} = await prisma.message.create({
+            data:message,
+            select:{
+                createdAt: true
+            }
+            })
+            await prisma.chat.update({
+                where:{
+                    id: message.chatId
+                },
+                data:{
+                    lastmsgAt: createdAt
+                }
+            })
     }catch(err){
         console.log(err);
     }

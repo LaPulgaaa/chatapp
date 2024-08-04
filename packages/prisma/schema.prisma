@@ -62,5 +62,7 @@ model Chat {
   messages Message[]
 
   createdAt DateTime @default(now())
+  lastmsgAt DateTime @default(now())
+
   deleted Boolean @default(false)
 }
