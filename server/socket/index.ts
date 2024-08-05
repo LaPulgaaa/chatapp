@@ -56,10 +56,6 @@ export async function ws(wss:WebSocketServer){
             if(users[wsId]!==undefined)
             {
                 RedisSubscriptionManager.get_instance().unsubscribe(wsId.toString(),users[wsId].roomId);
-                RedisSubscriptionManager.get_instance().addChatMessage(users[wsId].roomId,{
-                content:"someone just left the room",
-                user:"pulgabot"
-                })
             }
         })
         
