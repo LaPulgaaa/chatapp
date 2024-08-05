@@ -21,7 +21,7 @@ export default function Home() {
 
         const {msg,data}=await resp.json();
 
-        if(msg==="user identified"){
+        if(msg==="user identified" && window.localStorage.getItem("token") == "valid"){
           console.log("cookie still alive");
 
           setUserDetails({

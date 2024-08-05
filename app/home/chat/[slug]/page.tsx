@@ -8,7 +8,7 @@ import Inbox from "@/components/Inbox";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useRecoilValue} from "recoil";
+import { useRecoilValue, useRecoilState} from "recoil";
 import { userDetails } from "@/lib/store/atom/userDetails";
 import { useRouter } from "next/navigation";
 import { ChevronLeftIcon, ListEndIcon,} from "lucide-react";
@@ -16,6 +16,8 @@ import { DarkLight } from "@/components/DarkLight";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 import { user_chat_uuid } from "../../page";
+import { leave_room } from "../../util";
+import { UserStateChats } from "@/lib/store/atom/chats";
 
 export type RecievedMessage={
     type:string,
@@ -36,6 +38,7 @@ export default function Chat({params}:{params:{slug:string}}){
     const creds=useRecoilValue(userDetails);
     const [ws,setWs]=useState<WebSocket>();
     const [did,setDid]=useState<number>();
+    const [rooms,setRooms]=useRecoilState(UserStateChats)
     const router=useRouter();
     useEffect(()=>{
         async function fetch_messages(){
@@ -142,35 +145,24 @@ export default function Chat({params}:{params:{slug:string}}){
         }
 
     }
-    async function leaveRoom(){
-
+    async function may_be_leave_room(){
         const opcode_id=user_chat_uuid.get(params.slug);
-        if(opcode_id===undefined)
+        if(opcode_id===undefined || creds.id === undefined)
         {
             alert("Could not leave the chat!");
             return ;
         }
 
-        try{
-            const resp=await fetch(`http://localhost:3001/chat/leaveChat`,{
-                method:'DELETE',
-                body:JSON.stringify({
-                    memberId:creds.id,
-                    chatId:params.slug,
-                    id:opcode_id
-                }),
-                headers:{
-                    'Content-Type':"application/json"
-                },
-                credentials:"include"
-            })
-            if(resp.status===204)
-            {
-                router.push("/home");
-            }
-        }catch(err){
-            console.log(err)
-            alert("could not leave room!")
+        const is_deleted = await leave_room({
+            member_id: creds.id,
+            chat_id: params.slug,
+            conn_id: opcode_id
+        });
+
+        if(is_deleted){
+            const left_rooms = rooms.filter((room)=>room.id!=params.slug);
+            setRooms(left_rooms);
+            router.push("/home");
         }
     }
 
@@ -197,7 +189,7 @@ export default function Chat({params}:{params:{slug:string}}){
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={leaveRoom} className="cursor-pointer">
+                        <DropdownMenuItem onClick={may_be_leave_room} className="cursor-pointer">
                             Leave Room
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={deleteChat} className="cursor-pointer">
