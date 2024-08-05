@@ -40,7 +40,7 @@ router.get("/subscribedChats/:memberId",authenticate,async(req,res)=>{
             }
         })
         for(let i=0;i<message_subscribed_room.length;i++){
-            joined_rooms.push(message_subscribed_room[i].chat)
+            joined_rooms.push({...message_subscribed_room[i].chat, conn_id: message_subscribed_room[i].id})
         }
         res.status(200).json({
             msg:"subscribed room found",

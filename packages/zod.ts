@@ -43,7 +43,8 @@ export const user_chat_response_schema=z.array(
             deleted:z.boolean(),
             discription:z.string(),
             id:z.string(),
-            name:z.string()
+            name:z.string(),
+            conn_id: z.string(),
         }),
     
 )

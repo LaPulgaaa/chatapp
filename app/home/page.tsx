@@ -45,6 +45,8 @@ export function get_last_msg_time(lastmsgAt: string): string {
 
 }
 
+export let user_chat_uuid = new Map<string,string>();
+
 export default function Home(){
     const router=useRouter();
     const profile_info=useRecoilValue(userDetails);
@@ -78,6 +80,8 @@ export default function Home(){
    
 
     const RoomsComponents=rooms?.map((room)=>{
+        user_chat_uuid.set(room.id, room.conn_id);
+
         return <div key={room.id} 
         className="p-3 dark:bg-white rounded-md dark:text-black m-1 cursor-pointer hover:bg-stone-300 border-2 ease-out duration-300 transition-all"
         onClick={()=>{

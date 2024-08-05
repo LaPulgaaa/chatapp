@@ -14,6 +14,9 @@ import { useRouter } from "next/navigation";
 import { ChevronLeftIcon, ListEndIcon,} from "lucide-react";
 import { DarkLight } from "@/components/DarkLight";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+
+import { user_chat_uuid } from "../../page";
+
 export type RecievedMessage={
     type:string,
     payload:{
@@ -25,19 +28,6 @@ export type RecievedMessage={
     }
 }
 
-function get_opcode_id(id?:string,messages?:ChatMessageData):string | undefined{
-    if(id===undefined || messages===undefined)
-    return undefined;
-    const target_opcode=`chat_${id}`;
-    const data=messages.messages;
-    for(let i=0;i<data.length;i++)
-    {
-        if(data[i].content===target_opcode){
-            return data[i].id;
-        }
-    }
-    return undefined;
-}
 export default function Chat({params}:{params:{slug:string}}){
     const [messages,setMessages]=useState<ChatMessageData>();
     const [realtimechat, setRealtimechat] = useState<JSX.Element[]>([]);
@@ -153,9 +143,13 @@ export default function Chat({params}:{params:{slug:string}}){
 
     }
     async function leaveRoom(){
-        const opcode_id=get_opcode_id(creds.id,messages);
+
+        const opcode_id=user_chat_uuid.get(params.slug);
         if(opcode_id===undefined)
-        return;
+        {
+            alert("Could not leave the chat!");
+            return ;
+        }
 
         try{
             const resp=await fetch(`http://localhost:3001/chat/leaveChat`,{
