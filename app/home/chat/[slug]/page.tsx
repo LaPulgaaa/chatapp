@@ -40,6 +40,7 @@ function get_opcode_id(id?:string,messages?:ChatMessageData):string | undefined{
 }
 export default function Chat({params}:{params:{slug:string}}){
     const [messages,setMessages]=useState<ChatMessageData>();
+    const [realtimechat, setRealtimechat] = useState<JSX.Element[]>([]);
     const [compose,setCompose]=useState<string>("");
     const [chat,setChat]=useState<RecievedMessage[]>([]);
     const creds=useRecoilValue(userDetails);
@@ -104,13 +105,9 @@ export default function Chat({params}:{params:{slug:string}}){
         const data=JSON.parse(event.data);
         console.log("recieved a message"+data) 
         setChat([...chat,data]);
+        setRealtimechat([...realtimechat, <Message data={data}/>])
        }
     
-       const RealtimeChats=chat.map((data)=>{
-        return <Message data={data}/>
-            
-        })
-
     function sendMessage(){
         const data={
             type:"message",
@@ -221,7 +218,7 @@ export default function Chat({params}:{params:{slug:string}}){
             
             <ScrollArea id="chatbox" className="m-4 h-full flex flex-col pb-10  rounded-md border">
                 {InboxComponent}
-                {RealtimeChats}
+                {realtimechat}
                 <div className="absolute bottom-0 w-full mb-3 flex">
                 <Input 
                 className="ml-4" 
