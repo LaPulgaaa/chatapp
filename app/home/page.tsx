@@ -1,5 +1,7 @@
 "use client"
-import { Button } from "@/components/ui/button";
+
+import { memo } from "react";
+
 import CreateRoom from "@/components/CreateRoom";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { userDetails } from "@/lib/store/atom/userDetails";
@@ -9,6 +11,7 @@ import { UserStateChats } from "@/lib/store/atom/chats";
 import { useRouter } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
+import type { ChatReponse } from "@/packages/zod";
 
 export function get_last_msg_time(lastmsgAt: string): string {
 
@@ -48,7 +51,6 @@ export function get_last_msg_time(lastmsgAt: string): string {
 export let user_chat_uuid = new Map<string,string>();
 
 export default function Home(){
-    const router=useRouter();
     const profile_info=useRecoilValue(userDetails);
     const [rooms,setRooms]=useRecoilState(UserStateChats)
     const [loader,setLoader]=useState(true);
@@ -77,25 +79,6 @@ export default function Home(){
         get_user_chats()
     },[id])
 
-   
-
-    const RoomsComponents=rooms?.map((room)=>{
-        user_chat_uuid.set(room.id, room.conn_id);
-
-        return <div key={room.id} 
-        className="p-3 dark:bg-white rounded-md dark:text-black m-1 cursor-pointer hover:bg-stone-300 border-2 ease-out duration-300 transition-all"
-        onClick={()=>{
-            router.push(`/home/chat/${room.id}`)
-        }}
-        >
-            <div className="flex justify-between">
-            <h5 className="border-l-2 text-xl font-semibold scroll-m-20 tracking-light pl-2">{room.name}</h5>
-            <p className="hidden md:block">{get_last_msg_time(room.lastmsgAt)}</p>
-            </div>
-            
-            <p className="border-l-2 pl-6 italic">{room.discription}</p>
-        </div>
-    })
     if(loader===true){
         <div className="flex text-center ">Loading...</div>
     }
@@ -110,8 +93,37 @@ export default function Home(){
                     </h4>
                     <CreateRoom/>
                     </div>
-                    {RoomsComponents}
+                    <RoomTabs rooms={rooms} />
                 </div>
             </div>
     </div>
 }
+
+const RoomTabs = memo(
+    function(opts:{rooms:ChatReponse}){
+    const router = useRouter();
+    return(
+        <div>
+            {
+                opts.rooms?.map((room)=>{
+                    user_chat_uuid.set(room.id, room.conn_id);
+
+                    return <div key={room.id} 
+                    className="p-3 dark:bg-white rounded-md dark:text-black m-1 cursor-pointer hover:bg-stone-300 border-2 ease-out duration-300 transition-all"
+                    onClick={()=>{
+                        router.push(`/home/chat/${room.id}`)
+                    }}
+                    >
+                        <div className="flex justify-between">
+                        <h5 className="border-l-2 text-xl font-semibold scroll-m-20 tracking-light pl-2">{room.name}</h5>
+                        <p className="hidden md:block">{get_last_msg_time(room.lastmsgAt)}</p>
+                        </div>
+
+                        <p className="border-l-2 pl-6 italic">{room.discription}</p>
+                    </div>
+                })
+            }
+        </div>
+    )
+}
+)
