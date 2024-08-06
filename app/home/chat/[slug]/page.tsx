@@ -98,7 +98,7 @@ export default function Chat({params}:{params:{slug:string}}){
         const data=JSON.parse(event.data);
         console.log("recieved a message"+data) 
         setChat([...chat,data]);
-        setRealtimechat([...realtimechat, <Message data={data}/>])
+        setRealtimechat([...realtimechat, <Message key={(creds.id?.substring(5) || "")+Date.now()} data={data}/>])
        }
     
     function sendMessage(){
@@ -172,7 +172,7 @@ export default function Chat({params}:{params:{slug:string}}){
     }
 
     const InboxComponent=messages.messages.map((message)=>{
-        return <Inbox data={message}/>
+        return <Inbox key={message.id} data={message}/>
     })
 
     return <div className="h-svh pb-24 mt-4">
