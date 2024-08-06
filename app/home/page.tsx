@@ -100,12 +100,19 @@ export default function Home(){
 }
 
 const RoomTabs = memo(
-    function(opts:{rooms:ChatReponse}){
+    function({rooms}:{rooms:ChatReponse}){
     const router = useRouter();
+
+    // `rooms` is a state variable so we can not mutate it
+    // instead copy it over and sort accordingly
+    let sorted_acc_to_time = [...rooms];
+
+    sorted_acc_to_time.sort((a,b)=>new Date(b.lastmsgAt).getTime() - new Date(a.lastmsgAt).getTime());
+
     return(
         <div>
             {
-                opts.rooms?.map((room)=>{
+                sorted_acc_to_time?.map((room)=>{
                     user_chat_uuid.set(room.id, room.conn_id);
 
                     return <div key={room.id} 
