@@ -1,12 +1,14 @@
+import assert from 'minimalistic-assert';
 import jwt from 'jsonwebtoken';
 import { Request,Response,NextFunction } from 'express';
 
 
 export default function authenticate(req:Request,res:Response,next:NextFunction){
     const token=req.cookies.token;
-    if(token!==undefined && process.env.ACCESS_TOKEN_SECRET!==undefined)
+    assert(process.env.ACCESS_TOKEN_SECRET !== undefined);
+    if(token!==undefined)
         {
-                jwt.verify(token,process.env.ACCESS_TOKEN_SECRET!,undefined,async(err,user)=>{
+                jwt.verify(token,process.env.ACCESS_TOKEN_SECRET,undefined,async(err,user)=>{
                 if(err){
                     res.status(400).send(err)
                 }

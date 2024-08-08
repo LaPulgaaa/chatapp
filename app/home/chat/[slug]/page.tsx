@@ -1,5 +1,7 @@
 "use client";
 
+import assert from "minimalistic-assert";
+
 import { useEffect, useState } from "react";
 import Message from "@/components/Message";
 import type { ChatMessageData } from "@/packages/zod";
@@ -80,7 +82,7 @@ export default function Chat({params}:{params:{slug:string}}){
             const data={
                 type:"join",
                 payload:{
-                    roomId:params.slug!,
+                    roomId:params.slug,
                 }
             }
             ws.send(JSON.stringify(data));
@@ -102,6 +104,7 @@ export default function Chat({params}:{params:{slug:string}}){
        }
     
     function sendMessage(){
+        assert(ws !== undefined);
         const data={
             type:"message",
             payload:{
@@ -114,7 +117,7 @@ export default function Chat({params}:{params:{slug:string}}){
             }
         }
         setCompose("")
-        ws!.send(JSON.stringify(data));
+        ws.send(JSON.stringify(data));
     }
     async function deleteChat(){
         if(did===undefined)
