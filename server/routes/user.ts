@@ -33,27 +33,45 @@ router.post("/signup",async(req,res)=>{
     const {username,password}:UserInfo=req.body;
 
     try{
-        const new_member=await prisma.member.create({
-            data:{
-                username,
-                password
+        const new_created_user = await prisma.$transaction(async(tx)=>{
+            const already_existing_user = await tx.member.findFirst({
+                where:{
+                    username,
+                    password
+                }
+            });
+
+            if(already_existing_user !== null){
+                throw new Error("User with same password and username exists");
             }
-        })
-        const token=jwt.sign(new_member,process.env.ACCESS_TOKEN_SECRET!,{expiresIn:"3h"});
+
+            const new_created_user = await tx.member.create({
+                data:{
+                    username,
+                    password
+                }
+            })
+
+            return new_created_user;
+        });
+
+        const token=jwt.sign(new_created_user,process.env.ACCESS_TOKEN_SECRET!,{expiresIn:"3h"});
+
         res.cookie("token",token,{
             sameSite:"lax",
             maxAge:60*60*24*1000,
             domain:"localhost",
             httpOnly:true
         })
+
         res.status(201).json({
             msg:"created new user",
-            member:new_member,
+            member:new_created_user,
         })
+
     }catch(err)
     {
-        console.log(err);
-        res.status(500).json({
+        res.status(403).json({
             msg:err
         })
     }

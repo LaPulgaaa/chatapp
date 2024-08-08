@@ -25,6 +25,8 @@ model Member{
   directory Directory[]
 
   deleted Boolean @default(false)
+
+  @@unique([username,password])
 }
 
 model Directory{

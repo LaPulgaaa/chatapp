@@ -32,23 +32,30 @@ export default function signup(){
 
     async function onSubmit(values:Join){
         try{
-          const resp=await fetch("http://localhost:3001/user/signup",{
-            method:"POST",
-            body:JSON.stringify(values),
-            headers:{
-              'Content-Type':"application/json"
-            },
-            credentials:"include"
-          })
-          if(resp.status==201)
-          {
-            router.push("/home");
-            window.localStorage.setItem("token","valid");
-          }
+            const resp=await fetch("http://localhost:3001/user/signup",{
+              method:"POST",
+              body:JSON.stringify(values),
+              headers:{
+                'Content-Type':"application/json"
+              },
+              credentials:"include"
+            })
+
+            if(resp.status==201)
+            {
+              router.push("/home");
+              window.localStorage.setItem("token","valid");
+            }
+
+            if(resp.status == 403)
+            {
+              alert("User with same username and password exists!");
+            }
+
         }catch(err)
         {
-          alert("User signup failed!!")
           console.log(err);
+          alert("Signup Failed -- "+err);
         }
       }
     
