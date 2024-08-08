@@ -1,10 +1,12 @@
 import {z} from 'zod';
 import express from 'express';
+import assert from 'minimalistic-assert';
 import jwt, { JwtPayload } from 'jsonwebtoken'
 
 import authenticate from '../middleware/authenticate';
 import { member_profile_schema } from '../../packages/zod';
 import { prisma } from '../../packages/prisma/prisma_client';
+
 
 const router=express.Router();
 
@@ -150,7 +152,7 @@ router.delete("/eraseAll",authenticate,async(req,res)=>{
 })
 
 router.patch("/editProfile",authenticate,async(req,res)=>{
-    console.log("inside here!")
+
     const result=(z.intersection(
         z.object({
             id:z.string()
@@ -177,6 +179,19 @@ router.patch("/editProfile",authenticate,async(req,res)=>{
                 favorite:profile_fields.favorite,
                 avatarurl:profile_fields.avatarurl
             }
+        });
+
+        assert(process.env.ACCESS_TOKEN_SECRET !== undefined, "ACCESS_TOKEN_SECRET NOT DEFINED");
+
+        const new_token = jwt.sign(updated_profile, process.env.ACCESS_TOKEN_SECRET,{
+            expiresIn: "3h"
+        });
+
+        res.cookie("token",new_token,{
+            sameSite: "lax",
+            httpOnly: true,
+            domain: "localhost",
+            maxAge: 60*60*3*1000
         })
         
         res.status(200).json({
