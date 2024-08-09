@@ -4,7 +4,7 @@ import { useForm} from 'react-hook-form';
 import { member_profile_schema,MemberProfile } from '@/packages/zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { userDetails } from '@/lib/store/atom/userDetails';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState, useResetRecoilState } from 'recoil';
 import { Avatar,AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Form,FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -20,6 +20,7 @@ import { DarkLight } from '@/components/DarkLight';
 export default function Profile(){
     const router=useRouter();
     const [user_details,setUser_details]=useRecoilState(userDetails);
+    const removeUserState = useResetRecoilState(userDetails);
     const form=useForm<Omit<MemberProfile,"favorite"> & {favorite:string}>({
         resolver:zodResolver(z.intersection(member_profile_schema.omit({favorite:true}),z.object({
             favorite:z.string()
@@ -75,9 +76,8 @@ export default function Profile(){
                 },
                 credentials:"include"
             });
-            const data=await resp.json();
             if(resp.status==200){
-                setUser_details({});
+                removeUserState();
                 router.push("/");
                 window.localStorage.clear();
             }
