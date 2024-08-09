@@ -22,15 +22,15 @@ export default function Sidebar(){
                 <br/>
             </div>
             <div className="text-center sm:text-left grid grid-cols-1 divide-y mr-1">
-                <div className="flex cursor-pointer my-[1/2] w-full hover:bg-gray-400 p-2 dark:hover:bg-gray-800 rounded-md ease-out duration-300 transition-all"><MessageCircleIcon/><p className="ml-2">Direct Messages</p></div>
-                <div className="flex cursor-pointer my-[1/2] w-full hover:bg-gray-400 p-2 dark:hover:bg-gray-800 rounded-md ease-out duration-300 transition-all"><UserIcon/><p className="ml-3">Set Status</p></div>
+                <div className="flex cursor-pointer my-[1/2] w-full hover:bg-gray-500 p-2 dark:hover:bg-gray-800 rounded-md ease-out duration-300 transition-all"><MessageCircleIcon/><p className="ml-2">Direct Messages</p></div>
+                <div className="flex cursor-pointer my-[1/2] w-full hover:bg-gray-500 p-2 dark:hover:bg-gray-800 rounded-md ease-out duration-300 transition-all"><UserIcon/><p className="ml-3">Set Status</p></div>
                 <Dialog>
                     <DialogTrigger>
-                        <div className="flex cursor-pointer my-[1/2] w-full hover:bg-gray-400 p-2 dark:hover:bg-gray-800 rounded-md ease-out duration-300 transition-all"><MessageSquareDotIcon/> <p className="ml-3">Join Room</p></div>
+                        <div className="flex cursor-pointer my-[1/2] w-full hover:bg-gray-500 p-2 dark:hover:bg-gray-800 rounded-md ease-out duration-300 transition-all"><MessageSquareDotIcon/> <p className="ml-3">Join Room</p></div>
                     </DialogTrigger>
                         <JoinRoomDialog/>
                 </Dialog>
-                <div className="flex cursor-pointer my-[1/2] w-full hover:bg-gray-400 p-2 dark:hover:bg-gray-800 rounded-md ease-out duration-300 transition-all"
+                <div className="flex cursor-pointer my-[1/2] w-full hover:bg-gray-500 p-2 dark:hover:bg-gray-800 rounded-md ease-out duration-300 transition-all"
                 onClick={()=>router.push("/home/profile")}
                 >
                     <UserIcon/><p className="ml-2">Profile</p>

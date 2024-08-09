@@ -84,9 +84,9 @@ export default function Home(){
     }
     return <div>
         <Navbar/>
-        <div className="ml-8 my-4 grid md:grid-cols-5  h-full pb-24 m-2">
+        <div className="ml-8 my-4 grid lg:grid-cols-5  h-full pb-24 m-2">
                 <Sidebar/>
-                <div className="md:col-span-4 mr-4 ml-2 pt-2">
+                <div className="lg:col-span-4 mr-4 ml-2 pt-2">
                     <div className="grid grid-cols md:flex w-inherit justify-between">
                     <h4 className="scroll-m-20 p-2 text-2xl font-semibold tracking-tigh">
                         Catch up on missed chats!
@@ -116,7 +116,7 @@ const RoomTabs = memo(
                     user_chat_uuid.set(room.id, room.conn_id);
 
                     return <div key={room.id} 
-                    className="p-3 dark:bg-white rounded-md dark:text-black m-1 cursor-pointer hover:bg-stone-300 border-2 ease-out duration-300 transition-all"
+                    className="p-3 rounded-md m-1 cursor-pointer hover:bg-gray-400 border-2 ease-out duration-300 transition-all"
                     onClick={()=>{
                         router.push(`/home/chat/${room.id}`)
                     }}
