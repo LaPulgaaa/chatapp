@@ -94,10 +94,15 @@ export default function Profile(){
             form.setValue("favorite","")
         }
     }
+    function handleRemove(fav_text: string){
+        let updated_favs = favorites.filter((fav)=> fav!==fav_text);
+        setFavorites([...updated_favs]);
+        form.setValue("favorite"," ",{shouldDirty: true});
+    }
 
     const favs_comps=favorites.map((item)=>{
         return(
-            <Badge key={item.substring(0,2)} className='mx-1'>{item}</Badge>
+            <Badge onDoubleClick={()=>handleRemove(item)} key={item.substring(0,2)} className='mx-1'>{item}</Badge>
         )
     })
     const collection=<div className='flex mr-2'>{favs_comps}</div>;
@@ -210,11 +215,11 @@ export default function Profile(){
                                 <FormLabel>Favorites</FormLabel>
                                 
                                 <FormControl>
-                                    <div className='border-2 flex p-1 rounded-md'>
+                                    <div {...field} className='border-2 flex p-1 rounded-md'>
                                     {collection}
                                         <Input
-                                        className='border-none focus:outline-none focus:border-0'
                                         {...field}
+                                        className='border-none focus:outline-none focus:border-0'
                                         onKeyDown={handleAdd}
                                         placeholder='Your favorite food, place, person, pet etc.' 
                                         />
