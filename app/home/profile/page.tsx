@@ -39,7 +39,7 @@ export default function Profile(){
     
     console.log(user_details);
     async function settings_change(values:Omit<MemberProfile,"favorite">&{favorite:string}){
-        setUser_details({...values,favorite:favorites});
+        setUser_details({...values,favorite:favorites,id: user_details.id});
 
         try{
             const resp=await fetch(`http://localhost:3001/user/editProfile`,{
