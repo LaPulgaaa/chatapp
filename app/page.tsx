@@ -35,6 +35,9 @@ export default function Home() {
           })
           router.push("/home");
         }
+        else{
+          window.localStorage.clear();
+        }
       }catch(err){
         console.log(err);
       }
