@@ -31,7 +31,7 @@ export class RedisSubscriptionManager{
 
     static get_instance(){
         if(!this.instance){
-            return new RedisSubscriptionManager();
+            this.instance = new RedisSubscriptionManager();
         }
 
         return this.instance;
