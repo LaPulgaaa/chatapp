@@ -134,23 +134,6 @@ router.get("/getCreds",authenticate,async(req,res)=>{
   
 })
 
-router.delete("/eraseAll",authenticate,async(req,res)=>{
-    try{
-        const status=await prisma.member.deleteMany({});
-        if(status!==undefined)
-        {
-            res.status(200).json({
-                msg:"all the member has been deleted successfully!",
-                status
-            })
-        }
-    }catch(err)
-    {
-        console.log(err)
-        res.status(400).send("error deleting members!")
-    }
-})
-
 router.patch("/editProfile",authenticate,async(req,res)=>{
 
     const result=(z.intersection(
