@@ -17,21 +17,22 @@ router.get("/subscribedChats/:memberId",authenticate,async(req,res)=>{
     const {memberId}=req.params;
     try{
         let joined_rooms=[];
-        const message_subscribed_room=await prisma.message.findMany({
+        const message_subscribed_rooms=await prisma.message.findMany({
             where:{
                 content:`chat_${memberId}`,
                 deleted:true
             },
-            include:{
-                chat:true
+            select:{
+                chat: true,
+                id: true
             }
         })
-        for(let i=0;i<message_subscribed_room.length;i++){
-            joined_rooms.push({...message_subscribed_room[i].chat, conn_id: message_subscribed_room[i].id})
-        }
+        let raw_data = message_subscribed_rooms.map((room)=>{
+            return {...room.chat,conn_id: room.id};
+        })
         res.status(200).json({
             msg:"subscribed room found",
-            raw_data:joined_rooms
+            raw_data
         })
     }catch(err)
     {
