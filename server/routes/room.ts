@@ -12,19 +12,6 @@ type CreateRoomSchema={
     memberId:string
 }
 
-router.get("/allChats",authenticate,async(req,res)=>{
-    try{
-        const chats=prisma.chat.findMany({});
-        res.status(200).json({
-            msg:"This is a complete list of rooms.",
-            data:chats
-        })
-    }catch(err)
-    {
-        console.log(err);
-        res.status(400).send("Error fetching rooms.")
-    }
-})
 
 router.get("/subscribedChats/:memberId",authenticate,async(req,res)=>{
     const {memberId}=req.params;
