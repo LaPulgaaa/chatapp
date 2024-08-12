@@ -1,11 +1,13 @@
 import {z} from 'zod';
 import express from 'express';
 import assert from 'minimalistic-assert';
-import jwt, { JwtPayload } from 'jsonwebtoken'
+import jwt, { JwtPayload } from 'jsonwebtoken';
+
+import { prisma } from '../../packages/prisma/prisma_client';
 
 import authenticate from '../middleware/authenticate';
 import { member_profile_schema } from '../../packages/zod';
-import { prisma } from '../../packages/prisma/prisma_client';
+import { Cache } from '../util/jwt';
 
 
 const router=express.Router();
@@ -59,6 +61,8 @@ router.post("/signup",async(req,res)=>{
 
         const token=jwt.sign(new_created_user,process.env.ACCESS_TOKEN_SECRET!,{expiresIn:"3h"});
 
+        Cache.get_instance().set_member_id(token);
+
         res.cookie("token",token,{
             sameSite:"lax",
             maxAge:60*60*24*1000,
@@ -96,6 +100,7 @@ router.post("/login",async(req,res)=>{
         if(member!==null)
         {
             const token=jwt.sign(member,process.env.ACCESS_TOKEN_SECRET!,{expiresIn:"3h"});
+            Cache.get_instance().set_member_id(token);
             res.cookie("token",token,{
                 sameSite:"lax",
                 maxAge:60*60*3*1000,
@@ -117,6 +122,7 @@ router.post("/login",async(req,res)=>{
 router.get("/getCreds",authenticate,async(req,res)=>{
     try{
         const token=req.cookies.token;
+        Cache.get_instance().get_member_id(token);
         const creds=jwt.verify(token,process.env.ACCESS_TOKEN_SECRET!) as JwtPayload;
         if(token!==null || token!==undefined)
         {
@@ -169,6 +175,8 @@ router.patch("/editProfile",authenticate,async(req,res)=>{
         const new_token = jwt.sign(updated_profile, process.env.ACCESS_TOKEN_SECRET,{
             expiresIn: "3h"
         });
+
+        Cache.get_instance().set_member_id(new_token);
 
         res.cookie("token",new_token,{
             sameSite: "lax",
