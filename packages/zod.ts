@@ -57,8 +57,6 @@ export const unit_message_schema= z.object({
     id:z.string(),
     memberId:z.string(),
     sender:z.object({
-        id:z.string(),
-        password:z.string(),
         username:z.string()
     })
 })

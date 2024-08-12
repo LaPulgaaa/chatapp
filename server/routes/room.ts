@@ -116,7 +116,11 @@ router.post("/getMessage",authenticate,async(req,res)=>{
                         deleted: false
                     },
                     include:{
-                        sender:true
+                        sender:{
+                            select:{
+                                username: true
+                            }
+                        }
                     }
                 }
             }
