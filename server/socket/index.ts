@@ -40,13 +40,18 @@ export async function ws(wss:WebSocketServer){
                 console.log("someone sent a message");
                 const roomId=users[wsId].roomId;
                 const message=data.payload.message;
-                RedisSubscriptionManager.get_instance().addChatMessage(roomId,message);
+                const {id, ...content} = message;
+                RedisSubscriptionManager.get_instance().addChatMessage(roomId,content);
 
                 await client.lPush("message",JSON.stringify({
                     content:message.content,
                     chatId:roomId,
-                    memberId:message.id
+                    memberId:id
                 }))
+            }
+
+            if(data.type === "leave"){
+                RedisSubscriptionManager.get_instance().unsubscribe(wsId.toString(),data.payload.roomId);
             }
 
         })
@@ -56,6 +61,8 @@ export async function ws(wss:WebSocketServer){
             if(users[wsId]!==undefined)
             {
                 RedisSubscriptionManager.get_instance().unsubscribe(wsId.toString(),users[wsId].roomId);
+                delete users[wsId];
+                count--;
             }
         })
         

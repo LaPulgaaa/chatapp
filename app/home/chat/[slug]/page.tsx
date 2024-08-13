@@ -2,6 +2,8 @@
 
 import assert from "minimalistic-assert";
 
+import { Signal } from "../../signal";
+
 import { useEffect, useState } from "react";
 import Message from "@/components/Message";
 import type { ChatMessageData } from "@/packages/zod";
@@ -38,10 +40,10 @@ export default function Chat({params}:{params:{slug:string}}){
     const [compose,setCompose]=useState<string>("");
     const [chat,setChat]=useState<RecievedMessage[]>([]);
     const creds=useRecoilValue(userDetails);
-    const [ws,setWs]=useState<WebSocket>();
     const [did,setDid]=useState<number>();
     const [rooms,setRooms]=useRecoilState(UserStateChats)
     const router=useRouter();
+    const room_id = params.slug;
     useEffect(()=>{
         async function fetch_messages(){
             try{
@@ -74,29 +76,14 @@ export default function Chat({params}:{params:{slug:string}}){
     },[])
 
     useEffect(()=>{
+        Signal.get_instance().SUBSCRIBE(params.slug,recieve_msg);
         
-        let ws=new WebSocket("ws://localhost:3001");
-         
-        ws.onopen=function(){
-            console.log("connection open");
-            const data={
-                type:"join",
-                payload:{
-                    roomId:params.slug,
-                }
-            }
-            ws.send(JSON.stringify(data));
-            setWs(ws);
-        }
         return ()=>{
-            if(ws.OPEN === 1){
-                ws.close();
-            }
+            Signal.get_instance().UNSUBSCRIBE(params.slug);
         }
-    },[])
+    },[room_id])
 
-    if(ws!==undefined)
-    ws.onmessage=function(event){
+    function recieve_msg(event:MessageEvent){
         const data=JSON.parse(event.data);
         console.log("recieved a message"+data) 
         setChat([...chat,data]);
@@ -104,7 +91,6 @@ export default function Chat({params}:{params:{slug:string}}){
        }
     
     function sendMessage(){
-        assert(ws !== undefined);
         const data={
             type:"message",
             payload:{
@@ -117,7 +103,7 @@ export default function Chat({params}:{params:{slug:string}}){
             }
         }
         setCompose("")
-        ws.send(JSON.stringify(data));
+        Signal.get_instance().SEND(JSON.stringify(data));
     }
     async function deleteChat(){
         if(did===undefined)

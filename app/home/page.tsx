@@ -2,6 +2,8 @@
 
 import { memo } from "react";
 
+import { Signal } from "./signal";
+
 import CreateRoom from "@/components/CreateRoom";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { userDetails } from "@/lib/store/atom/userDetails";
@@ -55,6 +57,10 @@ export default function Home(){
     const [rooms,setRooms]=useRecoilState(UserStateChats)
     const [loader,setLoader]=useState(true);
     const id=profile_info.id;
+    useEffect(()=>{
+        Signal.get_instance();
+
+    },[])
     useEffect(()=>{
         async function get_user_chats(){
             try{
