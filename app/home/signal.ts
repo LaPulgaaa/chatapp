@@ -6,6 +6,7 @@ export class Signal{
     private ws:WebSocket;
     private initialised: boolean = false;
     private buffered_messages: string[] = [];
+    private callback: ((event:MessageEvent)=>void) | undefined;
 
     private constructor(){
         this.ws = new WebSocket(`${BASE_URL}:${PORT}`);
@@ -15,6 +16,10 @@ export class Signal{
                 this.ws.send(msg);
             })
             console.log("connection made with the server")
+        }
+
+        this.ws.onmessage = (event) => {
+            this.callback!(event);
         }
 
         this.ws.onclose = () =>{
@@ -36,7 +41,7 @@ export class Signal{
         return Signal.instance;
     }
 
-    SUBSCRIBE(room_id: string, callback:(event:MessageEvent)=>void){
+    SUBSCRIBE(room_id: string){
         const msg = JSON.stringify({
             type: "join",
             payload: {
@@ -48,8 +53,6 @@ export class Signal{
             return ;
         }
         this.ws.send(msg);
-
-        this.ws.onmessage = callback;
 
     }
 
@@ -67,6 +70,14 @@ export class Signal{
         }
 
         this.ws.send(msg);
+    }
+
+    REGISTER_CALLBACK(callback:(event:MessageEvent)=>void){
+        this.callback = callback;
+    }
+
+    DEREGISTER(){
+        delete this.callback;
     }
 
     SEND(payload: string){

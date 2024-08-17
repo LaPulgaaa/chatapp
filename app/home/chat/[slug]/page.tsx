@@ -76,19 +76,20 @@ export default function Chat({params}:{params:{slug:string}}){
     },[])
 
     useEffect(()=>{
-        Signal.get_instance().SUBSCRIBE(params.slug,recieve_msg);
+        Signal.get_instance().SUBSCRIBE(params.slug);
+        Signal.get_instance().REGISTER_CALLBACK(recieve_msg);
         
         return ()=>{
             Signal.get_instance().UNSUBSCRIBE(params.slug);
+            Signal.get_instance().DEREGISTER();
         }
     },[room_id])
-
     function recieve_msg(event:MessageEvent){
         const data=JSON.parse(event.data);
         console.log("recieved a message"+data) 
         setChat([...chat,data]);
-        setRealtimechat([...realtimechat, <Message key={(creds.id?.substring(5) || "")+Date.now()} data={data}/>])
-       }
+        setRealtimechat((realtimechat)=>[...realtimechat, <Message key={(creds.id?.substring(5) || "")+Date.now()} data={data}/>])
+    }
     
     function sendMessage(){
         const data={

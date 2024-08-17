@@ -71,8 +71,9 @@ export class RedisSubscriptionManager{
         if(this.subscription.get(userId)?.length==0){
             this.subscription.delete(userId);
         }
-        delete this.reverseSubscription.get(room)?.userId;
-
+        if(this.reverseSubscription.has(room)){
+            delete this.reverseSubscription.get(room)![userId];
+        }
         if(!this.reverseSubscription.get(room)||
         Object.keys(this.reverseSubscription.get(room)||{}).length===0){
             console.log("unsubscribing from room "+room);
