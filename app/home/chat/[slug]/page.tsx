@@ -1,4 +1,5 @@
 "use client";
+import { useRef } from "react";
 
 import assert from "minimalistic-assert";
 
@@ -35,6 +36,7 @@ export type RecievedMessage={
 }
 
 export default function Chat({params}:{params:{slug:string}}){
+    const chat_ref = useRef<HTMLDivElement>(null);
     const [messages,setMessages]=useState<ChatMessageData>();
     const [realtimechat, setRealtimechat] = useState<JSX.Element[]>([]);
     const [compose,setCompose]=useState<string>("");
@@ -88,9 +90,39 @@ export default function Chat({params}:{params:{slug:string}}){
         const data=JSON.parse(event.data);
         console.log("recieved a message"+data) 
         setChat([...chat,data]);
-        setRealtimechat((realtimechat)=>[...realtimechat, <Message key={(creds.id?.substring(5) || "")+Date.now()} data={data}/>])
+        setRealtimechat((realtimechat)=>[...realtimechat, <Message  key={(creds.id?.substring(5) || "")+Date.now()} data={data}/>])
     }
-    
+
+    useEffect(()=>{
+            const chat_node = chat_ref.current;
+            if(chat_node!==null)
+            {
+                const chat_history_comps = chat_node.querySelectorAll("#history");
+                if(chat_history_comps.length < 1)
+                    return;
+                const last_comp_idx = chat_history_comps.length - 1;
+                chat_history_comps[last_comp_idx].scrollIntoView({
+                    behavior: "instant",
+                    inline: "center"
+                })
+            }
+    },[messages])
+
+    useEffect(()=>{
+        const chat_node = chat_ref.current;
+        if(chat_node!==null)
+        {
+            const recent_msg_comps = chat_node.querySelectorAll("#recent");
+            if(recent_msg_comps.length < 1)
+                return;
+            const last_recent_idx = recent_msg_comps.length - 1;
+            recent_msg_comps[last_recent_idx].scrollIntoView({
+                behavior: "smooth",
+                inline: "center"
+            })
+        }
+    },[chat])
+
     function sendMessage(){
         const data={
             type:"message",
@@ -194,8 +226,10 @@ export default function Chat({params}:{params:{slug:string}}){
             
             <ScrollArea id="chatbox"
              className="m-4 h-full flex flex-col pb-10  rounded-md border">
-                <div>{InboxComponent}</div>
-                <div>{realtimechat}</div>
+                <div className="mb-4" ref={chat_ref}>
+                    <div>{InboxComponent}</div>
+                    <div>{realtimechat}</div>
+                </div>
                 <div className="absolute bottom-0 w-full mb-3 flex">
                 <Input 
                 className="ml-4" 

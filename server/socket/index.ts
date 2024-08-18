@@ -62,7 +62,6 @@ export async function ws(wss:WebSocketServer){
             {
                 RedisSubscriptionManager.get_instance().unsubscribe(wsId.toString(),users[wsId].roomId);
                 delete users[wsId];
-                count--;
             }
         })
         

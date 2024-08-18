@@ -11,8 +11,9 @@ export default function Message({data}:{data:RecievedMessage}){
     let hour_min = today_at.split(":").slice(0, -1);
 
     return <div 
+    id="recent"
     key={Math.floor(Math.random()*100000)} 
-    className={`flex m-2 p-2  ${data.payload.message.user===username?'justify-end':data.payload.message.user==='pulgabot'?' justify-center':''}  `}>
+    className={`flex m-2 ${data.payload.message.user===username?'justify-end':data.payload.message.user==='pulgabot'?' justify-center':''}  `}>
     <Avatar 
     className={`w-[35px] h-[35px] mr-2 border-2 border-slate-400 bg-slate-200 dark:bg-slate-900 mt-1 p-4 ${data.payload.message.user===username?'hidden':''}`}>
         
