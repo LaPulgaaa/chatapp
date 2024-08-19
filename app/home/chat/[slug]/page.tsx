@@ -76,7 +76,7 @@ export default function Chat({params}:{params:{slug:string}}){
             }
         }
         fetch_messages();
-    },[])
+    },[room_id])
 
     useEffect(()=>{
         Signal.get_instance().SUBSCRIBE(params.slug);
