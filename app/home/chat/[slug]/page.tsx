@@ -43,7 +43,8 @@ export default function Chat({params}:{params:{slug:string}}){
     const [chat,setChat]=useState<RecievedMessage[]>([]);
     const creds=useRecoilValue(userDetails);
     const [did,setDid]=useState<number>();
-    const [rooms,setRooms]=useRecoilState(UserStateChats)
+    const [rooms,setRooms]=useRecoilState(UserStateChats);
+    const [disable,setDisable] = useState(true);
     const router=useRouter();
     const room_id = params.slug;
     useEffect(()=>{
@@ -122,6 +123,13 @@ export default function Chat({params}:{params:{slug:string}}){
             })
         }
     },[chat])
+
+    useEffect(()=>{
+        if(compose.trim().length>0)
+            setDisable(false);
+        else
+            setDisable(true);
+    },[compose])
 
     function sendMessage(){
         const data={
@@ -236,11 +244,16 @@ export default function Chat({params}:{params:{slug:string}}){
                 value={compose}
                 onChange={(e)=>setCompose(e.target.value)}
                 onKeyDown={(e)=>{
-                    if(e.key==="Enter")
-                    sendMessage();
+                    if(e.key === "Enter" && compose.trim().length > 0)
+                        sendMessage();
                 }}
                 type="text" placeholder="Message"/>
-                <Button onClick={sendMessage} className="mx-4">Send</Button>
+                <Button
+                disabled = {disable}
+                onClick={()=>{
+                    if(compose.trim().length > 0)
+                        sendMessage();
+                }} className="mx-4">Send</Button>
                 </div>
             </ScrollArea>
         </div>
