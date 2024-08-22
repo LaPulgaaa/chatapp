@@ -88,3 +88,11 @@ export const worker_payload=z.object({
 
 //z.output is an alias for z.infer
 export type WorkerPayload=z.output<typeof worker_payload>;
+
+export const room_header_details = z.object({
+    name: z.string(),
+    discription: z.string(),
+    createdAt: z.string()
+});
+
+export type RoomHeaderDetails = z.output<typeof room_header_details>;

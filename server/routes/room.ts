@@ -3,6 +3,7 @@ import express from 'express';
 
 import {prisma} from '../../packages/prisma/prisma_client'
 import authenticate from '../middleware/authenticate';
+import { RedisSubscriptionManager } from '../socket/redisClient';
 
 const router=express.Router();
 
@@ -241,6 +242,82 @@ router.patch("/updateFrom",authenticate,async(req,res)=>{
     {
         console.log(err);
         res.send("internal server error!")
+    }
+})
+
+router.get("/getDetails/:room_id",authenticate,async(req,res)=>{
+    const room_id = req.params.room_id;
+    try{
+        const resp = await prisma.chat.findUnique({
+            where:{
+                id: room_id
+            },
+            select: {
+                name: true,
+                discription: true,
+                createdAt: true
+            }
+        });
+        if(resp === null){
+            return res.status(404).json({
+                msg: "Room details not found"
+            })
+        }
+
+        res.status(200).json({
+            msg: "success",
+            raw_data: resp,
+        })
+    }catch(err){
+        res.status(500).json({
+            msg: "Could not fetch details",
+            err: err
+        })
+    }
+})
+router.get("/getMembers/:room_id",authenticate,async(req,res)=>{
+    const room_id = req.params.room_id;
+    try{
+        const resp = await prisma.directory.findMany({
+            where:{
+                chat_id: room_id
+            },
+            select:{
+                user: {
+                    select: {
+                        id: true,
+                        username: true,
+                        status: true,
+                        avatarurl: true
+                    }
+                }
+            }
+        });
+        const activeMemberIds = RedisSubscriptionManager.get_instance().getRoomMembers(room_id);
+        const member_info = resp.map(({user})=>{
+            const {id, ...details} = user;
+            const maybe_active = activeMemberIds?.has(id);
+            if(maybe_active === undefined){
+                return {
+                    ...details,
+                    active: false
+                }
+            }
+            return {
+                ...details,
+                active: true
+            }
+        });
+
+        return res.status(200).json({
+            msg: "successfull",
+            raw_data: member_info
+        })
+    }catch(err){
+        res.status(500).json({
+            msg: "Could not fetch members",
+            err
+        })
     }
 })
 export default router;

@@ -76,7 +76,6 @@ export class RedisSubscriptionManager{
         }
         if(!this.reverseSubscription.get(room)||
         Object.keys(this.reverseSubscription.get(room)||{}).length===0){
-            console.log("unsubscribing from room "+room);
             this.subscriber.unsubscribe(room);
             this.reverseSubscription.delete(room);
         }
@@ -91,5 +90,14 @@ export class RedisSubscriptionManager{
                 message
             }
         }))
+    }
+
+    getRoomMembers(roomId: string){
+        const member_details = this.reverseSubscription.get(roomId);
+        if(member_details === undefined){
+            return undefined;
+        }
+
+        return new Set(Object.keys(member_details));
     }
 }

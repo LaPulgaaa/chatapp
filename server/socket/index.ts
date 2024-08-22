@@ -22,11 +22,9 @@ export async function ws(wss:WebSocketServer){
         
         ws.on("message",async(message:string)=>{
             const data=JSON.parse(`${message}`);
-            console.log(data);
             if(data.type==="join")
             {
 
-                console.log("someone joined the room");
                 users[wsId]={
                     roomId:data.payload.roomId,
                     ws
@@ -37,7 +35,6 @@ export async function ws(wss:WebSocketServer){
 
             if(data.type==="message")
             {
-                console.log("someone sent a message");
                 const roomId=users[wsId].roomId;
                 const message=data.payload.message;
                 const {id, ...content} = message;
@@ -56,7 +53,6 @@ export async function ws(wss:WebSocketServer){
 
         })
         ws.on("close",()=>{
-            // console.log("someone left this room");
 
             if(users[wsId]!==undefined)
             {

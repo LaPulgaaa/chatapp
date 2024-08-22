@@ -23,6 +23,9 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { user_chat_uuid } from "../../page";
 import { leave_room } from "../../util";
 import { UserStateChats } from "@/lib/store/atom/chats";
+import { RoomHeaderDetails } from "@/packages/zod";
+import { get_room_details } from "./action";
+import RoomHeader from "@/components/RoomHeader";
 
 export type RecievedMessage={
     type:string,
@@ -46,7 +49,9 @@ export default function Chat({params}:{params:{slug:string}}){
     const [rooms,setRooms]=useRecoilState(UserStateChats);
     const [disable,setDisable] = useState(true);
     const router=useRouter();
+    const [room_details,setRoomDetails] = useState<RoomHeaderDetails>();
     const room_id = params.slug;
+    
     useEffect(()=>{
         async function fetch_messages(){
             try{
@@ -76,6 +81,14 @@ export default function Chat({params}:{params:{slug:string}}){
             }
         }
         fetch_messages();
+
+        const fetch_room_details = async() => {
+            const resp = await get_room_details(params.slug);
+            if(resp !== undefined)
+                setRoomDetails(resp);
+        }
+
+        fetch_room_details();
     },[room_id])
 
     useEffect(()=>{
@@ -207,10 +220,17 @@ export default function Chat({params}:{params:{slug:string}}){
 
     return <div className="h-svh pb-24 mt-4">
             <div className="flex justify-between">
-                <Button variant={`outline`} size={`icon`} className="ml-4"
-                    onClick={()=>router.push("/home")}
-                    ><ChevronLeftIcon/>
-                </Button>
+                    <Button variant={`outline`} size={`icon`} className="ml-4"
+                        onClick={()=>router.push("/home")}
+                        ><ChevronLeftIcon/>
+                    </Button>
+                {
+                    room_details && (
+                        <>
+                        <RoomHeader room_details={room_details}/>
+                        </>
+                    )
+                }
                 <div className="flex mr-2">
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
