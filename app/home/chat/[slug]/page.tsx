@@ -227,7 +227,7 @@ export default function Chat({params}:{params:{slug:string}}){
                 {
                     room_details && (
                         <>
-                        <RoomHeader room_details={room_details}/>
+                        <RoomHeader room_details={{...room_details, room_id: params.slug}}/>
                         </>
                     )
                 }

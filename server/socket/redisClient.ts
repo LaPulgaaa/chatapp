@@ -99,7 +99,11 @@ export class RedisSubscriptionManager{
         if(member_details === undefined){
             return undefined;
         }
-
-        return new Set(Object.keys(member_details));
+        const member_ids = Object.values(member_details).flatMap((member)=> {
+            if(member.uuid)
+                return member.uuid
+            return [];
+        })
+        return new Set(member_ids);
     }
 }

@@ -38,8 +38,6 @@ export class Cache{
     get_member_id(token: string){
         const store = this.member_id_store.get(token);
 
-        console.log(store);
-
         if(store === undefined)
             return undefined;
         else if(store.expiry < Date.now()){

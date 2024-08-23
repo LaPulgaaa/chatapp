@@ -294,18 +294,19 @@ router.get("/getMembers/:room_id",authenticate,async(req,res)=>{
             }
         });
         const activeMemberIds = RedisSubscriptionManager.get_instance().getRoomMembers(room_id);
+        console.log(activeMemberIds);
         const member_info = resp.map(({user})=>{
             const {id, ...details} = user;
             const maybe_active = activeMemberIds?.has(id);
-            if(maybe_active === undefined){
+            if(maybe_active !== undefined && maybe_active === true){
                 return {
                     ...details,
-                    active: false
+                    active: true
                 }
             }
             return {
                 ...details,
-                active: true
+                active: false
             }
         });
 

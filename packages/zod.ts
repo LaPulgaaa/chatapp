@@ -96,3 +96,12 @@ export const room_header_details = z.object({
 });
 
 export type RoomHeaderDetails = z.output<typeof room_header_details>;
+
+export const room_member_details_schema = z.array(z.object({
+    username: z.string(),
+    active: z.boolean(),
+    avatarurl: z.string().nullish(),
+    status: z.string().nullish(),
+}))
+
+export type RoomMemberDetails = z.output<typeof room_member_details_schema>;
