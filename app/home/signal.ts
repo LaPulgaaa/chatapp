@@ -41,11 +41,12 @@ export class Signal{
         return Signal.instance;
     }
 
-    SUBSCRIBE(room_id: string){
+    SUBSCRIBE(room_id: string, user_id?: string){
         const msg = JSON.stringify({
             type: "join",
             payload: {
-                roomId: room_id
+                roomId: room_id,
+                userId: user_id,
             }
         });
         if(this.initialised === false){

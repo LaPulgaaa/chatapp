@@ -7,7 +7,8 @@ const client=createClient();
 const users:{
     [wsId:string]:{
         roomId:string,
-        ws:any
+        ws:any,
+        userId?: string,
     }
 }={};
 
@@ -27,10 +28,15 @@ export async function ws(wss:WebSocketServer){
 
                 users[wsId]={
                     roomId:data.payload.roomId,
-                    ws
+                    ws,
+                    userId: data.payload.userId,
                 }
 
-                RedisSubscriptionManager.get_instance().handleSubscription(data.payload.roomId,ws,wsId.toString())
+                RedisSubscriptionManager.get_instance().handleSubscription(
+                    data.payload.roomId,
+                    ws,
+                    wsId.toString(),
+                    data.payload.userId)
             }
 
             if(data.type==="message")

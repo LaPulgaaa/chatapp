@@ -10,7 +10,8 @@ export class RedisSubscriptionManager{
     public reverseSubscription:Map<string,{
         [userId:string]:{
             userId:string,
-            ws:any
+            ws:any,
+            uuid?: string,
         }
     }>;
 
@@ -37,7 +38,7 @@ export class RedisSubscriptionManager{
         return this.instance;
     }
 
-    handleSubscription(roomId:string,wss:any,userId:string){
+    handleSubscription(roomId:string,wss:any,userId:string, uuid?: string){
 
         this.subscription.set(userId,[...(this.subscription.get(userId))||[],roomId]);
 
@@ -45,7 +46,8 @@ export class RedisSubscriptionManager{
             ...(this.reverseSubscription.get(roomId) || {}),
             [userId]:{
                 userId:userId,
-                ws:wss
+                ws:wss,
+                uuid
             }
         })
 

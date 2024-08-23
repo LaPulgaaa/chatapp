@@ -92,7 +92,7 @@ export default function Chat({params}:{params:{slug:string}}){
     },[room_id])
 
     useEffect(()=>{
-        Signal.get_instance().SUBSCRIBE(params.slug);
+        Signal.get_instance().SUBSCRIBE(params.slug, creds.id);
         Signal.get_instance().REGISTER_CALLBACK(recieve_msg);
         
         return ()=>{
