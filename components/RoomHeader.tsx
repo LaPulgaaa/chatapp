@@ -75,8 +75,8 @@ export function Members({room_id}:{room_id: string}){
                 {
                     members.map((member)=>{
                         return (
-                            <div>
-                                <DropdownMenuItem key={member.username} className="flex w-full justify-between">
+                            <div key={member.username}>
+                                <DropdownMenuItem className="flex w-full justify-between">
                                 <div className="flex justify-start">
                                     <Avatar className="mt-1">
                                         <AvatarImage src={member.avatarurl ?? "https://github.com/shadcn.png"}/>
@@ -98,8 +98,8 @@ export function Members({room_id}:{room_id: string}){
                                         {member.active ? "active" : "inactive"}
                                     </Badge>
                                 </div>
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator/>
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator/>
                             </div>
                         )
                     })
