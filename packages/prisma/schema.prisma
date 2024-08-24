@@ -26,7 +26,8 @@ model Member{
 
   deleted Boolean @default(false)
 
-  @@unique([username,password])
+  @@unique([username])
+  @@index([username])
 }
 
 model Directory{
