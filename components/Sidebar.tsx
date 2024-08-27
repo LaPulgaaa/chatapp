@@ -2,7 +2,7 @@ import { ScrollArea } from "./ui/scroll-area";
 import { Dialog,DialogTrigger } from "./ui/dialog";
 import JoinRoomDialog from "@/components/JoinRoom";
 import { Avatar, AvatarFallback } from "./ui/avatar";
-import { SettingsIcon ,MessageCircleIcon, UserIcon} from "lucide-react";
+import { MessageCircleIcon, UserIcon} from "lucide-react";
 import { userDetails } from "@/lib/store/atom/userDetails";
 import { MessageSquareDotIcon } from "lucide-react";
 import { useRecoilValue } from "recoil";

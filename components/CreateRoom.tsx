@@ -5,7 +5,7 @@ import {Dialog,DialogClose,DialogContent,DialogDescription,DialogFooter,DialogHe
 from "@/components/ui/dialog";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { RoomType, create_room_schema } from "@/packages/zod";
-import { Form,FormControl,FormDescription,FormField,FormLabel,FormItem,FormMessage } from "./ui/form";
+import { Form,FormControl,FormField,FormLabel,FormItem,FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";

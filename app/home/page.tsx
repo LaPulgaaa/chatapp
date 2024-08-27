@@ -5,7 +5,7 @@ import { memo } from "react";
 import { Signal } from "./signal";
 
 import CreateRoom from "@/components/CreateRoom";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { userDetails } from "@/lib/store/atom/userDetails";
 import { useEffect, useState } from "react";
 import { user_chat_response_schema } from "@/packages/zod";

@@ -1,8 +1,6 @@
 "use client";
 import { useRef } from "react";
 
-import assert from "minimalistic-assert";
-
 import { Signal } from "../../signal";
 
 import { useEffect, useState } from "react";
