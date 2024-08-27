@@ -93,7 +93,7 @@ export default function Home(){
         <div className="ml-8 my-4 grid lg:grid-cols-5  h-full pb-24 m-2">
                 <Sidebar/>
                 <div className="lg:col-span-4 mr-4 ml-2 pt-2">
-                    <div className="grid grid-cols md:flex w-inherit justify-between">
+                    <div className="flex w-inherit justify-between">
                     <h4 className="scroll-m-20 p-2 text-2xl font-semibold tracking-tigh">
                         Catch up on missed chats!
                     </h4>
