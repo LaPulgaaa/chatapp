@@ -9,7 +9,7 @@
     "lint": "next lint",
     "test": "vitest",
     "dev:combined": "npm run dev & npx next dev",
-    "prisma:migrate": "npx prisma migrate deploy --schema=./packages/prisma/schema.prisma",
+    "prisma:migrate": "npx prisma migrate dev --schema=./packages/prisma/schema.prisma",
     "prisma:generate": "npx prisma generate --schema=./packages/prisma/schema.prisma",
     "dev:docker": "npm run prisma:generate && npm run prisma:migrate & npx next dev"
   },
