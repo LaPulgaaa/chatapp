@@ -30,7 +30,7 @@ export default function Profile(){
             password:user_details.password ?? "",
             status:user_details.status ?? "",
             about:user_details.about ?? "",
-            avatarurl:user_details.avatarurl ?? "",
+            avatarurl:user_details.avatarurl,
             favorite:""
         }
     })
