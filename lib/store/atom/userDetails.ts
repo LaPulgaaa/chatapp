@@ -10,6 +10,7 @@ export const userDetails=atom<UserDetails>({
         username:undefined,
         password:undefined,
         id:undefined,
+        name: undefined,
         favorite:[],
         status:undefined,
         about:undefined,

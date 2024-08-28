@@ -28,6 +28,7 @@ export default function Profile(){
         defaultValues:{
             username:user_details.username ?? "",
             password:user_details.password ?? "",
+            name: user_details.name,
             status:user_details.status ?? "",
             about:user_details.about ?? "",
             avatarurl:user_details.avatarurl,
@@ -47,6 +48,7 @@ export default function Profile(){
                 method:"PATCH",
                 body:JSON.stringify({
                     id:user_details.id,
+                    name: user_details.name,
                     about:values.about,
                     favorite:favorites,
                     status:values.status,
@@ -169,6 +171,23 @@ export default function Profile(){
                                     <Input
                                     type='password' placeholder='password' {...field}
                                     disabled={true}
+                                    />
+                                </FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                        />
+
+                        <FormField
+                        control={form.control}
+                        name='name'
+                        render={({field})=>(
+                            <FormItem>
+                                <FormLabel>Name</FormLabel>
+                                <FormControl>
+                                    <Input
+                                    type='text'
+                                    placeholder={"Your full name"} {...field}
                                     />
                                 </FormControl>
                                 <FormMessage/>

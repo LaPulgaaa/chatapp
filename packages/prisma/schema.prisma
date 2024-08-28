@@ -15,6 +15,7 @@ model Member{
   username String
   password String
 
+  name String?
   about String?
   status String?
   favorite String[]

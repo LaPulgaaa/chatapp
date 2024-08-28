@@ -72,6 +72,7 @@ export type ChatReponse=z.infer<typeof user_chat_response_schema>;
 export const member_profile_schema=z.object({
     username:z.string(),
     password:z.string(),
+    name: z.string().optional(),
     about:z.string().optional(),
     favorite:z.array(z.string()),
     status:z.string(),
@@ -99,6 +100,7 @@ export type RoomHeaderDetails = z.output<typeof room_header_details>;
 
 export const room_member_details_schema = z.array(z.object({
     username: z.string(),
+    name: z.string().nullish(),
     active: z.boolean(),
     avatarurl: z.string().nullish(),
     status: z.string().nullish(),

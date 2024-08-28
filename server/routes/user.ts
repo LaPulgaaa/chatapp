@@ -163,6 +163,7 @@ router.patch("/editProfile",authenticate,async(req,res)=>{
                 id:profile_fields.id,
             },
             data:{
+                name: profile_fields.name,
                 about:profile_fields.about,
                 status:profile_fields.status,
                 favorite:profile_fields.favorite,
