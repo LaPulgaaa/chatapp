@@ -11,19 +11,23 @@ import Inbox from "@/components/Inbox";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useRecoilValue, useRecoilState} from "recoil";
+import { useRecoilValue, useRecoilState, useSetRecoilState} from "recoil";
 import { userDetails } from "@/lib/store/atom/userDetails";
 import { useRouter } from "next/navigation";
 import { ChevronLeftIcon, ListEndIcon,} from "lucide-react";
 import { DarkLight } from "@/components/DarkLight";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import { user_chat_uuid } from "../../page";
 import { leave_room } from "../../util";
 import { UserStateChats } from "@/lib/store/atom/chats";
 import { RoomHeaderDetails } from "@/packages/zod";
 import { get_room_details } from "./action";
-import RoomHeader from "@/components/RoomHeader";
+import type { RoomMemberDetails } from "@/packages/zod";
+import { room_member_details_schema } from "@/packages/zod";
+import { isSidebarHidden } from "@/lib/store/atom/sidebar";
 
 export type RecievedMessage={
     type:string,
@@ -45,6 +49,7 @@ export default function Chat({params}:{params:{slug:string}}){
     const creds=useRecoilValue(userDetails);
     const [did,setDid]=useState<number>();
     const [rooms,setRooms]=useRecoilState(UserStateChats);
+    const [ishidden,setIshidden] = useRecoilState(isSidebarHidden) 
     const [disable,setDisable] = useState(true);
     const router=useRouter();
     const [room_details,setRoomDetails] = useState<RoomHeaderDetails>();
@@ -225,7 +230,18 @@ export default function Chat({params}:{params:{slug:string}}){
                 {
                     room_details && (
                         <>
-                        <RoomHeader room_details={{...room_details, room_id: params.slug}}/>
+                        <div 
+                        onClick={()=>setIshidden(!ishidden)}
+                        className="w-full mx-2 mr-4">
+                            <div className="w-full flex px-3 pt-1 mx-2 border-[1.5px] border-slate-800 rounded">
+                                <h4 className="scroll-m-20 text-xl pb-1 font-semibold tracking-tight mr-3">
+                                {room_details.name}
+                                </h4>
+                                <h5 className="truncate border-l-2 pl-4 italic my-1">
+                                {room_details.discription}
+                                </h5>
+                            </div>
+                        </div>
                         </>
                     )
                 }
@@ -250,30 +266,96 @@ export default function Chat({params}:{params:{slug:string}}){
                                
             </div>
             
-            <ScrollArea id="chatbox"
-             className="m-4 h-full flex flex-col pb-10  rounded-md border">
-                <div className="mb-4" ref={chat_ref}>
-                    <div>{InboxComponent}</div>
-                    <div>{realtimechat}</div>
-                </div>
-                <div className="absolute bottom-0 w-full mb-3 flex">
-                <Input 
-                className="ml-4" 
-                value={compose}
-                onChange={(e)=>setCompose(e.target.value)}
-                onKeyDown={(e)=>{
-                    if(e.key === "Enter" && compose.trim().length > 0)
-                        sendMessage();
-                }}
-                type="text" placeholder="Message"/>
-                <Button
-                disabled = {disable}
-                onClick={()=>{
-                    if(compose.trim().length > 0)
-                        sendMessage();
-                }} className="mx-4">Send</Button>
-                </div>
-            </ScrollArea>
+            <div className="mx-4 mt-4 h-full flex">
+                <ScrollArea id="chatbox"
+                className="flex flex-col h-full rounded-md border w-full">
+                    <div className="mb-16" ref={chat_ref}>
+                        <div>{InboxComponent}</div>
+                        <div>{realtimechat}</div>
+                    </div>
+                    <div className="absolute bottom-0 w-full mb-3 flex">
+                    <Input 
+                    className="ml-4" 
+                    value={compose}
+                    onChange={(e)=>setCompose(e.target.value)}
+                    onKeyDown={(e)=>{
+                        if(e.key === "Enter" && compose.trim().length > 0)
+                            sendMessage();
+                    }}
+                    type="text" placeholder="Message"/>
+                    <Button
+                    disabled = {disable}
+                    onClick={()=>{
+                        if(compose.trim().length > 0)
+                            sendMessage();
+                    }} className="mx-4">Send</Button>
+                    </div>
+                </ScrollArea>
+                <Members room_id={params.slug}/>
+            </div>
         </div>
 
+}
+
+export function Members({room_id}:{room_id: string}){
+    const [members,SetMembers] = useState<RoomMemberDetails>([]);
+    const ishidden= useRecoilValue(isSidebarHidden);
+    const avatar_url = "https://avatars.githubusercontent.com/u/123243429?v=4";
+    useEffect(()=>{
+        const fetch_members = async()=>{
+            try{
+                const resp = await fetch(`http://localhost:3001/chat/getMembers/${room_id}`,{
+                    credentials: "include",
+                });
+                if(resp.status === 200){
+                    const { raw_data } = await resp.json();
+                    console.log(raw_data)
+                    const parsed = room_member_details_schema.safeParse(raw_data);
+                    if(parsed.success)
+                    SetMembers(parsed.data);
+                    else
+                    console.log(parsed.error);
+
+                }
+            }catch(err){
+                console.log(err);
+            }
+        }
+        fetch_members();
+    },[room_id]);
+    return (
+        <ScrollArea className={`${ishidden === true ? "hidden" : ""} w-[400px]`}>
+            <div>
+                {
+                    members.map((member)=>{
+                        return (
+                            <div key={member.username} 
+                            className={`flex justify-between rounded-md p-1 w-full h-[72px] m-1`}>
+                                <div className="flex item-center p-2">
+                                    <Avatar className="mr-1">
+                                        <AvatarImage src={member.avatarurl ?? avatar_url}/>
+                                        <AvatarFallback>{member.username.substring(0,2)}</AvatarFallback>
+                                    </Avatar>
+                                    <div className="mx-1 px-1 mx-1">
+                                        <div>{member.username}</div>
+                                        <div className="italic text-muted-foreground truncate w-[124px] text-[15px]">{member.status ?? "NA"}</div>
+                                    </div>
+                                </div>
+                                    <Badge 
+                                    className={`
+                                    h-6 mt-4 mr-1
+                                    ${member.active ? "bg-rose-600" : "bg-green-400"}
+                                    `}>
+                                        {
+                                            member.active ? "Active" : "Offline"
+                                        }
+                                    </Badge>
+                                <br/>
+                            </div>
+                        )
+                    })
+                }
+            </div>
+        </ScrollArea>
+    )
 }
