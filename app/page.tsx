@@ -27,6 +27,7 @@ export default function Home() {
           setUserDetails({
             password:data.password,
             id:data.id,
+            name: data.name,
             favorite:data.favorite,
             status:data.status,
             avatarurl:data.avatarurl,

@@ -38,6 +38,12 @@ export default function Profile(){
     const {formState:{isDirty,isSubmitting}}=form;
     const disable=isSubmitting || !isDirty;
     const [favorites,setFavorites]=useState([...user_details.favorite!]);
+    const names=user_details.name?.split(" ");
+    
+    let initials = user_details.username?.substring(0,2);
+    if(names){
+        initials = names.map((name)=> name.charAt(0)).join("");
+    }
     
     console.log(user_details);
     async function settings_change(values:Omit<MemberProfile,"favorite">&{favorite:string}){
@@ -48,7 +54,7 @@ export default function Profile(){
                 method:"PATCH",
                 body:JSON.stringify({
                     id:user_details.id,
-                    name: user_details.name,
+                    name: values.name,
                     about:values.about,
                     favorite:favorites,
                     status:values.status,
@@ -130,7 +136,7 @@ export default function Profile(){
                 <div className='flex flex-left py-4'>
                     <Avatar className='w-[72px] h-[72px]'>
                         <AvatarImage src='' alt={`${user_details.username?.substring(2)}`}/>
-                        <AvatarFallback>{user_details.username?.substring(0,2)}</AvatarFallback>
+                        <AvatarFallback>{initials}</AvatarFallback>
                     </Avatar>
                     <div className=' ml-4'>
                         <div className='flex mr-2 mb-4'>

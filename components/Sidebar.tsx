@@ -10,15 +10,19 @@ import { useRouter } from "next/navigation";
 export default function Sidebar(){
     const router=useRouter();
     const user_creds=useRecoilValue(userDetails);
-    const names=user_creds.username?.split("") ?? ["John","Doe"];
-    const initials=names[0].charAt(0)+names[1].charAt(0);
+    const names=user_creds.name?.split(" ");
+    
+    let initials = user_creds.username?.substring(0,2);
+    if(names){
+        initials = names.map((name)=> name.charAt(0)).join("");
+    }
     return (
         <ScrollArea className="mx-2 rounded-sm border-2 p-2 sticky pt-4 ">
             <div className="flex ml-1 pb-2 text-center cursor-pointer">
                 <Avatar className="">
                     <AvatarFallback>{initials}</AvatarFallback>
                 </Avatar>
-                <h6 className="pt-2 ml-2">{user_creds.username}</h6>
+                <h6 className="pt-2 ml-2">{user_creds.name ?? user_creds.username}</h6>
                 <br/>
             </div>
             <div className="text-center sm:text-left grid grid-cols-1 divide-y mr-1">

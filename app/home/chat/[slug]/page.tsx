@@ -35,7 +35,8 @@ export type RecievedMessage={
         roomId:string,
         message:{
             content:string,
-            user:string
+            user:string,
+            name?: string,
         }
     }
 }
@@ -155,6 +156,7 @@ export default function Chat({params}:{params:{slug:string}}){
                 message:{
                     content:compose,
                     user:creds.username,
+                    name: creds.name,
                     id:creds.id
                 }
             }
@@ -328,13 +330,18 @@ export function Members({room_id}:{room_id: string}){
             <div>
                 {
                     members.map((member)=>{
+                        let initials = member.username.substring(0,2);
+                        const names = member.name?.split(" ");
+                        if(names){
+                            initials = names.map((name)=> name.charAt(0)).join("");
+                        }
                         return (
                             <div key={member.username} 
                             className={`flex justify-between rounded-md p-1 w-full h-[72px] m-1`}>
                                 <div className="flex item-center p-2">
                                     <Avatar className="mr-1">
-                                        <AvatarImage src={member.avatarurl ?? avatar_url}/>
-                                        <AvatarFallback>{member.username.substring(0,2)}</AvatarFallback>
+                                        <AvatarImage src={member.avatarurl ?? ""}/>
+                                        <AvatarFallback>{initials}</AvatarFallback>
                                     </Avatar>
                                     <div className="mx-1 px-1 mx-1">
                                         <div>{member.username}</div>

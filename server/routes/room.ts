@@ -119,7 +119,8 @@ router.post("/getMessage",authenticate,async(req,res)=>{
                     include:{
                         sender:{
                             select:{
-                                username: true
+                                username: true,
+                                name: true,
                             }
                         }
                     }
@@ -286,6 +287,7 @@ router.get("/getMembers/:room_id",authenticate,async(req,res)=>{
                 user: {
                     select: {
                         id: true,
+                        name: true,
                         username: true,
                         status: true,
                         avatarurl: true

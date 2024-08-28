@@ -34,9 +34,10 @@ function InitUser(){
                     id: z.string(),
                     avatarurl:z.string().nullable(),
                     status:z.string().nullable(),
-                    about:z.string().nullable()
+                    about:z.string().nullable(),
+                    name: z.string().nullable(),
                 }),
-                member_profile_schema.omit({about:true, avatarurl:true, status:true})
+                member_profile_schema.omit({about:true, avatarurl:true, status:true, name: true})
             )
             .parse(creds);
 
@@ -46,6 +47,7 @@ function InitUser(){
                 setUserDetails({
                     username:data.username,
                     password:data.password,
+                    name: data.name ?? undefined,
                     id:data.id,
                     favorite:data.favorite,
                     status:data.status ?? "",
