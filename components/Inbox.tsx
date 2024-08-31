@@ -15,8 +15,8 @@ export default function Inbox({data}:{data:UnitMessage}){
         
         <AvatarFallback>{initials}</AvatarFallback>
     </Avatar>
-    <div className={`border-2 pb-1 bg-slate-200 dark:bg-slate-900 mr-2 p-2 pl-4 max-w-prose rounded-md flex`}>
-        <p className="italic text-wrap mr-2">{data.content}</p>
+    <div className={`border-2 pb-1 mr-2 p-2 bg-slate-200 dark:bg-slate-900  max-w-prose rounded-md flex`}>
+        <p className="italic text-wrap">{data.content}</p>
         <p className="flex justify-end text-[10px] mt-3 ml-2">{time[0]+":"+time[1]}</p>
     </div>
     <Avatar className={`w-[35px] h-[35px] border-2 border-slate-400 bg-slate-200 dark:bg-slate-900  mr-2 mt-1 p-4 ${data.sender.username===username?'':'hidden'}`}>
