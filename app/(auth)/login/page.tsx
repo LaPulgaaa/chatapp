@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
-import { useSetRecoilState,useRecoilValue  } from "recoil";
+import { useSetRecoilState } from "recoil";
 import { useRouter } from "next/navigation";
 import { userDetails } from "@/lib/store/atom/userDetails";
 import Navbar from "@/components/Navbar";
