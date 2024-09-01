@@ -55,6 +55,7 @@ export default function Chat({params}:{params:{slug:string}}){
     const router=useRouter();
     const [room_details,setRoomDetails] = useState<RoomHeaderDetails>();
     const room_id = params.slug;
+    const user_id = creds.id;
     const [memberStatus,setMemberStatus] = useRecoilState(member_online_state);
     
     useEffect(()=>{
@@ -97,16 +98,23 @@ export default function Chat({params}:{params:{slug:string}}){
     },[room_id])
 
     useEffect(()=>{
-        Signal.get_instance().SUBSCRIBE(params.slug, creds.id, creds.username);
-        Signal.get_instance().REGISTER_CALLBACK("MSG_CALLBACK",recieve_msg);
-        Signal.get_instance().REGISTER_CALLBACK("ONLINE_CALLBACK",update_member_online_status);
+        if(room_id !== undefined && user_id !== undefined && creds.username !== undefined)
+        {
+            Signal.get_instance(creds.username).SUBSCRIBE(params.slug, creds.id, creds.username);
+            Signal.get_instance().REGISTER_CALLBACK("MSG_CALLBACK",recieve_msg);
+            Signal.get_instance().REGISTER_CALLBACK("ONLINE_CALLBACK",update_member_online_status);
+        }
+
         
         return ()=>{
-            Signal.get_instance().UNSUBSCRIBE(params.slug,creds.username);
-            Signal.get_instance().DEREGISTER("MSG_CALLBACK");
-            Signal.get_instance().DEREGISTER("ONLINE_CALLBACK");
+            if(room_id !== undefined && user_id !== undefined && creds.username !== undefined)
+            {
+                Signal.get_instance().UNSUBSCRIBE(params.slug,creds.username);
+                Signal.get_instance().DEREGISTER("MSG_CALLBACK");
+                Signal.get_instance().DEREGISTER("ONLINE_CALLBACK");
+            }
         }
-    },[room_id])
+    },[room_id,user_id])
     function recieve_msg(raw_data: string){
         const data:RecievedMessage = JSON.parse(`${raw_data}`);
         console.log("recieved a message"+data) 
@@ -170,7 +178,7 @@ export default function Chat({params}:{params:{slug:string}}){
                     content:compose,
                     user:creds.username,
                     name: creds.name,
-                    id:creds.id
+                    id:creds.id,
                 }
             }
         }

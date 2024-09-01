@@ -9,6 +9,7 @@ import * as React from "react";
 import { DarkLight } from "./DarkLight";
 import { userDetails } from "@/lib/store/atom/userDetails";
 import { UserStateChats } from "@/lib/store/atom/chats";
+import { Signal } from "@/app/home/signal";
 
 export default function Navbar(){
     const router=useRouter();
@@ -22,11 +23,12 @@ export default function Navbar(){
         {token=="valid"?<Button
         className="mx-2"
          onClick={()=>{
+            Signal.get_instance().CLOSE();
             window.localStorage.clear()
             setToken(null);
             resetUserChats();
             resetUserState();
-            router.push("/")
+            router.push("/");
          }}
          variant={"ghost"}>Logout</Button>:<Button variant="ghost" onClick={()=>router.push("/login")}>LogIn</Button>}
         {token===null?<Button

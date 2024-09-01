@@ -14,16 +14,18 @@ export class Signal{
     private callbacks: Record<string, (message: string)=>void> = {};
     private id: number;
     private backoff_interval:number = 1000;
+    private username: string;
 
-    private constructor(){
+    private constructor(id: string){
         this.ws = new WebSocket(`${BASE_URL}:${PORT}`);
         this.id = 1;
+        this.username = id;
         this.init_ws();
     }
 
-    static get_instance(){
+    static get_instance(id?: string){
         if(!Signal.instance){
-            Signal.instance = new Signal();
+            Signal.instance = new Signal(id!);
         }
 
         return Signal.instance;
@@ -44,6 +46,7 @@ export class Signal{
             const data:string = payload.data;
 
             const target_callback = this.callbacks[type];
+            if(target_callback !== undefined)
             target_callback(data);
         }
 
@@ -53,6 +56,8 @@ export class Signal{
                 this.init_ws();
             },this.backoff_interval)
         }
+
+        this.BULK_SUBSCRIBE(this.username);
     }
 
     SUBSCRIBE(room_id: string, user_id?: string, username?: string){
@@ -73,6 +78,44 @@ export class Signal{
         }
         this.ws.send(msg);
 
+    }
+
+    private BULK_SUBSCRIBE(user_id: string){
+        const msg = JSON.stringify({
+            type: "bulk_join",
+            payload: {
+                userId: user_id,
+            }
+        });
+
+        if(this.initialised === false){
+            this.buffered_messages.push({
+                id: this.id++,
+                message: msg,
+            })
+            return;
+        }
+
+        this.ws.send(msg);
+    }
+
+    private BULK_UNSUBSCRIBE(user_id: string){
+        const msg = JSON.stringify({
+            type: "bulk_leave",
+            payload: {
+                userId: user_id,
+            }
+        });
+
+        if(!this.initialised === false){
+            this.buffered_messages.push({
+                id: this.id++,
+                message: msg,
+            })
+            return;
+        }
+
+        this.ws.send(msg);
     }
 
     UNSUBSCRIBE(room_id: string, username?: string){
@@ -108,7 +151,7 @@ export class Signal{
     }
 
     CLOSE(){
-        //@ts-ignore
-        delete Signal.instance;
+        this.BULK_UNSUBSCRIBE(this.username);
+        this.ws.close();
     }
 }
