@@ -36,7 +36,17 @@ export async function ws(wss:WebSocketServer){
                     data.payload.roomId,
                     ws,
                     wsId.toString(),
-                    data.payload.userId)
+                    data.payload.userId
+                );
+                const msg_data = JSON.stringify(
+                    {
+                        type: "MemberJoins",
+                        payload:{
+                            username: data.payload.username,
+                        }
+                    }
+                )
+                RedisSubscriptionManager.get_instance().addChatMessage(data.payload.roomId,"ONLINE_CALLBACK",msg_data);
             }
 
             if(data.type==="message")
@@ -44,7 +54,14 @@ export async function ws(wss:WebSocketServer){
                 const roomId=users[wsId].roomId;
                 const message=data.payload.message;
                 const {id, ...content} = message;
-                RedisSubscriptionManager.get_instance().addChatMessage(roomId,content);
+                const msg_data = JSON.stringify({
+                    type:"message",
+                    payload:{
+                        roomId,
+                        message: content
+                    }
+                });
+                RedisSubscriptionManager.get_instance().addChatMessage(roomId,"MSG_CALLBACK",msg_data);
 
                 await client.lPush("message",JSON.stringify({
                     content:message.content,
@@ -54,6 +71,15 @@ export async function ws(wss:WebSocketServer){
             }
 
             if(data.type === "leave"){
+                const msg_data = JSON.stringify(
+                    {
+                        type: "MemberLeaves",
+                        payload:{
+                            username: data.payload.username,
+                        }
+                    }
+                )
+                RedisSubscriptionManager.get_instance().addChatMessage(data.payload.roomId,"ONLINE_CALLBACK",msg_data);
                 RedisSubscriptionManager.get_instance().unsubscribe(wsId.toString(),data.payload.roomId);
             }
 
