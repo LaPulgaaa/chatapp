@@ -11,7 +11,7 @@ import Inbox from "@/components/Inbox";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useRecoilValue, useRecoilState, useSetRecoilState} from "recoil";
+import { useRecoilValue, useRecoilState} from "recoil";
 import { userDetails } from "@/lib/store/atom/userDetails";
 import { useRouter } from "next/navigation";
 import { ChevronLeftIcon, ListEndIcon,} from "lucide-react";
@@ -25,9 +25,9 @@ import { leave_room } from "../../util";
 import { UserStateChats } from "@/lib/store/atom/chats";
 import { RoomHeaderDetails } from "@/packages/zod";
 import { get_room_details } from "./action";
-import type { RoomMemberDetails } from "@/packages/zod";
 import { room_member_details_schema } from "@/packages/zod";
 import { isSidebarHidden } from "@/lib/store/atom/sidebar";
+import { member_online_state } from "@/lib/store/atom/status";
 
 export type RecievedMessage={
     type:string,
@@ -55,6 +55,7 @@ export default function Chat({params}:{params:{slug:string}}){
     const router=useRouter();
     const [room_details,setRoomDetails] = useState<RoomHeaderDetails>();
     const room_id = params.slug;
+    const [memberStatus,setMemberStatus] = useRecoilState(member_online_state);
     
     useEffect(()=>{
         async function fetch_messages(){
@@ -96,19 +97,31 @@ export default function Chat({params}:{params:{slug:string}}){
     },[room_id])
 
     useEffect(()=>{
-        Signal.get_instance().SUBSCRIBE(params.slug, creds.id);
-        Signal.get_instance().REGISTER_CALLBACK(recieve_msg);
+        Signal.get_instance().SUBSCRIBE(params.slug, creds.id, creds.username);
+        Signal.get_instance().REGISTER_CALLBACK("MSG_CALLBACK",recieve_msg);
+        Signal.get_instance().REGISTER_CALLBACK("ONLINE_CALLBACK",update_member_online_status);
         
         return ()=>{
-            Signal.get_instance().UNSUBSCRIBE(params.slug);
-            Signal.get_instance().DEREGISTER();
+            Signal.get_instance().UNSUBSCRIBE(params.slug,creds.username);
+            Signal.get_instance().DEREGISTER("MSG_CALLBACK");
+            Signal.get_instance().DEREGISTER("ONLINE_CALLBACK");
         }
     },[room_id])
-    function recieve_msg(event:MessageEvent){
-        const data=JSON.parse(event.data);
+    function recieve_msg(raw_data: string){
+        const data:RecievedMessage = JSON.parse(`${raw_data}`);
         console.log("recieved a message"+data) 
         setChat([...chat,data]);
         setRealtimechat((realtimechat)=>[...realtimechat, <Message  key={(creds.id?.substring(5) || "")+Date.now()} data={data}/>])
+    }
+
+    function update_member_online_status(raw_data: string){
+        const data = JSON.parse(`${raw_data}`);
+        const type: "MemberJoins" | "MemberLeaves" = data.type;
+        const member = memberStatus.find((m) => m.username === data.payload.username);
+        if(member !== undefined){
+            const other_members = memberStatus.filter((m)=> m.username !== data.payload.username);
+            setMemberStatus((memberStatus)=>[{...member, active: type === "MemberJoins" ? true : false},...other_members])
+        }
     }
 
     useEffect(()=>{
@@ -300,9 +313,9 @@ export default function Chat({params}:{params:{slug:string}}){
 }
 
 export function Members({room_id}:{room_id: string}){
-    const [members,SetMembers] = useState<RoomMemberDetails>([]);
     const ishidden= useRecoilValue(isSidebarHidden);
     const avatar_url = "https://avatars.githubusercontent.com/u/123243429?v=4";
+    const [memberStatus, setMemberStatus] = useRecoilState(member_online_state);
     useEffect(()=>{
         const fetch_members = async()=>{
             try{
@@ -311,10 +324,11 @@ export function Members({room_id}:{room_id: string}){
                 });
                 if(resp.status === 200){
                     const { raw_data } = await resp.json();
-                    console.log(raw_data)
                     const parsed = room_member_details_schema.safeParse(raw_data);
                     if(parsed.success)
-                    SetMembers(parsed.data);
+                    {
+                        setMemberStatus(parsed.data);
+                    }
                     else
                     console.log(parsed.error);
 
@@ -329,7 +343,7 @@ export function Members({room_id}:{room_id: string}){
         <ScrollArea className={`${ishidden === true ? "hidden" : ""} w-[400px]`}>
             <div>
                 {
-                    members.map((member)=>{
+                    memberStatus.map((member)=>{
                         let initials = member.username.substring(0,2);
                         const names = member.name?.split(" ");
                         if(names){

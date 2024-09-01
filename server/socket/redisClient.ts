@@ -84,13 +84,10 @@ export class RedisSubscriptionManager{
 
     }
 
-    async addChatMessage(roomId:string,message:{content:string,user:string,name?: string}){
+    async addChatMessage(roomId:string,type: string,data: string){
         this.publisher.publish(roomId,JSON.stringify({
-            type:"message",
-            payload:{
-                roomId,
-                message
-            }
+            type,
+            data
         }))
     }
 
