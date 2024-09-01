@@ -11,10 +11,9 @@ export class RedisSubscriptionManager{
         [userId:string]:{
             userId:string,
             ws:any,
-            uuid?: string,
+            uuid: string,
         }
     }>;
-
 
     private constructor(){
         this.subscriber=createClient();
@@ -25,7 +24,8 @@ export class RedisSubscriptionManager{
         this.reverseSubscription=new Map<string,{
             [userId:string]:{
                 userId:string,
-                ws:WebSocket
+                ws:WebSocket,
+                uuid: string,
             }
         }>();
     }
@@ -38,50 +38,54 @@ export class RedisSubscriptionManager{
         return this.instance;
     }
 
-    handleSubscription(roomId:string,wss:any,userId:string, uuid?: string){
+    bulk_subscribe(wss: any, room_ids: string[], userId: string, uuid: string){
+        this.subscription.set(userId,[...(this.subscription.get(userId) ?? []), ...room_ids]);
 
-        this.subscription.set(userId,[...(this.subscription.get(userId))||[],roomId]);
-
-        this.reverseSubscription.set(roomId,{
-            ...(this.reverseSubscription.get(roomId) || {}),
-            [userId]:{
-                userId:userId,
-                ws:wss,
-                uuid
-            }
-        })
-
-
-        if(Object.keys(this.reverseSubscription.get(roomId)||{}).length==1){
-            //first one in this room
-
-            this.subscriber.subscribe(roomId,(payload)=>{
-                try{
-                    Object.values(this.reverseSubscription.get(roomId)||{}).forEach(({ws})=>{
-                        ws.send(payload);
-                    })
-                }catch(err)
-                {
-                    console.log(err);
+        room_ids.forEach((roomId)=>{
+            this.reverseSubscription.set(roomId,{
+                ...(this.reverseSubscription.get(roomId) || {}),
+                [userId]:{
+                    userId:userId,
+                    ws:wss,
+                    uuid,
                 }
             })
-        }
+    
+    
+            if(Object.keys(this.reverseSubscription.get(roomId)||{}).length==1){
+                //first one in this room
+    
+                this.subscriber.subscribe(roomId,(payload)=>{
+                    try{
+                        Object.values(this.reverseSubscription.get(roomId)||{}).forEach(({ws})=>{
+                            ws.send(payload);
+                        })
+                    }catch(err)
+                    {
+                        console.log(err);
+                    }
+                })
+            }
+        })
     }
 
-    unsubscribe(userId:string,room:string){
-        this.subscription.set(userId,this.subscription.get(userId)?.filter((id)=>id!==room)||[]);
-        if(this.subscription.get(userId)?.length==0){
-            this.subscription.delete(userId);
-        }
-        if(this.reverseSubscription.has(room)){
-            delete this.reverseSubscription.get(room)![userId];
-        }
-        if(!this.reverseSubscription.get(room)||
-        Object.keys(this.reverseSubscription.get(room)||{}).length===0){
-            this.subscriber.unsubscribe(room);
-            this.reverseSubscription.delete(room);
-        }
+    bulk_unsubscribe(userId: string, rooms: string[]){
+        this.subscription.set(
+            userId,
+            []
+        );
+        this.subscription.delete(userId);
 
+        rooms.map((room)=>{
+            if(this.reverseSubscription.has(room)){
+                delete this.reverseSubscription.get(room)![userId];
+            }
+            if(!this.reverseSubscription.get(room)||
+            Object.keys(this.reverseSubscription.get(room)||{}).length===0){
+                this.subscriber.unsubscribe(room);
+                this.reverseSubscription.delete(room);
+            }
+        })
     }
 
     async addChatMessage(roomId:string,type: string,data: string){

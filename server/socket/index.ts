@@ -1,14 +1,14 @@
 import { WebSocketServer } from 'ws';
 import { RedisSubscriptionManager } from './redisClient';
 import { createClient } from 'redis';
+import { prisma } from '../../packages/prisma/prisma_client';
 
 const client=createClient();
 
 const users:{
     [wsId:string]:{
-        roomId:string,
         ws:any,
-        userId?: string,
+        userId: string,
     }
 }={};
 
@@ -16,7 +16,6 @@ let count=0;
 export async function ws(wss:WebSocketServer){
  await client.connect();
  wss.on("connection", async(ws,req:Request)=>{
-        
 
         const wsId=count++;
         console.log("connection made")
@@ -25,19 +24,6 @@ export async function ws(wss:WebSocketServer){
             const data=JSON.parse(`${message}`);
             if(data.type==="join")
             {
-
-                users[wsId]={
-                    roomId:data.payload.roomId,
-                    ws,
-                    userId: data.payload.userId,
-                }
-
-                RedisSubscriptionManager.get_instance().handleSubscription(
-                    data.payload.roomId,
-                    ws,
-                    wsId.toString(),
-                    data.payload.userId
-                );
                 const msg_data = JSON.stringify(
                     {
                         type: "MemberJoins",
@@ -49,9 +35,50 @@ export async function ws(wss:WebSocketServer){
                 RedisSubscriptionManager.get_instance().addChatMessage(data.payload.roomId,"ONLINE_CALLBACK",msg_data);
             }
 
+            if(data.type === "bulk_join"){
+                const userId = data.payload.userId;
+                users[wsId]={
+                    ws,
+                    userId: data.payload.userId,
+                }
+                try{
+                    const rooms_subscribed = await prisma.directory.findMany({
+                        where:{
+                            userId,
+                        },
+                        select:{
+                            chat_id: true,
+                        }
+                    });
+                    const rooms_arr = rooms_subscribed.map((rooms)=> rooms.chat_id);
+                    RedisSubscriptionManager.get_instance().bulk_subscribe(ws,rooms_arr,wsId.toString(),userId);
+                }catch(err){
+                    console.log(err);
+                }
+            }
+
+            if(data.type === "bulk_leave"){
+                const userId = data.payload.userId;
+                try{
+                    const rooms_subscribed = await prisma.directory.findMany({
+                        where:{
+                            userId,
+                        },
+                        select:{
+                            chat_id: true,
+                        }
+                    });
+                    const rooms_arr = rooms_subscribed.map((rooms)=> rooms.chat_id);
+                    RedisSubscriptionManager.get_instance().bulk_unsubscribe(userId,rooms_arr);
+                }catch(err){
+                    console.log(err);
+                }
+                
+            }
+
             if(data.type==="message")
             {
-                const roomId=users[wsId].roomId;
+                const roomId=data.payload.roomId;
                 const message=data.payload.message;
                 const {id, ...content} = message;
                 const msg_data = JSON.stringify({
@@ -80,16 +107,28 @@ export async function ws(wss:WebSocketServer){
                     }
                 )
                 RedisSubscriptionManager.get_instance().addChatMessage(data.payload.roomId,"ONLINE_CALLBACK",msg_data);
-                RedisSubscriptionManager.get_instance().unsubscribe(wsId.toString(),data.payload.roomId);
             }
 
         })
-        ws.on("close",()=>{
-
+        ws.on("close",async()=>{
             if(users[wsId]!==undefined)
             {
-                RedisSubscriptionManager.get_instance().unsubscribe(wsId.toString(),users[wsId].roomId);
-                delete users[wsId];
+                const userId = users[wsId].userId;
+                try{
+                    const rooms_subscribed = await prisma.directory.findMany({
+                        where:{
+                            userId,
+                        },
+                        select:{
+                            chat_id: true,
+                        }
+                    });
+                    const rooms_arr = rooms_subscribed.map((rooms)=> rooms.chat_id);
+                    RedisSubscriptionManager.get_instance().bulk_unsubscribe(userId,rooms_arr);
+                    delete users[wsId];
+                }catch(err){
+                    console.log(err);
+                }
             }
         })
         

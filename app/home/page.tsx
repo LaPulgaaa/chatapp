@@ -58,9 +58,10 @@ export default function Home(){
     const [loader,setLoader]=useState(true);
     const id=profile_info.id;
     useEffect(()=>{
-        Signal.get_instance();
+        if(id !== undefined)
+        Signal.get_instance(id)
 
-    },[])
+    },[id])
     useEffect(()=>{
         async function get_user_chats(){
             try{
