@@ -3,24 +3,18 @@
 import {zodResolver} from '@hookform/resolvers/zod'
 import { Button } from "@/components/ui/button";
 import { Card,CardTitle,CardContent,CardHeader, CardDescription, CardFooter } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { join_schema } from "@/packages/zod";
 import { Join } from '@/packages/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { usePathname, useRouter } from 'next/navigation';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { wsState } from '@/lib/store/atom/Socket';
+import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 
 
 
 export default function signup(){
-    
-    const wsConnection=useRecoilValue(wsState);
     const router=useRouter();
-    const pathname=usePathname();
 
     const form=useForm<Join>({
         resolver:zodResolver(join_schema),
