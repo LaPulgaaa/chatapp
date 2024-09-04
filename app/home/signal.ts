@@ -152,6 +152,7 @@ export class Signal{
 
     CLOSE(){
         this.BULK_UNSUBSCRIBE(this.username);
+        this.initialised = false;
         this.ws.close();
     }
 }
