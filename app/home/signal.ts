@@ -107,7 +107,7 @@ export class Signal{
             }
         });
 
-        if(!this.initialised === false){
+        if(this.initialised === false){
             this.buffered_messages.push({
                 id: this.id++,
                 message: msg,
