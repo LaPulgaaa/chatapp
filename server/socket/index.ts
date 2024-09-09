@@ -57,6 +57,13 @@ export async function ws(wss:WebSocketServer){
                 }
             }
 
+            if(data.type === "add_room"){
+                const userId = data.payload.userId;
+                const roomId = data.payload.roomId;
+
+                RedisSubscriptionManager.get_instance().subscribe(ws,roomId,wsId.toString(),userId);
+            }
+
             if(data.type === "bulk_leave"){
                 const userId = data.payload.userId;
                 try{

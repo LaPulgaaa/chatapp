@@ -99,6 +99,28 @@ export class Signal{
         this.ws.send(msg);
     }
 
+    ADD_ROOM(user_id: string, room_id: string){
+        console.log("here creating rooms");
+        const msg = JSON.stringify({
+            type: "add_room",
+            payload: {
+                userId: user_id,
+                roomId: room_id,
+            }
+        });
+
+        if(this.initialised === false){
+            this.buffered_messages.push({
+                id: this.id++,
+                message: msg,
+            });
+
+            return;
+        }
+
+        this.ws.send(msg);
+    }
+
     private BULK_UNSUBSCRIBE(user_id: string){
         const msg = JSON.stringify({
             type: "bulk_leave",

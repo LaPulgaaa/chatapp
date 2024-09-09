@@ -1,5 +1,6 @@
 import {createClient} from 'redis';
 import { RedisClientType } from 'redis';
+import WebSocket from 'ws';
 
 
 export class RedisSubscriptionManager{
@@ -67,6 +68,34 @@ export class RedisSubscriptionManager{
                 })
             }
         })
+    }
+
+    subscribe(wss: WebSocket, roomId: string, userId: string, uuid: string){
+        this.subscription.set(userId, [...this.subscription.get(userId) ?? [],roomId]);
+
+        this.reverseSubscription.set(roomId, {
+            ...this.reverseSubscription.get(roomId) ?? {},
+            [userId]:{
+                userId,
+                ws: wss,
+                uuid
+            }
+        });
+
+        if(Object.keys(this.reverseSubscription.get(roomId)||{}).length==1){
+            //first one in this room
+
+            this.subscriber.subscribe(roomId,(payload)=>{
+                try{
+                    Object.values(this.reverseSubscription.get(roomId)||{}).forEach(({ws})=>{
+                        ws.send(payload);
+                    })
+                }catch(err)
+                {
+                    console.log(err);
+                }
+            })
+        }
     }
 
     bulk_unsubscribe(userId: string, rooms: string[]){

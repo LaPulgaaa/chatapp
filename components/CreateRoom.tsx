@@ -11,6 +11,7 @@ import { Textarea } from "./ui/textarea";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { userDetails } from "@/lib/store/atom/userDetails";
 import { UserStateChats } from "@/lib/store/atom/chats";
+import { Signal } from "@/app/home/signal";
 
 
 export default function CreateRoom(){
@@ -44,6 +45,7 @@ export default function CreateRoom(){
                 else
                 {
                     const {created_chat}=await resp.json();
+                    Signal.get_instance().ADD_ROOM(member_data.username!,created_chat.id);
                     setRooms([created_chat,...rooms]);
                 }
             }catch(err)
