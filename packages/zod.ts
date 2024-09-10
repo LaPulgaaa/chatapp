@@ -1,16 +1,26 @@
 import {z} from 'zod';
 
-export const join_schema=z.object({
-    username:z.string({
-        required_error:"Username is required",
-        invalid_type_error:"name must be a string"
-    }).min(2,{message:"username must be atleast 2 characters"}),
-    password:z.string({
-        required_error:"password is required"
-    }).min(5,{message:"password should of min 5 digits"}),
+export const user_signup_form_schema = z.object({
+    username: z.string({
+        required_error: "Username is required"
+    }).min(8,{message: "username must atleast be 8 characters"}).max(20),
+    email: z.string().email({message: "Invalid email address"}),
+    password: z.string({
+        required_error: "Password is required"
+    }).min(10,{message: "Password should atleast be 10 characters"}).max(14)
 })
 
-export type Join=z.infer<typeof join_schema>;
+
+export const join_schema=z.object({
+    username: z.string({
+        required_error: "Username is required"
+    }).min(8,{message: "username must atleast be 8 characters"}).max(20),
+    password: z.string({
+        required_error: "Password is required"
+    }).min(10,{message: "Password should atleast be 10 characters"}).max(14)
+})
+
+export type Join=z.infer<typeof user_signup_form_schema>;
 
 
 export const message_schema=z.object({
@@ -72,7 +82,6 @@ export type ChatReponse=z.infer<typeof user_chat_response_schema>;
 
 export const member_profile_schema=z.object({
     username:z.string(),
-    password:z.string(),
     name: z.string().optional(),
     about:z.string().optional(),
     favorite:z.array(z.string()),

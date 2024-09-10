@@ -5,8 +5,7 @@ import { memo } from "react";
 import { Signal } from "./signal";
 
 import CreateRoom from "@/components/CreateRoom";
-import { useRecoilState, useRecoilValue } from "recoil";
-import { userDetails } from "@/lib/store/atom/userDetails";
+import { useRecoilState} from "recoil";
 import { useEffect, useState } from "react";
 import { user_chat_response_schema } from "@/packages/zod";
 import { UserStateChats } from "@/lib/store/atom/chats";
@@ -14,6 +13,7 @@ import { useRouter } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
 import type { ChatReponse } from "@/packages/zod";
+import { useSession } from "next-auth/react";
 
 export function get_last_msg_time(lastmsgAt: string): string {
 
@@ -53,21 +53,24 @@ export function get_last_msg_time(lastmsgAt: string): string {
 export let user_chat_uuid = new Map<string,string>();
 
 export default function Home(){
-    const profile_info=useRecoilValue(userDetails);
+    const session = useSession();
     const [rooms,setRooms]=useRecoilState(UserStateChats)
     const [loader,setLoader]=useState(true);
-    const id=profile_info.id;
+    //@ts-ignore
+    const id: string | undefined = session.data?.id;
     useEffect(()=>{
         if(id !== undefined)
         Signal.get_instance(id)
 
-    },[id])
+    },[id]);
+    console.log(session.data);
     useEffect(()=>{
+        if(!id){
+            return;
+        }
         async function get_user_chats(){
             try{
-                const resp=await fetch(`http://localhost:3001/chat/subscribedChats/${id}`,{
-                    credentials:"include"
-                });
+                const resp=await fetch(`http://localhost:3001/chat/subscribedChats/${id}`);
                 //TODO:add zod here before using the returned data
                 const {raw_data}=await resp.json();
                 if(Array.isArray(raw_data) && raw_data.length>0)
@@ -93,7 +96,7 @@ export default function Home(){
         <Navbar/>
         <div className="ml-8 my-4 grid lg:grid-cols-5  h-full pb-24 m-2">
                 <Sidebar/>
-                <div className="lg:col-span-4 mr-4 ml-2 pt-2">
+                {session.status === "authenticated" ? <div className="lg:col-span-4 mr-4 ml-2 pt-2">
                     <div className="flex w-inherit justify-between">
                     <h4 className="scroll-m-20 p-2 text-2xl font-semibold tracking-tigh">
                         Catch up on missed chats!
@@ -101,7 +104,7 @@ export default function Home(){
                     <CreateRoom/>
                     </div>
                     <RoomTabs rooms={rooms} />
-                </div>
+                </div> : <div>Loading</div>}
             </div>
     </div>
 }

@@ -14,7 +14,8 @@ const router=express.Router();
 
 type UserInfo={
     username:string,
-    password:string
+    password:string,
+    email: string
 }
 
 router.get("/me",(req,res)=>{
@@ -34,7 +35,7 @@ router.get("/me",(req,res)=>{
 })
 
 router.post("/signup",async(req,res)=>{
-    const {username,password}:UserInfo=req.body;
+    const {username,password,email}:UserInfo=req.body;
 
     try{
         const new_created_user = await prisma.$transaction(async(tx)=>{
@@ -51,6 +52,7 @@ router.post("/signup",async(req,res)=>{
 
             const new_created_user = await tx.member.create({
                 data:{
+                    email,
                     username,
                     password
                 }
@@ -119,16 +121,23 @@ router.post("/login",async(req,res)=>{
     }
 })
 
-router.get("/getCreds",authenticate,async(req,res)=>{
+router.get("/getCreds/:username",authenticate,async(req,res)=>{
+    const username = req.params.username;
     try{
-        const token=req.cookies.token;
-        Cache.get_instance().get_member_id(token);
-        const creds=jwt.verify(token,process.env.ACCESS_TOKEN_SECRET!) as JwtPayload;
-        if(token!==null || token!==undefined)
-        {
-            res.status(201).json({
-            msg:"jwt token valid",
-            creds
+        const user = await prisma.member.findUnique({
+            where:{
+                username
+            },
+            select: {
+                favorite: true,
+                status: true,
+                about: true,
+            }
+        })
+        if(user){
+            res.status(200).json({
+                msg: "success",
+                data: user,
             })
         }
         else
@@ -146,7 +155,7 @@ router.patch("/editProfile",authenticate,async(req,res)=>{
         z.object({
             id:z.string()
         }),
-        member_profile_schema.omit({username:true,password:true})
+        member_profile_schema.omit({username:true})
     )).safeParse(req.body);
     
     if(!result.success){
