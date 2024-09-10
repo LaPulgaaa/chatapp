@@ -9,13 +9,13 @@ import { Form,FormControl,FormField,FormLabel,FormItem,FormMessage } from "./ui/
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { userDetails } from "@/lib/store/atom/userDetails";
 import { UserStateChats } from "@/lib/store/atom/chats";
 import { Signal } from "@/app/home/signal";
+import { useSession } from "next-auth/react";
 
 
 export default function CreateRoom(){
-    const member_data=useRecoilValue(userDetails);
+    const session = useSession();
     const [rooms,setRooms]=useRecoilState(UserStateChats)
     const form=useForm<RoomType>({
         resolver:zodResolver(create_room_schema),
@@ -25,7 +25,7 @@ export default function CreateRoom(){
         }
     })
     async function onSubmit(values:RoomType){
-        if(member_data.id)
+        if(session.status === "authenticated")
         {
             try{
                 const resp=await fetch("http://localhost:3001/chat/createChat",{
@@ -33,7 +33,8 @@ export default function CreateRoom(){
                     body:JSON.stringify({
                         name:values.name,
                         discription:values.discription,
-                        memberId:member_data.id
+                        //@ts-ignore
+                        memberId:session.data.user?.id
                     }),
                     headers:{
                         'Content-Type':"application/json"
@@ -45,7 +46,8 @@ export default function CreateRoom(){
                 else
                 {
                     const {created_chat}=await resp.json();
-                    Signal.get_instance().ADD_ROOM(member_data.username!,created_chat.id);
+                    //@ts-ignore
+                    Signal.get_instance().ADD_ROOM(session.data.user?.username!,created_chat.id);
                     setRooms([created_chat,...rooms]);
                 }
             }catch(err)

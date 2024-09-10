@@ -14,7 +14,7 @@ type CreateRoomSchema={
 }
 
 
-router.get("/subscribedChats/:memberId",authenticate,async(req,res)=>{
+router.get("/subscribedChats/:memberId",async(req,res)=>{
     const {memberId}=req.params;
     try{
         let joined_rooms=[];

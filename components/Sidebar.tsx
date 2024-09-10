@@ -1,30 +1,40 @@
 import { ScrollArea } from "./ui/scroll-area";
 import { Dialog,DialogTrigger } from "./ui/dialog";
 import JoinRoomDialog from "@/components/JoinRoom";
-import { Avatar, AvatarFallback } from "./ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { MessageCircleIcon, UserIcon} from "lucide-react";
-import { userDetails } from "@/lib/store/atom/userDetails";
 import { MessageSquareDotIcon } from "lucide-react";
-import { useRecoilValue } from "recoil";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 export default function Sidebar(){
     const router=useRouter();
-    const user_creds=useRecoilValue(userDetails);
-    const names=user_creds.name?.split(" ");
     
-    let initials = user_creds.username?.substring(0,2);
-    if(names){
-        initials = names.map((name)=> name.charAt(0)).join("");
+    const session = useSession();
+
+    function get_initials(){
+        //@ts-ignore
+        const names:string[]=session.data!.name?.split(" ");
+        //@ts-ignore
+        let initials = session.data.username?.substring(0,2);
+        if(names){
+            initials = names.map((name)=> name.charAt(0)).join("");
+        }
+
+        return initials;
     }
+    
     return (
         <ScrollArea className="mx-2 rounded-sm border-2 p-2 sticky pt-4 ">
-            <div className="flex ml-1 pb-2 text-center cursor-pointer">
+           {session.status === "authenticated" && <div className="flex ml-1 pb-2 text-center cursor-pointer">
                 <Avatar className="">
-                    <AvatarFallback>{initials}</AvatarFallback>
+                    {/* @ts-ignore */}
+                    <AvatarImage src={session.data.avatar_url}/>
+                    <AvatarFallback>{get_initials()}</AvatarFallback>
                 </Avatar>
-                <h6 className="pt-2 ml-2">{user_creds.name ?? user_creds.username}</h6>
+                {/* @ts-ignore */}
+                <h6 className="pt-2 ml-2">{session.data.name ?? ""}</h6>
                 <br/>
-            </div>
+            </div>}
             <div className="text-center sm:text-left grid grid-cols-1 divide-y mr-1">
                 <div className="flex cursor-pointer my-[1/2] w-full hover:bg-gray-500 p-2 dark:hover:bg-gray-800 rounded-md ease-out duration-300 transition-all"><MessageCircleIcon/><p className="ml-2">Direct Messages</p></div>
                 <div className="flex cursor-pointer my-[1/2] w-full hover:bg-gray-500 p-2 dark:hover:bg-gray-800 rounded-md ease-out duration-300 transition-all"><UserIcon/><p className="ml-3">Set Status</p></div>

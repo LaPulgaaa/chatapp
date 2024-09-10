@@ -5,6 +5,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import RecoilContextProvider from "@/components/providers/RecoilContextProvider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import {AuthProvider} from "@/components/Provider";
 // const inter = Inter({ subsets: ["latin"] });
 import { cn } from "../lib/utils"
  
@@ -32,6 +33,7 @@ export default function RootLayout({
             "min-h-screen bg-background font-sans antialiased",
             fontSans.variable
           )}>
+            <AuthProvider>
             <ThemeProvider
             attribute="class"
             defaultTheme="system"
@@ -41,6 +43,7 @@ export default function RootLayout({
            
             {children}
             </ThemeProvider>
+            </AuthProvider>
             </body>
         </RecoilContextProvider>
       

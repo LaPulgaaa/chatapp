@@ -3,57 +3,61 @@
 import { useForm} from 'react-hook-form';
 import { member_profile_schema,MemberProfile } from '@/packages/zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { userDetails } from '@/lib/store/atom/userDetails';
-import { useRecoilState, useResetRecoilState } from 'recoil';
+import { UserDetails } from '@/lib/store/atom/userDetails';
+import { useRecoilValue } from 'recoil';
 import { Avatar,AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Form,FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { KeyboardEvent, useState } from 'react';
+import { KeyboardEvent, Suspense, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { z} from 'zod';
 
 import { useRouter } from 'next/navigation';
 import { ChevronLeftIcon } from 'lucide-react';
 import { DarkLight } from '@/components/DarkLight';
+import { useSession } from 'next-auth/react';
 export default function Profile(){
     const router=useRouter();
-    const [user_details,setUser_details]=useRecoilState(userDetails);
-    const removeUserState = useResetRecoilState(userDetails);
+    const session = useSession();
+    //@ts-ignore
+    const user_details = useRecoilValue(UserDetails({user_id: session.data?.user?.id}));
     const form=useForm<Omit<MemberProfile,"favorite"> & {favorite:string}>({
         resolver:zodResolver(z.intersection(member_profile_schema.omit({favorite:true}),z.object({
             favorite:z.string()
         }))),
         defaultValues:{
-            username:user_details.username ?? "",
-            password:user_details.password ?? "",
-            name: user_details.name,
-            status:user_details.status ?? "",
-            about:user_details.about ?? "",
-            avatarurl:user_details.avatarurl,
+            //@ts-ignore
+            username:session.data?.user?.username ?? "",
+            name: session.data?.user?.name ?? "",
+            status:user_details?.status ?? "",
+            about:user_details?.about ?? "",
+            //@ts-ignore
+            avatarurl: session.data?.user?.avatar_url,
             favorite:""
         }
     })
-    const {formState:{isDirty,isSubmitting}}=form;
-    const disable=isSubmitting || !isDirty;
-    const [favorites,setFavorites]=useState([...user_details.favorite!]);
-    const names=user_details.name?.split(" ");
-    
-    let initials = user_details.username?.substring(0,2);
+    const {formState:{isDirty,isSubmitting, isLoading}}=form;
+    const [favorites,setFavorites]=useState([""]);
+    const names=session.data?.user?.name?.split(" ");
+    //@ts-ignore
+    let initials = session.data?.user?.username?.substring(0,2);
     if(names){
         initials = names.map((name)=> name.charAt(0)).join("");
     }
     
     console.log(user_details);
     async function settings_change(values:Omit<MemberProfile,"favorite">&{favorite:string}){
-        setUser_details({...values,favorite:favorites,id: user_details.id});
-
+        //@ts-ignore
+        if(!session.data?.id)
+            return;
         try{
             const resp=await fetch(`http://localhost:3001/user/editProfile`,{
                 method:"PATCH",
                 body:JSON.stringify({
-                    id:user_details.id,
+                    //@ts-ignore
+                    id:session.data.id,
                     name: values.name,
                     about:values.about,
                     favorite:favorites,
@@ -76,8 +80,12 @@ export default function Profile(){
         }
     }
     async function delete_account(){
+        //@ts-ignore
+        if(!session.data?.id)
+            return;
         try{
-            const resp=await fetch(`http://localhost:3001/user/deleteAccount/${user_details.id}`,{
+            //@ts-ignore
+            const resp=await fetch(`http://localhost:3001/user/deleteAccount/${session.data.id}`,{
                 method:'PATCH',
                 headers:{
                     'Content-Type':"application/json"
@@ -85,7 +93,6 @@ export default function Profile(){
                 credentials:"include"
             });
             if(resp.status==200){
-                removeUserState();
                 router.push("/");
                 window.localStorage.clear();
             }
@@ -116,7 +123,8 @@ export default function Profile(){
     const collection=<div className='flex mr-2'>{favs_comps}</div>;
 
     return (
-        <div className="m-8  mx-24">
+        <Suspense>
+            <div className="m-8  mx-24">
             <div className='flex justify-between'>
             <Button variant={'outline'} size={'icon'} 
             className=''
@@ -134,14 +142,14 @@ export default function Profile(){
             </div>
             <div className='border-2 p-4 rounded-sm sticky'>
                 <div className='flex flex-left py-4'>
-                    <Avatar className='w-[72px] h-[72px]'>
-                        <AvatarImage src='' alt={`${user_details.username?.substring(2)}`}/>
+                   {session.status === "authenticated" && <Avatar className='w-[72px] h-[72px]'>
+                        <AvatarImage src={session.data.user?.image!} alt="User Avatar"/>
                         <AvatarFallback>{initials}</AvatarFallback>
-                    </Avatar>
+                    </Avatar>}
                     <div className=' ml-4'>
                         <div className='flex mr-2 mb-4'>
                             {
-                                (user_details.favorite ?? ["user"]).map((item)=>{
+                                (user_details?.favorite ?? ["user"]).map((item)=>{
                                     return(
                                         <Badge key={item.substring(0,2)} className='mx-1'>{item}</Badge>
                                     )
@@ -165,23 +173,6 @@ export default function Profile(){
                                 <FormMessage/>
                             </FormItem>
                             )}
-                        />
-
-                        <FormField
-                        control={form.control}
-                        name='password'
-                        render={({field})=>(
-                            <FormItem>
-                                <FormLabel>Password</FormLabel>
-                                <FormControl>
-                                    <Input
-                                    type='password' placeholder='password' {...field}
-                                    disabled={true}
-                                    />
-                                </FormControl>
-                                <FormMessage/>
-                            </FormItem>
-                        )}
                         />
 
                         <FormField
@@ -254,7 +245,11 @@ export default function Profile(){
                         )}
                         />
                         <div className='flex justify-end'>
-                        <Button type='submit' disabled={disable} >Update</Button>
+                        <Button type='submit' disabled={
+                            !isDirty ||
+                            isLoading ||
+                            isSubmitting
+                        } >Update</Button>
                         </div>
                     </form>
                 </Form>
@@ -280,5 +275,6 @@ export default function Profile(){
             </div>
 
         </div>
+        </Suspense>
     )
 }

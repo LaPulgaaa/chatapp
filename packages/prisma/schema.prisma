@@ -13,7 +13,8 @@ datasource db {
 model Member{
   id String @id @default(uuid())
   username String
-  password String
+  email String
+  password String?
 
   name String?
   about String?
@@ -28,6 +29,7 @@ model Member{
   deleted Boolean @default(false)
 
   @@unique([username])
+  @@unique([email])
   @@index([username])
 }
 

@@ -6,14 +6,18 @@ import { Button } from "./ui/button";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { UserStateChats } from "@/lib/store/atom/chats";
 import { useRouter } from "next/navigation";
-import { userDetails } from "@/lib/store/atom/userDetails";
+import { useSession } from "next-auth/react";
+
 
 export default function JoinRoomDialog(){
     const [roomid,setRoomId]=useState<string>("");
     const [rooms,setRooms]=useRecoilState(UserStateChats);
-    const profile_info=useRecoilValue(userDetails)
+    const session = useSession();
     const router=useRouter();
     async function searchRoom(){
+
+        if(session.status === "loading" || session.status === "unauthenticated")
+            return;
 
         const room_already_joined = rooms.find((r)=>r.id == roomid);
         if(room_already_joined !== undefined)
@@ -26,7 +30,8 @@ export default function JoinRoomDialog(){
             const resp=await fetch(`http://localhost:3001/chat/joinChat`,{
                 method:"POST",
                 body:JSON.stringify({
-                    memberId:profile_info.id,
+                    //@ts-ignore
+                    memberId:session.data?.user?.id,
                     roomId:roomid
                 }),
                 headers:{
