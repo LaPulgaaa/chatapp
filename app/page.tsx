@@ -2,9 +2,19 @@
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { ArrowRightCircleIcon } from "lucide-react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function Home() {
+  const session = useSession();
+  const router = useRouter();
+
+  useEffect(()=>{
+    if(session.status === "authenticated")
+      router.push("/home");
+  },[session.status])
   return (
     <div>
       <Navbar/>

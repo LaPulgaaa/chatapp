@@ -70,7 +70,7 @@ export default function Home(){
         }
         async function get_user_chats(){
             try{
-                const resp=await fetch(`http://localhost:3001/chat/subscribedChats/${id}`);
+                const resp=await fetch(`/api/room`);
                 //TODO:add zod here before using the returned data
                 const {raw_data}=await resp.json();
                 if(Array.isArray(raw_data) && raw_data.length>0)
