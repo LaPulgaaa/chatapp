@@ -8,7 +8,7 @@ import { RoomType, create_room_schema } from "@/packages/zod";
 import { Form,FormControl,FormField,FormLabel,FormItem,FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState } from "recoil";
 import { UserStateChats } from "@/lib/store/atom/chats";
 import { Signal } from "@/app/home/signal";
 import { useSession } from "next-auth/react";
@@ -23,18 +23,18 @@ export default function CreateRoom(){
             name:"",
             discription:""
         }
-    })
+    });
+
+    const {formState:{isDirty , isSubmitting, isLoading}} = form;
     async function onSubmit(values:RoomType){
         if(session.status === "authenticated")
         {
             try{
-                const resp=await fetch("http://localhost:3001/chat/createChat",{
+                const resp=await fetch("/api/room",{
                     method:"POST",
                     body:JSON.stringify({
                         name:values.name,
-                        discription:values.discription,
-                        //@ts-ignore
-                        memberId:session.data.user?.id
+                        discription:values.discription
                     }),
                     headers:{
                         'Content-Type':"application/json"
@@ -104,7 +104,13 @@ export default function CreateRoom(){
                                 />
                                 <DialogFooter className="mt-3">
                                     <DialogClose asChild>
-                                        <Button type='submit' className="w-full">Create room</Button>
+                                        <Button
+                                        disabled = {
+                                            !isDirty ||
+                                            isLoading ||
+                                            isSubmitting
+                                        }
+                                        type='submit' className="w-full">Create room</Button>
                                     </DialogClose>
                                 </DialogFooter>
                                     
