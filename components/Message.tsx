@@ -1,11 +1,14 @@
-import { useRecoilValue } from "recoil"
+'use client'
 
 import { Avatar,AvatarFallback } from "./ui/avatar"
 import type { RecievedMessage } from "@/app/home/chat/[slug]/page"
-import { userDetails } from "@/lib/store/atom/userDetails";
+import { useSession } from "next-auth/react";
 
 export default function Message({data}:{data:RecievedMessage}){
-    const {username}=useRecoilValue(userDetails);
+    const session = useSession();
+
+    //@ts-ignore
+    const username = session.data?.username
 
     let initials = data.payload.message.user.substring(0,2);
     const names = data.payload.message.name?.split(" ");
@@ -19,9 +22,12 @@ export default function Message({data}:{data:RecievedMessage}){
     return <div 
     id="recent"
     key={Math.floor(Math.random()*100000)} 
-    className={`flex m-2 ${data.payload.message.user === username?'justify-end':data.payload.message.user==='pulgabot'?' justify-center':''}  `}>
+    //@ts-ignore
+    className={`flex m-2 ${data.payload.message.user === username ? 'justify-end':data.payload.message.user==='pulgabot'?' justify-center':''}  `}>
     <Avatar 
-    className={`w-[35px] h-[35px] mr-2 border-2 border-slate-400 bg-slate-200 dark:bg-slate-900 mt-1 p-4 ${data.payload.message.user===username?'hidden':''}`}>
+    className={`w-[35px] h-[35px] mr-2 border-2 border-slate-400 bg-slate-200 dark:bg-slate-900 mt-1 p-4 ${data.payload.
+    // @ts-ignore
+    message.user === username ? 'hidden':''}`}>
         
         <AvatarFallback>
             {initials}
@@ -33,7 +39,9 @@ export default function Message({data}:{data:RecievedMessage}){
         <p className="flex justify-end text-[10px] mt-3 ml-2">{(hour_min[0]+":"+ hour_min[1])}</p>
     </div>
     <Avatar 
-    className={`w-[35px] h-[35px] mr-2 border-2 border-slate-400 bg-slate-200 dark:bg-slate-900 mt-1 p-4 ${data.payload.message.user===username?'':'hidden'}`}>
+    className={`w-[35px] h-[35px] mr-2 border-2 border-slate-400 bg-slate-200 dark:bg-slate-900 mt-1 p-4 ${data.payload.
+    // @ts-ignore
+    message.user === username ? '':'hidden'}`}>
         <AvatarFallback>{initials}</AvatarFallback>
     </Avatar>
     </div>

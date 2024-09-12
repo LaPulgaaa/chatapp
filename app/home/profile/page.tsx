@@ -29,7 +29,7 @@ export default function Profile(){
         }))),
         defaultValues:{
             //@ts-ignore
-            username:session.data?.user?.username ?? "",
+            username:session.data?.username ?? "",
             name: session.data?.user?.name ?? "",
             status:user_details?.status ?? "",
             about:user_details?.about ?? "",
