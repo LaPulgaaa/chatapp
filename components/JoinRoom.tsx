@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
@@ -15,6 +15,14 @@ export default function JoinRoomDialog(){
     const [rooms,setRooms]=useRecoilState(UserStateChats);
     const session = useSession();
     const router=useRouter();
+    const [disable,setDisable] = useState(true);
+
+    useEffect(()=>{
+        if(roomid.trim() === "")
+            setDisable(true);
+        else 
+            setDisable(false);
+    },[roomid])
     async function searchRoom(){
 
         if(session.status !== "authenticated")
@@ -84,6 +92,7 @@ export default function JoinRoomDialog(){
             </div>
             <DialogFooter>
                 <Button
+                disabled = {disable}
                 className={`w-full`}
                 onClick={searchRoom}
                 >
