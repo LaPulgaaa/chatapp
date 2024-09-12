@@ -2,12 +2,17 @@ import { ScrollArea } from "./ui/scroll-area";
 import { Dialog,DialogTrigger } from "./ui/dialog";
 import JoinRoomDialog from "@/components/JoinRoom";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { MessageCircleIcon, UserIcon} from "lucide-react";
+import { ChevronLeftIcon, Heart, HeartPulseIcon, MessageCircleIcon, UserIcon} from "lucide-react";
 import { MessageSquareDotIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { Button } from "./ui/button";
+import { useState } from "react";
+import { useRecoilState } from "recoil";
+import { mainSidebarState } from "@/lib/store/atom/mainSidebar";
 export default function Sidebar(){
     const router=useRouter();
+    const [hidden,setHidden] = useRecoilState(mainSidebarState);
     
     const session = useSession();
 
@@ -24,20 +29,27 @@ export default function Sidebar(){
     }
     
     return (
-        <ScrollArea className="mx-2 p-2 sticky pt-4 ">
-           {session.status === "authenticated" && <div className="flex ml-1 pb-2 text-center cursor-pointer">
-                <Avatar className="">
-                    {/* @ts-ignore */}
-                    <AvatarImage src={session.data.avatar_url}/>
-                    <AvatarFallback>{get_initials()}</AvatarFallback>
-                </Avatar>
-                {/* @ts-ignore */}
-                <h6 className="pt-2 ml-2">{session.data.name ?? ""}</h6>
+        <ScrollArea className = {`mr-2 p-2 sticky pt-4 mt-1 hidden lg:block`}>
+           {session.status === "authenticated" && <div className="flex ml-1 pb-2 text-center cursor-pointer justify-between">
+                    <div className="flex  w-full">
+                        <Avatar className = "">
+                            {/* @ts-ignore */}
+                            <AvatarImage src={session.data.avatar_url}/>
+                            <AvatarFallback>{get_initials()}</AvatarFallback>
+                        </Avatar>
+                        {/* @ts-ignore */}
+                        <h6 className="pt-2 ml-2">{session.data.name ?? ""}</h6>
+                    </div>
+                    <Button size={"icon"} 
+                    onClick={()=>setHidden(!hidden)}
+                    className="ml-2"
+                    variant={"ghost"}><ChevronLeftIcon/></Button>
+
                 <br/>
             </div>}
-            <div className="text-center sm:text-left grid grid-cols-1 divide-y mr-1">
+            <div className="text-center sm:text-left grid grid-cols-1 divide-y">
                 <div className="flex cursor-pointer my-[1/2] w-full hover:bg-gray-500 p-2 dark:hover:bg-gray-800 rounded-md ease-out duration-300 transition-all"><MessageCircleIcon/><p className="ml-2">Direct Messages</p></div>
-                <div className="flex cursor-pointer my-[1/2] w-full hover:bg-gray-500 p-2 dark:hover:bg-gray-800 rounded-md ease-out duration-300 transition-all"><UserIcon/><p className="ml-3">Set Status</p></div>
+                <div className="flex cursor-pointer my-[1/2] w-full hover:bg-gray-500 p-2 dark:hover:bg-gray-800 rounded-md ease-out duration-300 transition-all"><HeartPulseIcon/><p className="ml-3">Set Status</p></div>
                 <Dialog>
                     <DialogTrigger>
                         <div className="flex cursor-pointer my-[1/2] w-full hover:bg-gray-500 p-2 dark:hover:bg-gray-800 rounded-md ease-out duration-300 transition-all"><MessageSquareDotIcon/> <p className="ml-3">Join Room</p></div>
