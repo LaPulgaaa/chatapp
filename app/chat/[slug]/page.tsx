@@ -1,7 +1,7 @@
 "use client";
 import { useRef } from "react";
 
-import { Signal } from "../../signal";
+import { Signal } from "@/app/home/signal";
 
 import { useEffect, useState } from "react";
 import Message from "@/components/Message";
@@ -19,8 +19,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-import { user_chat_uuid } from "../../page";
-import { leave_room } from "../../util";
+import { user_chat_uuid } from "@/app/home/page";
+import { leave_room } from "@/app/home/util";
 import { UserStateChats } from "@/lib/store/atom/chats";
 import { RoomHeaderDetails } from "@/packages/zod";
 import { get_room_details } from "./action";

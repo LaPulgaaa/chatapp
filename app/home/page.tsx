@@ -92,11 +92,9 @@ export default function Home(){
     if(loader===true){
         <div className="flex text-center ">Loading...</div>
     }
-    return <div>
-        <Navbar/>
-        <div className="ml-8 my-4 grid lg:grid-cols-5  h-full pb-24 m-2">
-                <Sidebar/>
-                {session.status === "authenticated" ? <div className="lg:col-span-4 mr-4 ml-2 pt-2">
+    return(
+        <div className="lg:col-span-4 mr-4 ml-2 pt-2">
+            {session.status === "authenticated" ? <div className="">
                     <div className="flex w-inherit justify-between">
                     <h4 className="scroll-m-20 p-2 text-2xl font-semibold tracking-tigh">
                         Catch up on missed chats!
@@ -104,9 +102,10 @@ export default function Home(){
                     <CreateRoom/>
                     </div>
                     <RoomTabs rooms={rooms} />
-                </div> : <div>Loading</div>}
-            </div>
-    </div>
+                </div> : <div>Loading</div>
+            }
+        </div>
+    )
 }
 
 const RoomTabs = memo(
@@ -128,7 +127,7 @@ const RoomTabs = memo(
                     return <div key={room.id} 
                     className="p-3 rounded-md m-1 cursor-pointer hover:bg-gray-400 border-2 ease-out duration-300 transition-all"
                     onClick={()=>{
-                        router.push(`/home/chat/${room.id}`)
+                        router.push(`/chat/${room.id}`)
                     }}
                     >
                         <div className="flex justify-between">

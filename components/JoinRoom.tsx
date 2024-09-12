@@ -50,7 +50,7 @@ export default function JoinRoomDialog(){
                 setRooms([...rooms, room_info]);
                 //@ts-ignore
                 Signal.get_instance().ADD_ROOM(session.data.id,room_info.id)
-                router.push(`/home/chat/${room_info.id}`)
+                router.push(`/chat/${room_info.id}`)
             }
             else
             {
