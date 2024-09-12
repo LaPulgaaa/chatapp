@@ -24,7 +24,7 @@ export default function Sidebar(){
     }
     
     return (
-        <ScrollArea className="mx-2 rounded-sm border-2 p-2 sticky pt-4 ">
+        <ScrollArea className="mx-2 p-2 sticky pt-4 ">
            {session.status === "authenticated" && <div className="flex ml-1 pb-2 text-center cursor-pointer">
                 <Avatar className="">
                     {/* @ts-ignore */}
