@@ -3,10 +3,11 @@ import { DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTit
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Button } from "./ui/button";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState } from "recoil";
 import { UserStateChats } from "@/lib/store/atom/chats";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { Signal } from "@/app/home/signal";
 
 
 export default function JoinRoomDialog(){
@@ -16,7 +17,7 @@ export default function JoinRoomDialog(){
     const router=useRouter();
     async function searchRoom(){
 
-        if(session.status === "loading" || session.status === "unauthenticated")
+        if(session.status !== "authenticated")
             return;
 
         const room_already_joined = rooms.find((r)=>r.id == roomid);
@@ -31,7 +32,7 @@ export default function JoinRoomDialog(){
                 method:"POST",
                 body:JSON.stringify({
                     //@ts-ignore
-                    memberId:session.data?.user?.id,
+                    memberId:session.data.id,
                     roomId:roomid
                 }),
                 headers:{
@@ -47,6 +48,8 @@ export default function JoinRoomDialog(){
                 console.log("room found");
                 const room_info=raw_resp.raw_data;
                 setRooms([...rooms, room_info]);
+                //@ts-ignore
+                Signal.get_instance().ADD_ROOM(session.data.id,room_info.id)
                 router.push(`/home/chat/${room_info.id}`)
             }
             else

@@ -5,21 +5,20 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
-import { useRecoilState } from "recoil";
 import { useRouter } from "next/navigation";
-import { userDetails } from "@/lib/store/atom/userDetails";
 import Navbar from "@/components/Navbar";
+import { useSession } from "next-auth/react";
 
 export default function login(){
-    const [userdetails,setUserDetails]=useRecoilState(userDetails);
+    const session = useSession();
     const [username,setUsername]=useState("");
     const [password,setPassword]=useState("");
     const router=useRouter();
 
     // a little shady
     useEffect(()=>{
-      if(userdetails.id !== undefined)
-      router.push("/home");
+      if(session.status === "authenticated")
+        router.push("/home");
     },[])
 
   async function joinRoom(){
@@ -39,8 +38,6 @@ export default function login(){
       if(resp.status==200)
       {
         const {member}=await resp.json();
-        window.localStorage.setItem("token","valid");
-        setUserDetails(member);
         router.push("/home");
       }
       else if(resp.status==404)

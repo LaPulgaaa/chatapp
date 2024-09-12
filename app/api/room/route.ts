@@ -1,17 +1,16 @@
-import { getServerSession } from "next-auth";
 import { prisma } from "@/packages/prisma/prisma_client";
 import { getToken } from "next-auth/jwt";
+import { NextRequest } from "next/server";
 
-export async function GET(){
-    const session = await getServerSession();
+export async function GET(req:NextRequest){
+    const token = await getToken({req})
 
-    if(session === null)
+    if(token === null)
     return Response.json({message: "unauthorized"},{status: 401});
 
     try{
         //@ts-ignore
-        const memberId = session.user.id;
-        console.log(session)
+        const memberId = token.id;
         let joined_rooms=[];
         const message_subscribed_rooms=await prisma.message.findMany({
             where:{
@@ -42,10 +41,10 @@ export async function GET(){
     }
 }
 
-export async function POST(req: Request){
-    const session = await getServerSession();
+export async function POST(req: NextRequest){
+    const token = await getToken({req});
     const {name,discription} = await req.json();
-    if(session === null){
+    if(token === null){
         return Response.json({
             msg: "Unauthorized"
         },{status: 401})
@@ -53,8 +52,7 @@ export async function POST(req: Request){
 
     try{
         //@ts-ignore
-        const memberId = session.user.id;
-        console.log(session)
+        const memberId: string = token.id;
         const [new_room,chat_opcode]=await prisma.$transaction(async(tx)=>{
             const new_room=await tx.chat.create({
                 data:{

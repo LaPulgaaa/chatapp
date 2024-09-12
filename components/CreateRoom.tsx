@@ -47,7 +47,7 @@ export default function CreateRoom(){
                 {
                     const {created_chat}=await resp.json();
                     //@ts-ignore
-                    Signal.get_instance().ADD_ROOM(session.data.user?.username!,created_chat.id);
+                    Signal.get_instance().ADD_ROOM(session.data.id!,created_chat.id);
                     setRooms([created_chat,...rooms]);
                 }
             }catch(err)

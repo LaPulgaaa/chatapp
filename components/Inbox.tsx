@@ -1,16 +1,19 @@
 import { Avatar,AvatarFallback } from "./ui/avatar"
 import type { UnitMessage } from "@/packages/zod";
-import { userDetails } from "@/lib/store/atom/userDetails";
-import { useRecoilValue } from "recoil"
+import { useSession } from "next-auth/react";
 export default function Inbox({data}:{data:UnitMessage}){
     const time = (new Date(data.createdAt).toTimeString().split(" ")[0]).split(":").slice(0,-1);
-    const {username}=useRecoilValue(userDetails);
+    const session = useSession();
     let initials = data.sender.username.substring(0,2);
     const names = data.sender.name?.split(" ");
     if(names){
         initials = names.map((name)=> name.charAt(0)).join("");
     }
-    return <div id="history" className={`flex m-2 ${data.sender.username===username?'justify-end':data.sender.username===''?' justify-center':''}  `}>
+    
+    //@ts-ignore
+    const username = session.data?.username;
+
+    return <div id="history" className={`flex m-2 ${data.sender.username === username?'justify-end':data.sender.username===''?' justify-center':''}  `}>
     <Avatar className={`w-[35px] h-[35px] border-2 border-slate-400 bg-slate-200 dark:bg-slate-900 mr-2 mt-1 p-4 ${data.sender.username===username?'hidden':''}`}>
         
         <AvatarFallback>{initials}</AvatarFallback>

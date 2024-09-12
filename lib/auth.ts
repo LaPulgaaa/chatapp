@@ -18,7 +18,6 @@ export const NEXTAUTH_CONFIG:NextAuthOptions = {
                 throw new Error("Credentials not present!");
             }
             if(params.token.sub){
-                console.log(params.trigger + "trigger hai");
 
                 if(params.trigger === "signIn")
                 {

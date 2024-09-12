@@ -12,7 +12,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useRecoilValue, useRecoilState} from "recoil";
-import { userDetails } from "@/lib/store/atom/userDetails";
 import { useRouter } from "next/navigation";
 import { ChevronLeftIcon, ListEndIcon,} from "lucide-react";
 import { DarkLight } from "@/components/DarkLight";
@@ -28,6 +27,7 @@ import { get_room_details } from "./action";
 import { room_member_details_schema } from "@/packages/zod";
 import { isSidebarHidden } from "@/lib/store/atom/sidebar";
 import { member_online_state } from "@/lib/store/atom/status";
+import { useSession } from "next-auth/react";
 
 export type RecievedMessage={
     type:string,
@@ -47,7 +47,7 @@ export default function Chat({params}:{params:{slug:string}}){
     const [realtimechat, setRealtimechat] = useState<JSX.Element[]>([]);
     const [compose,setCompose]=useState<string>("");
     const [chat,setChat]=useState<RecievedMessage[]>([]);
-    const creds=useRecoilValue(userDetails);
+    const session = useSession();
     const [did,setDid]=useState<number>();
     const [rooms,setRooms]=useRecoilState(UserStateChats);
     const [ishidden,setIshidden] = useRecoilState(isSidebarHidden) 
@@ -55,17 +55,21 @@ export default function Chat({params}:{params:{slug:string}}){
     const router=useRouter();
     const [room_details,setRoomDetails] = useState<RoomHeaderDetails>();
     const room_id = params.slug;
-    const user_id = creds.id;
+    //@ts-ignore
+    const user_id = session.data?.id;
     const [memberStatus,setMemberStatus] = useRecoilState(member_online_state);
     
     useEffect(()=>{
         async function fetch_messages(){
+            if(session.status !== "authenticated")
+                return ;
             try{
                 const resp=await fetch(`http://localhost:3001/chat/getMessage`,{
                     method:'POST',
                     body:JSON.stringify({
                         chat_id:params.slug,
-                        user_id:creds.id
+                        //@ts-ignore
+                        user_id:session.data.id
                     }),
                     headers:{
                         'Content-Type':"application/json"
@@ -95,21 +99,23 @@ export default function Chat({params}:{params:{slug:string}}){
         }
 
         fetch_room_details();
-    },[room_id])
+    },[session.status])
 
     useEffect(()=>{
-        if(room_id !== undefined && user_id !== undefined && creds.username !== undefined)
+        if(room_id !== undefined && session.status === "authenticated" )
         {
-            Signal.get_instance(creds.username).SUBSCRIBE(params.slug, creds.id, creds.username);
+            //@ts-ignore
+            Signal.get_instance(session.data.id).SUBSCRIBE(params.slug, session.data.id, session.data.username);
             Signal.get_instance().REGISTER_CALLBACK("MSG_CALLBACK",recieve_msg);
             Signal.get_instance().REGISTER_CALLBACK("ONLINE_CALLBACK",update_member_online_status);
         }
 
         
         return ()=>{
-            if(room_id !== undefined && user_id !== undefined && creds.username !== undefined)
+            if(room_id !== undefined && session.status === "authenticated")
             {
-                Signal.get_instance().UNSUBSCRIBE(params.slug,creds.username);
+                //@ts-ignore
+                Signal.get_instance().UNSUBSCRIBE(params.slug,session.data.username);
                 Signal.get_instance().DEREGISTER("MSG_CALLBACK");
                 Signal.get_instance().DEREGISTER("ONLINE_CALLBACK");
             }
@@ -119,7 +125,7 @@ export default function Chat({params}:{params:{slug:string}}){
         const data:RecievedMessage = JSON.parse(`${raw_data}`);
         console.log("recieved a message"+data) 
         setChat([...chat,data]);
-        setRealtimechat((realtimechat)=>[...realtimechat, <Message  key={(creds.id?.substring(5) || "")+Date.now()} data={data}/>])
+        setRealtimechat((realtimechat)=>[...realtimechat, <Message  key={(session.data?.user?.email?.substring(5) || "")+Date.now()} data={data}/>])
     }
 
     function update_member_online_status(raw_data: string){
@@ -176,9 +182,11 @@ export default function Chat({params}:{params:{slug:string}}){
                 roomId:params.slug,
                 message:{
                     content:compose,
-                    user:creds.username,
-                    name: creds.name,
-                    id:creds.id,
+                    //@ts-ignore
+                    user:session.data!.username,
+                    name: session.data!.user?.name,
+                    //@ts-ignore
+                    id:session.data!.id,
                 }
             }
         }
@@ -197,7 +205,8 @@ export default function Chat({params}:{params:{slug:string}}){
                 body:JSON.stringify({
                     date:new Date(),
                     did:did,
-                    user_id:creds.id,
+                    //@ts-ignore
+                    user_id: session.data!.id,
                     chat_id:params.slug
                 }),
                 headers:{
@@ -216,14 +225,15 @@ export default function Chat({params}:{params:{slug:string}}){
     }
     async function may_be_leave_room(){
         const opcode_id=user_chat_uuid.get(params.slug);
-        if(opcode_id===undefined || creds.id === undefined)
+        if(opcode_id===undefined || session.status === "authenticated")
         {
             alert("Could not leave the chat!");
             return ;
         }
 
         const is_deleted = await leave_room({
-            member_id: creds.id,
+            //@ts-ignore
+            member_id: session.data?.id,
             chat_id: params.slug,
             conn_id: opcode_id
         });
