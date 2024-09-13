@@ -269,7 +269,7 @@ export default function Chat({params}:{params:{slug:string}}){
                             onClick={()=>setIshidden(!ishidden)}
                             size={"icon"}
                             variant={"ghost"}
-                            className="">
+                            className="hidden lg:block">
                                 {
                                     ishidden ? <ChevronLeftIcon/> : <ChevronRightIcon/>
                                 }
@@ -357,7 +357,7 @@ export function Members({room_id}:{room_id: string}){
         fetch_members();
     },[room_id]);
     return (
-        <ScrollArea className={`${ishidden === true ? "hidden" : ""} w-[400px]`}>
+        <ScrollArea className={`hidden ${ishidden === true ? "lg:hidden" : "lg:block"} w-[400px]`}>
             <div>
                 {
                     memberStatus.map((member)=>{
