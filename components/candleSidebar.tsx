@@ -1,7 +1,7 @@
 import { ScrollArea } from "./ui/scroll-area";
 import { Dialog,DialogTrigger } from "./ui/dialog";
 import JoinRoomDialog from "@/components/JoinRoom";
-import { ChevronRightIcon , Heart, HeartPulseIcon, MessageCircleIcon, UserIcon} from "lucide-react";
+import { ChevronRightIcon , HeartPulseIcon, MessageCircleIcon, UserIcon} from "lucide-react";
 import { MessageSquareDotIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useRecoilState } from "recoil";

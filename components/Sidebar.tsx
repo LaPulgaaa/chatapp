@@ -2,12 +2,11 @@ import { ScrollArea } from "./ui/scroll-area";
 import { Dialog,DialogTrigger } from "./ui/dialog";
 import JoinRoomDialog from "@/components/JoinRoom";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { ChevronLeftIcon, Heart, HeartPulseIcon, MessageCircleIcon, UserIcon} from "lucide-react";
+import { ChevronLeftIcon, HeartPulseIcon, MessageCircleIcon, UserIcon} from "lucide-react";
 import { MessageSquareDotIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Button } from "./ui/button";
-import { useState } from "react";
 import { useRecoilState } from "recoil";
 import { mainSidebarState } from "@/lib/store/atom/mainSidebar";
 export default function Sidebar(){

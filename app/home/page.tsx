@@ -10,8 +10,6 @@ import { useEffect, useState } from "react";
 import { user_chat_response_schema } from "@/packages/zod";
 import { UserStateChats } from "@/lib/store/atom/chats";
 import { useRouter } from "next/navigation";
-import Sidebar from "@/components/Sidebar";
-import Navbar from "@/components/Navbar";
 import type { ChatReponse } from "@/packages/zod";
 import { useSession } from "next-auth/react";
 

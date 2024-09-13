@@ -4,9 +4,8 @@ import { useRef } from "react";
 import { Signal } from "@/app/home/signal";
 
 import { useEffect, useState } from "react";
-import Message from "@/components/Message";
-import type { ChatMessageData } from "@/packages/zod";
-import { chat_messages_response_schema } from "@/packages/zod";
+
+import { useSession } from "next-auth/react";
 import Inbox from "@/components/Inbox";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -20,6 +19,9 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import { user_chat_uuid } from "@/app/home/page";
+import Message from "@/components/Message";
+import type { ChatMessageData } from "@/packages/zod";
+import { chat_messages_response_schema } from "@/packages/zod";
 import { leave_room } from "@/app/home/util";
 import { UserStateChats } from "@/lib/store/atom/chats";
 import { RoomHeaderDetails } from "@/packages/zod";
@@ -27,7 +29,6 @@ import { get_room_details } from "./action";
 import { room_member_details_schema } from "@/packages/zod";
 import { isSidebarHidden } from "@/lib/store/atom/sidebar";
 import { member_online_state } from "@/lib/store/atom/status";
-import { useSession } from "next-auth/react";
 
 export type RecievedMessage={
     type:string,
@@ -332,7 +333,6 @@ export default function Chat({params}:{params:{slug:string}}){
 
 export function Members({room_id}:{room_id: string}){
     const ishidden= useRecoilValue(isSidebarHidden);
-    const avatar_url = "https://avatars.githubusercontent.com/u/123243429?v=4";
     const [memberStatus, setMemberStatus] = useRecoilState(member_online_state);
     useEffect(()=>{
         const fetch_members = async()=>{
