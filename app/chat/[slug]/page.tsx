@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useRecoilValue, useRecoilState} from "recoil";
 import { useRouter } from "next/navigation";
-import { ChevronLeftIcon, ListEndIcon,} from "lucide-react";
+import { ChevronLeftIcon, ChevronRightIcon, ListEndIcon,} from "lucide-react";
 import { DarkLight } from "@/components/DarkLight";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
@@ -264,10 +264,9 @@ export default function Chat({params}:{params:{slug:string}}){
                 {
                     room_details && (
                         <>
-                        <div 
-                        onClick={()=>setIshidden(!ishidden)}
-                        className="w-full mx-2 mr-4">
-                            <div className="w-full flex px-3 pt-1 mx-2 border-[1.5px] border-slate-800 rounded">
+                        <div
+                        className="w-full flex justify-between mx-2 mr-4 border-[1.5px] border-slate-800 rounded">
+                            <div className="w-full flex px-3 pt-1 mx-2 ">
                                 <h4 className="scroll-m-20 text-xl pb-1 font-semibold tracking-tight mr-3">
                                 {room_details.name}
                                 </h4>
@@ -275,6 +274,15 @@ export default function Chat({params}:{params:{slug:string}}){
                                 {room_details.discription}
                                 </h5>
                             </div>
+                            <Button
+                            onClick={()=>setIshidden(!ishidden)}
+                            size={"icon"}
+                            variant={"ghost"}
+                            className="">
+                                {
+                                    ishidden ? <ChevronLeftIcon/> : <ChevronRightIcon/>
+                                }
+                            </Button>
                         </div>
                         </>
                     )
