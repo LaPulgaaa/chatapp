@@ -12,65 +12,6 @@ type CreateRoomSchema={
     memberId:string
 }
 
-router.post("/getMessage",authenticate,async(req,res)=>{
-    const creds:{chat_id:string,user_id:string}=req.body;
-    try{
-        const directory=await prisma.directory.findFirst({
-            where:{
-                AND:[
-                    {userId:creds.user_id},
-                    {chat_id:creds.chat_id},
-                ]
-            },
-            select:{
-                after:true,
-                id:true
-            }
-        })
-        const data=await prisma.chat.findUnique({
-            where:{
-                id:creds.chat_id
-            },
-            select:{
-                messages:{
-                    where:{
-                        createdAt:{
-                            gte:directory?.after
-                        },
-                        deleted: false
-                    },
-                    include:{
-                        sender:{
-                            select:{
-                                username: true,
-                                name: true,
-                            }
-                        }
-                    }
-                }
-            }
-        });
-        if(data!==null)
-        {
-            res.status(200).json({
-            msg:"successfull",
-            raw_data:data,
-            directory_id:directory?.id
-            })
-        }
-        else
-        {
-            res.status(200).json({
-                msg:"not_successfull"
-            })
-        }
-    }catch(err)
-    {
-        console.log(err);
-        res.status(400).send(err);
-    }
-})
-
 router.post("/joinChat",authenticate,async(req,res)=>{
     const {roomId,memberId}=req.body;
     try{

@@ -65,16 +65,7 @@ export default function Chat({params}:{params:{slug:string}}){
             if(session.status !== "authenticated")
                 return ;
             try{
-                const resp=await fetch(`http://localhost:3001/chat/getMessage`,{
-                    method:'POST',
-                    body:JSON.stringify({
-                        chat_id:params.slug,
-                        //@ts-ignore
-                        user_id:session.data.id
-                    }),
-                    headers:{
-                        'Content-Type':"application/json"
-                    },
+                const resp=await fetch(`/api/message/${params.slug}`,{
                     credentials:"include"
                 });
                 const {raw_data,directory_id}=await resp.json();
