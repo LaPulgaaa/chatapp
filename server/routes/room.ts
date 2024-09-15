@@ -110,36 +110,6 @@ router.patch("/updateFrom",authenticate,async(req,res)=>{
     }
 })
 
-router.get("/getDetails/:room_id",authenticate,async(req,res)=>{
-    const room_id = req.params.room_id;
-    try{
-        const resp = await prisma.chat.findUnique({
-            where:{
-                id: room_id
-            },
-            select: {
-                name: true,
-                discription: true,
-                createdAt: true
-            }
-        });
-        if(resp === null){
-            return res.status(404).json({
-                msg: "Room details not found"
-            })
-        }
-
-        res.status(200).json({
-            msg: "success",
-            raw_data: resp,
-        })
-    }catch(err){
-        res.status(500).json({
-            msg: "Could not fetch details",
-            err: err
-        })
-    }
-})
 router.get("/getMembers/:room_id",authenticate,async(req,res)=>{
     const room_id = req.params.room_id;
     try{

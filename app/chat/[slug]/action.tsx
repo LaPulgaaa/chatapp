@@ -2,11 +2,12 @@ import { RoomHeaderDetails, room_header_details } from "@/packages/zod";
 
 export async function get_room_details(room_id: string):Promise<RoomHeaderDetails | undefined>{
     try{
-        const resp = await fetch(`http://localhost:3001/chat/getDetails/${room_id}`,{
+        const resp = await fetch(`/api/member/room/${room_id}`,{
             credentials: "include",
             headers:{
                 'Content':"application/json"
-            }
+            },
+            cache: "force-cache"
         });
 
         if(resp.status === 200){
