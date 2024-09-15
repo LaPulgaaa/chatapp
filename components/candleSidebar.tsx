@@ -15,7 +15,7 @@ export default function CandleSidebar(){
         <ScrollArea className = {`mr-1 pr-4 sticky pt-4 mt-1`}>
             <div className="text-center sm:text-left grid grid-cols-1 mx-1 ">
                 <div><Button
-                className="mt-1"
+                className="mt-1 hidden md:block pl-2"
                 onClick={()=>setHidden(!hidden)}
                 variant={"ghost"}
                  size={"icon"}><ChevronRightIcon/></Button></div>
