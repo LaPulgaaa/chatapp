@@ -74,7 +74,16 @@ export const unit_message_schema= z.object({
 
 export const chat_messages_response_schema=z.object({
     messages:z.array(unit_message_schema)
-})
+});
+
+export const room_details_response_schema = z.intersection(
+    chat_messages_response_schema,
+    z.object({
+        name: z.string(),
+        discription: z.string(),
+        createdAt: z.string(),
+    })
+)
 export type ChatMessageData=z.infer<typeof chat_messages_response_schema>;
 export type UnitMessage=z.infer<typeof unit_message_schema>;
 

@@ -21,11 +21,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { user_chat_uuid } from "@/app/home/page";
 import Message from "@/components/Message";
 import type { ChatMessageData } from "@/packages/zod";
-import { chat_messages_response_schema } from "@/packages/zod";
+import { room_details_response_schema } from "@/packages/zod";
 import { leave_room } from "@/app/home/util";
 import { UserStateChats } from "@/lib/store/atom/chats";
 import { RoomHeaderDetails } from "@/packages/zod";
-import { get_room_details } from "./action";
 import { room_member_details_schema } from "@/packages/zod";
 import { isSidebarHidden } from "@/lib/store/atom/sidebar";
 import { member_online_state } from "@/lib/store/atom/status";
@@ -66,13 +65,24 @@ export default function Chat({params}:{params:{slug:string}}){
                 return ;
             try{
                 const resp=await fetch(`/api/message/${params.slug}`,{
-                    credentials:"include"
+                    credentials:"include",
+                    next:{
+                        revalidate: 30
+                    }
                 });
                 const {raw_data,directory_id}=await resp.json();
                 setDid(directory_id);
 
-                const data=chat_messages_response_schema.parse(raw_data);
-                setMessages(data);
+                const data = room_details_response_schema.parse(raw_data);
+                setMessages({
+                    messages: data.messages
+                });
+
+                setRoomDetails({
+                    name: data.name,
+                    discription: data.discription,
+                    createdAt: data.createdAt,
+                })
                 
                
             }catch(err)
@@ -84,13 +94,6 @@ export default function Chat({params}:{params:{slug:string}}){
         }
         fetch_messages();
 
-        const fetch_room_details = async() => {
-            const resp = await get_room_details(params.slug);
-            if(resp !== undefined)
-                setRoomDetails(resp);
-        }
-
-        fetch_room_details();
     },[session.status])
 
     useEffect(()=>{
