@@ -2,10 +2,11 @@ import { ScrollArea } from "./ui/scroll-area";
 import { Dialog,DialogTrigger } from "./ui/dialog";
 import JoinRoomDialog from "@/components/JoinRoom";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { HeartPulseIcon, MessageCircleIcon, UserIcon} from "lucide-react";
+import { CopyPlusIcon, HeartPulseIcon, MessageCircleIcon, PlusSquare, UserIcon} from "lucide-react";
 import { MessageSquareDotIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import CreateRoom from "./CreateRoom";
 export default function Sidebar(){
     const router=useRouter();    
     const session = useSession();
@@ -39,6 +40,12 @@ export default function Sidebar(){
             <div className="text-center sm:text-left grid grid-cols-1 divide-y">
                 <div className="flex cursor-pointer my-[1/2] w-full hover:bg-gray-500 p-2 dark:hover:bg-gray-800 rounded-md ease-out duration-300 transition-all"><MessageCircleIcon/><p className="ml-2">Direct Messages</p></div>
                 <div className="flex cursor-pointer my-[1/2] w-full hover:bg-gray-500 p-2 dark:hover:bg-gray-800 rounded-md ease-out duration-300 transition-all"><HeartPulseIcon/><p className="ml-3">Set Status</p></div>
+                <Dialog>
+                    <DialogTrigger>
+                        <div className="flex cursor-pointer my-[1/2] w-full hover:bg-gray-500 p-2 dark:hover:bg-gray-800 rounded-md ease-out duration-300 transition-all"><PlusSquare/> <p className="ml-3">Create Room</p></div>
+                    </DialogTrigger>
+                        <CreateRoom/>
+                </Dialog>
                 <Dialog>
                     <DialogTrigger>
                         <div className="flex cursor-pointer my-[1/2] w-full hover:bg-gray-500 p-2 dark:hover:bg-gray-800 rounded-md ease-out duration-300 transition-all"><MessageSquareDotIcon/> <p className="ml-3">Join Room</p></div>

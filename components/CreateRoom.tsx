@@ -15,6 +15,7 @@ import { Textarea } from "./ui/textarea";
 import { UserStateChats } from "@/lib/store/atom/chats";
 import { Signal } from "@/app/home/signal";
 import { RoomType, create_room_schema } from "@/packages/zod";
+import { PlusIcon } from "lucide-react";
 
 export default function CreateRoom(){
     const session = useSession();
@@ -62,11 +63,7 @@ export default function CreateRoom(){
         console.log("member_id is not defined");
     }
     return(
-        <Dialog>
-            <DialogTrigger asChild>
-                <Button className="w-[150px]">+ New</Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px] p-6">
+        <DialogContent className="sm:max-w-[425px] p-6">
                 <DialogHeader>
                     <DialogTitle>
                         Create a room
@@ -120,6 +117,5 @@ export default function CreateRoom(){
                         </form>
                     </Form>
             </DialogContent>
-        </Dialog>
     )
 }

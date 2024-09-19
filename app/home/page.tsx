@@ -93,12 +93,9 @@ export default function Home(){
     return(
         <div className="lg:col-span-4 mr-4 ml-2 pt-2">
             {session.status === "authenticated" ? <div className="">
-                    <div className="flex w-inherit justify-between">
                     <h4 className="scroll-m-20 p-2 text-2xl font-semibold tracking-tigh">
                         Catch up on missed chats!
                     </h4>
-                    <CreateRoom/>
-                    </div>
                     <RoomTabs rooms={rooms} />
                 </div> : <div>Loading</div>
             }
