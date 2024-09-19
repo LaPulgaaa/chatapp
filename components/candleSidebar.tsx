@@ -42,17 +42,17 @@ export default function CandleSidebar(){
                 variant={"ghost"} size={"icon"}><HeartPulseIcon/></Button>
                 <Dialog>
                     <DialogTrigger>
-                        <Button 
-                        className="mt-1 p-1"
-                        variant={"ghost"} size={"icon"}><PlusSquare/></Button>
+                        <div 
+                        className="mt-1 p-2 hover:bg-gray-800 rounded-md ease-out duration-300 transition-all"
+                        ><PlusSquare/></div>
                     </DialogTrigger>
                         <CreateRoom/>
                 </Dialog>
                 <Dialog>
                     <DialogTrigger>
-                        <Button 
-                        className="mt-1 p-1"
-                        variant={"ghost"} size={"icon"}><MessageSquareDotIcon/></Button>
+                        <div 
+                        className="mt-1 p-2 hover:bg-gray-800 rounded-md ease-out duration-300 transition-all"
+                        ><MessageSquareDotIcon/></div>
                     </DialogTrigger>
                         <JoinRoomDialog/>
                 </Dialog>
