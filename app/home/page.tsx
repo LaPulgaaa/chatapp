@@ -69,10 +69,10 @@ export default function Home(){
             try{
                 const resp=await fetch(`/api/room`,{
                     next: {
-                        revalidate: 3600,
+                        revalidate: 60,
                         tags: ['rooms']
                     },
-                    cache: "force-cache"
+                    cache: "no-cache"
                 });
                 //TODO:add zod here before using the returned data
                 const {raw_data}=await resp.json();
