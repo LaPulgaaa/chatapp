@@ -2,17 +2,12 @@ import { ScrollArea } from "./ui/scroll-area";
 import { Dialog,DialogTrigger } from "./ui/dialog";
 import JoinRoomDialog from "@/components/JoinRoom";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { ChevronLeftIcon, HeartPulseIcon, MessageCircleIcon, UserIcon} from "lucide-react";
+import { HeartPulseIcon, MessageCircleIcon, UserIcon} from "lucide-react";
 import { MessageSquareDotIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { Button } from "./ui/button";
-import { useRecoilState } from "recoil";
-import { mainSidebarState } from "@/lib/store/atom/mainSidebar";
 export default function Sidebar(){
-    const router=useRouter();
-    const [hidden,setHidden] = useRecoilState(mainSidebarState);
-    
+    const router=useRouter();    
     const session = useSession();
 
     function get_initials(){
@@ -39,11 +34,6 @@ export default function Sidebar(){
                         {/* @ts-ignore */}
                         <h6 className="pt-2 ml-2">{session.data.name ?? ""}</h6>
                     </div>
-                    <Button size={"icon"} 
-                    onClick={()=>setHidden(!hidden)}
-                    className="ml-2"
-                    variant={"ghost"}><ChevronLeftIcon/></Button>
-
                 <br/>
             </div>}
             <div className="text-center sm:text-left grid grid-cols-1 divide-y">

@@ -6,7 +6,7 @@ import { Signal } from "./signal";
 
 import CreateRoom from "@/components/CreateRoom";
 import { useRecoilState} from "recoil";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { user_chat_response_schema } from "@/packages/zod";
 import { UserStateChats } from "@/lib/store/atom/chats";
 import { useRouter } from "next/navigation";
