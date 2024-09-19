@@ -13,7 +13,7 @@ import { signOut, useSession } from "next-auth/react";
 export default function Navbar(){;
     const session = useSession();
     return (
-        <div className="p-4 font-bold flex justify-between cursor-pointer">
+        <div className="p-4 font-bold flex justify-between cursor-pointer mx-4 mt-1">
             <Link href="/">
                 <h2>chat.city</h2>
             </Link>
