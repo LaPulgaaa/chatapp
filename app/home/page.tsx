@@ -53,7 +53,6 @@ export let user_chat_uuid = new Map<string,string>();
 export default function Home(){
     const session = useSession();
     const [rooms,setRooms]=useRecoilState(UserStateChats)
-    const [loader,setLoader]=useState(true);
     //@ts-ignore
     const id: string | undefined = session.data?.id;
     useEffect(()=>{
@@ -61,7 +60,7 @@ export default function Home(){
         Signal.get_instance(id)
 
     },[id]);
-    console.log(session.data);
+
     useEffect(()=>{
         if(!id){
             return;
@@ -80,7 +79,6 @@ export default function Home(){
                 {
                     const data=user_chat_response_schema.parse(raw_data);
                     console.log(data);
-                    setLoader(false);
                     setRooms(data);
                 }
                 
@@ -92,9 +90,6 @@ export default function Home(){
         get_user_chats()
     },[id])
 
-    if(loader===true){
-        <div className="flex text-center ">Loading...</div>
-    }
     return(
         <div className="lg:col-span-4 mr-4 ml-2 pt-2">
             {session.status === "authenticated" ? <div className="">
