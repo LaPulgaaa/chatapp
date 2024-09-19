@@ -70,6 +70,7 @@ export default function Home(){
                 const resp=await fetch(`/api/room`,{
                     next: {
                         revalidate: 3600,
+                        tags: ['rooms']
                     },
                     cache: "force-cache"
                 });
