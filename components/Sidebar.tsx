@@ -7,6 +7,7 @@ import { MessageSquareDotIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import CreateRoom from "./CreateRoom";
+import Link from "next/link";
 export default function Sidebar(){
     const router=useRouter();    
     const session = useSession();
@@ -26,7 +27,7 @@ export default function Sidebar(){
     return (
         <ScrollArea className = {`mr-2 p-2 sticky pt-4 mt-1 hidden lg:block`}>
            {session.status === "authenticated" && <div className="flex ml-1 pb-2 text-center cursor-pointer justify-between">
-                    <div className="flex  w-full">
+                    <Link href={"/home"} className="flex w-full">
                         <Avatar className = "">
                             {/* @ts-ignore */}
                             <AvatarImage src={session.data.avatar_url}/>
@@ -34,7 +35,7 @@ export default function Sidebar(){
                         </Avatar>
                         {/* @ts-ignore */}
                         <h6 className="pt-2 ml-2">{session.data.name ?? ""}</h6>
-                    </div>
+                    </Link>
                 <br/>
             </div>}
             <div className="text-center sm:text-left grid grid-cols-1 divide-y">

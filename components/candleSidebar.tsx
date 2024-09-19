@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
 import { useSession } from "next-auth/react";
 import CreateRoom from "./CreateRoom";
+import Link from "next/link";
 export default function CandleSidebar(){
     const router=useRouter();
     const session = useSession();
@@ -28,11 +29,13 @@ export default function CandleSidebar(){
         <ScrollArea className = {`mr-1 pr-4 sticky pt-4 mt-1 block lg:hidden`}>
             <div className="flex flex-col items-center">
                 {session.status === "authenticated" && 
+                    <Link href={"/home"}>
                     <Avatar>
                         {/* @ts-ignore */}
                         <AvatarImage src={session.data.avatar_url}/>
                         <AvatarFallback>{get_initials()}</AvatarFallback>
                     </Avatar>
+                    </Link>
                 }
                 <Button 
                 className="mt-1 p-1"
