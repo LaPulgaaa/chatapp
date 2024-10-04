@@ -1,280 +1,256 @@
-"use client"
+'use client'
 
-import { useForm} from 'react-hook-form';
-import { member_profile_schema,MemberProfile } from '@/packages/zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { UserDetails } from '@/lib/store/atom/userDetails';
-import { useRecoilValue } from 'recoil';
-import { Avatar,AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { Form,FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { KeyboardEvent, Suspense, useState } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { z} from 'zod';
+import { useEffect, useState } from "react";
 
-import { useRouter } from 'next/navigation';
-import { ChevronLeftIcon } from 'lucide-react';
-import { DarkLight } from '@/components/DarkLight';
-import { useSession } from 'next-auth/react';
+import { useRouter } from "next/navigation";
+
+import { z } from "zod";
+
+import { useForm } from "react-hook-form";
+
+import { useSession } from "next-auth/react";
+import { useRecoilRefresher_UNSTABLE, useRecoilValueLoadable } from "recoil";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+
+import { UserDetails } from "@/lib/store/atom/userDetails";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { user_details_edit_form_schema } from "@/packages/zod";
+
+type FormValue = z.output<typeof user_details_edit_form_schema>;
+
 export default function Profile(){
-    const router=useRouter();
-    const session = useSession();
-    //@ts-ignore
-    const user_details = useRecoilValue(UserDetails({user_id: session.data?.user?.id}));
-    const form=useForm<Omit<MemberProfile,"favorite"> & {favorite:string}>({
-        resolver:zodResolver(z.intersection(member_profile_schema.omit({favorite:true}),z.object({
-            favorite:z.string()
-        }))),
-        defaultValues:{
-            //@ts-ignore
-            username:session.data?.username ?? "",
-            name: session.data?.user?.name ?? "",
-            status:user_details?.status ?? "",
-            about:user_details?.about ?? "",
-            //@ts-ignore
-            avatarurl: session.data?.user?.avatar_url,
-            favorite:""
+    const { update } = useSession();
+    const router = useRouter();
+    const user_state = useRecoilValueLoadable(UserDetails);
+    const refresh_state = useRecoilRefresher_UNSTABLE(UserDetails);
+    const [fav,setFav] = useState<string>("");
+    const [favsdirty,setFavsDirty] = useState<boolean>(false);
+    const [favs,setFavs] = useState<string[]>([]);
+    const user_details = user_state.contents;
+
+    const { toast } = useToast();
+
+    const form_details = useForm<FormValue>({
+        resolver: zodResolver(user_details_edit_form_schema.required()),
+        defaultValues: {
+            username: "",
+            name: "",
+            avatarurl: "",
+            status: "",
+            about: "",
         }
-    })
-    const {formState:{isDirty,isSubmitting, isLoading}}=form;
-    const [favorites,setFavorites]=useState([""]);
-    const names=session.data?.user?.name?.split(" ");
-    //@ts-ignore
-    let initials = session.data?.user?.username?.substring(0,2);
-    if(names){
-        initials = names.map((name)=> name.charAt(0)).join("");
-    }
+    });
+
+    const { control, handleSubmit, formState:{isDirty, isLoading, isSubmitting}, setValue, getFieldState} = form_details;
     
-    console.log(user_details);
-    async function settings_change(values:Omit<MemberProfile,"favorite">&{favorite:string}){
-        //@ts-ignore
-        if(!session.data?.id)
-            return;
+    useEffect(()=>{
+        if(user_state.state === "hasValue"){
+            const loaded_state = user_state.contents;
+            setValue("username",loaded_state?.username ?? "");
+            setValue("name",loaded_state?.name ?? "");
+            setValue("avatarurl",loaded_state?.avatarurl ?? "");
+            setValue("status",loaded_state?.status ?? "");
+            setValue("about",loaded_state?.about ?? "");
+            setFavs([...loaded_state?.favorite ?? []])
+        }
+
+    },[user_state.state])
+
+    useEffect(()=>{
+        if(user_state.state === "hasValue" &&
+            JSON.stringify(favs) === JSON.stringify(user_details.favorite)
+        ){
+            setFavsDirty(false);
+        }
+    },[favs]);
+
+    async function onSubmit(form_data: FormValue){
         try{
-            const resp=await fetch(`http://localhost:3001/user/editProfile`,{
-                method:"PATCH",
-                body:JSON.stringify({
-                    //@ts-ignore
-                    id:session.data.id,
-                    name: values.name,
-                    about:values.about,
-                    favorite:favorites,
-                    status:values.status,
-                    avatarurl:values.avatarurl
+            const resp = await fetch("/api/member",{
+                method: 'PATCH',
+                body: JSON.stringify({
+                    ...form_data,
+                    favorite: favs
                 }),
-                headers:{
-                    'Content-Type':"application/json"
-                },
-                credentials:"include"
-            })
-            if(resp.status===200)
-            {
-                const data=await resp.json();
-                console.log(data.data)
-                alert("Profile Updated Successfully!");
-            }
-        }catch(err){
-            console.log(err);
-        }
-    }
-    async function delete_account(){
-        //@ts-ignore
-        if(!session.data?.id)
-            return;
-        try{
-            //@ts-ignore
-            const resp=await fetch(`http://localhost:3001/user/deleteAccount/${session.data.id}`,{
-                method:'PATCH',
-                headers:{
-                    'Content-Type':"application/json"
-                },
-                credentials:"include"
+                credentials: "include"
             });
-            if(resp.status==200){
-                router.push("/");
-                window.localStorage.clear();
+
+            if(resp.status === 200){
+                toast({
+                    title: "Profile Update Successfully!",
+                    duration: 3000
+                });
+                refresh_state();
+                await update();
+                return router.push("/home");
             }
         }catch(err){
             console.log(err);
-            alert("Could not delete account. Retry after some time.")
         }
-    }
-    function handleAdd(e:KeyboardEvent){
-        if(e.key===" "){
-            console.log("Added one more itemz");
-            console.log(form.getValues("favorite"))
-            setFavorites([...favorites,form.getValues("favorite")]);
-            form.setValue("favorite","")
-        }
-    }
-    function handleRemove(fav_text: string){
-        let updated_favs = favorites.filter((fav)=> fav!==fav_text);
-        setFavorites([...updated_favs]);
-        form.setValue("favorite"," ",{shouldDirty: true});
     }
 
-    const favs_comps=favorites.map((item)=>{
-        return(
-            <Badge onDoubleClick={()=>handleRemove(item)} key={item.substring(0,2)} className='mx-1'>{item}</Badge>
-        )
-    })
-    const collection=<div className='flex mr-2'>{favs_comps}</div>;
+    if(user_state.state === "hasError")
+        return router.push('/home');
 
     return (
-        <Suspense>
-            <div className="m-8  mx-24">
-            <div className='flex justify-between'>
-            <Button variant={'outline'} size={'icon'} 
-            className=''
-            onClick={()=>router.push("/home")}
-            >
-                <ChevronLeftIcon/>
-            </Button>
-            <DarkLight/>
-            </div>
-            <div className='p-4 border-2 rounded-sm sticky my-2'>
-                <h3 className="text-2xl pb-2 font-semibold  scroll-m-20 tracking-tight first:mt-0">
-                    Profile
-                </h3>
-                <h6 className="text-muted-foreground">Manage your settings for chat.city profile</h6>
-            </div>
-            <div className='border-2 p-4 rounded-sm sticky'>
-                <div className='flex flex-left py-4'>
-                   {session.status === "authenticated" && <Avatar className='w-[72px] h-[72px]'>
-                        <AvatarImage src={session.data.user?.image!} alt="User Avatar"/>
-                        <AvatarFallback>{initials}</AvatarFallback>
-                    </Avatar>}
-                    <div className=' ml-4'>
-                        <div className='flex mr-2 mb-4'>
+        <div>
+            {
+                user_state.state === "hasValue" && <div className="flex flex-col m-12 mx-24 p-4 border-2 rounded-md divide-y">
+                <div className="p-2 m-2">
+                    <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
+                        Profile
+                    </h3>
+                    <p className="text-muted-foreground">
+                        Manage your chat.city profile
+                    </p>
+                </div>
+                <div className="">
+                    <div className="flex space-x-8 pt-4 m-4">
+                        <Avatar className="mt-2 w-[74px] h-[74px]">
+                            <AvatarImage height={"100px"} src={user_details?.avatarurl ?? ""}/>
+                            <AvatarFallback>{user_details?.username?.substring(0,2) ?? ""}</AvatarFallback>
+                        </Avatar>
+                        <div className="flex flex-col space-y-2">
+                        <div>
                             {
-                                (user_details?.favorite ?? ["user"]).map((item)=>{
+                                favs.map((fav)=>{
                                     return(
-                                        <Badge key={item.substring(0,2)} className='mx-1'>{item}</Badge>
+                                        <Badge className="m-1">{fav}</Badge>
                                     )
                                 })
                             }
                         </div>
-                        <Button disabled={true} className=''>Upload Avatar</Button>
+                        <div className="flex space-x-2">
+                            <Button disabled = {true}>Upload Avatar</Button>
+                            <Button 
+                            onClick={()=>{
+                                setValue("avatarurl","");
+                            }}
+                            variant={"secondary"}>Remove Avatar</Button>
+                        </div>
+                        </div>
                     </div>
-                </div>
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(settings_change)} className='space-y-8 p-6'>
-                        <FormField
-                        control={form.control}
-                        name='username'
-                        render={({field})=>(
-                            <FormItem>
-                                <FormLabel>Username</FormLabel>
-                                <FormControl>
-                                    <Input disabled={true} type='text' placeholder='username' {...field}/>
-                                </FormControl>
-                                <FormMessage/>
-                            </FormItem>
+                    <Form {...form_details} >
+                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
+                            <FormField
+                            control={control}
+                            name="username"
+                            render={({field})=>(
+                                <FormItem>
+                                    <FormLabel>Username</FormLabel>
+                                    <FormControl>
+                                    <div className="flex border-[1.5px] rounded-md">
+                                      <p className="text-sm text-muted-foreground px-2 mt-3">chat.city/</p>
+                                      <Input type="text" {...field}/>
+                                    </div>
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
                             )}
-                        />
-
-                        <FormField
-                        control={form.control}
-                        name='name'
-                        render={({field})=>(
-                            <FormItem>
-                                <FormLabel>Name</FormLabel>
-                                <FormControl>
-                                    <Input
-                                    type='text'
-                                    placeholder={"Your full name"} {...field}
-                                    />
-                                </FormControl>
-                                <FormMessage/>
-                            </FormItem>
-                        )}
-                        />
-
-                        <FormField
-                        control={form.control}
-                        name='status'
-                        render={({field})=>(
-                            <FormItem>
-                                <FormLabel>Status</FormLabel>
-                                <FormControl>
-                                    <Textarea
-                                    placeholder={"What's happening lately"} {...field}
-                                    />
-                                </FormControl>
-                                <FormMessage/>
-                            </FormItem>
-                        )}
-                        />
-
-                        <FormField
-                        control={form.control}
-                        name='about'
-                        render={({field})=>(
-                            <FormItem>
-                                <FormLabel>About</FormLabel>
-                                <FormControl>
-                                    <Textarea
-                                    placeholder={"Tell us about yourself"} {...field}
-                                    />
-                                </FormControl>
-                            </FormItem>
-                        )}
-                        />
-
-                        <FormField
-                        control={form.control}
-                        name='favorite'
-                        render={({field})=>(
-                            <FormItem>
-                                <FormLabel>Favorites</FormLabel>
-                                
-                                <FormControl>
-                                    <div {...field} className='border-2 flex p-1 rounded-md'>
-                                    {collection}
+                            />
+                            <FormField
+                            control={control}
+                            name="name"
+                            render={({field})=>(
+                                <FormItem>
+                                    <FormLabel>Name</FormLabel>
+                                    <FormControl>
                                         <Input
                                         {...field}
-                                        className='border-none focus:outline-none focus:border-0'
-                                        onKeyDown={handleAdd}
-                                        placeholder='Your favorite food, place, person, pet etc.' 
+                                        type="text" placeholder="Your name"
                                         />
-                                    </div>
-                                </FormControl>
-                            </FormItem>
-                        )}
-                        />
-                        <div className='flex justify-end'>
-                        <Button type='submit' disabled={
-                            !isDirty ||
-                            isLoading ||
-                            isSubmitting
-                        } >Update</Button>
-                        </div>
-                    </form>
-                </Form>
-            </div>
-            <div className='p-4 rounded-sm border-2 my-2'>
-                <div className='border-b mb-2'>
-                    <h4 className='text-red-700 scroll-m-20 text-xl font-semibold tracking-tight first:mt-0'>
-                        Cautious!
-                    </h4>
-                    <p className='leading-7 [&:not(:first-child)]:mt-6"'>
-                        This action can not be undone.
-                    </p>
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                            />
+                            <FormField
+                            control={control}
+                            name="status"
+                            render={({field})=>(
+                                <FormItem>
+                                    <FormLabel>Status</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                        type="text" placeholder="Share your status ..."
+                                        {...field}
+                                        />
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                            />
+                            <FormField
+                            control={control}
+                            name="about"
+                            render={({field})=>(
+                                <FormItem>
+                                    <FormLabel>About</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                        type="text" placeholder="Share something about yourself..."
+                                        {...field}
+                                        />
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                            />
+                            <div className="space-y-2">
+                            <Label>Favorite</Label>
+                            <div className="rounded-md border-2 flex">
+                                <div className="flex space-x-1 mr-1">
+                                    {
+                                        favs.length >0 && favs.map((fav:string)=>{
+                                            return(
+                                                <Badge
+                                                onDoubleClick={()=>{
+                                                    let left_favs = favs.filter((f)=>f !== fav);
+                                                    setFavs((f)=>[...left_favs]);
+                                                }}
+                                                className="m-1 p-2"
+                                                key={fav}
+                                                >{fav}</Badge>
+                                            )
+                                        })
+                                    }
+                                </div>
+                                <Input
+                                onChange={(e)=>{
+                                    setFav(e.target.value);
+                                }}
+                                onKeyDown={(e)=>{
+                                    if(e.key === " "){
+                                        const add_fav = fav;
+                                        setFav("");
+                                        setFavs((favs)=>[...favs,add_fav]);
+                                        setFavsDirty(true);
+                                    }
+                                }}
+                                type="text" placeholder="Add your favs... anything you like .."
+                                />
+                            </div>
+                            </div>
+                            <div className="flex justify-end">
+                            <Button
+                            disabled = {
+                                (!isDirty ||
+                                isLoading ||
+                                isSubmitting) && 
+                                !favsdirty
+                            }
+                            type="submit"
+                            className=""
+                            >Save</Button>
+                            </div>
+                        </form>
+                    </Form>
                 </div>
-                {/* eventually add a dialog for warning before actually making request. */}
-                <div className='flex justify-end '>
-                    <Button
-                    onClick={delete_account} 
-                    className='hover:text-red-600 hover:bg-stone-300 ease-out duration-300 transition-all'>
-                        Delete Account
-                    </Button>
-                </div>
-                
             </div>
-
+            }
         </div>
-        </Suspense>
     )
 }

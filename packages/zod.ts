@@ -126,3 +126,11 @@ export const room_member_details_schema = z.array(z.object({
 }))
 
 export type RoomMemberDetails = z.output<typeof room_member_details_schema>;
+
+export const user_details_edit_form_schema = z.object({
+    username: z.string(),
+    name: z.string().optional(),
+    avatarurl: z.string().optional(),
+    about: z.string().optional(),
+    status: z.string().optional(),
+})
