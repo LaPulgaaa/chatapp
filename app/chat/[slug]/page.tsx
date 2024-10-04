@@ -212,7 +212,8 @@ export default function Chat({params}:{params:{slug:string}}){
             if(resp.status===200)
             {
                 setChat([]);
-                setMessages({messages:[]})
+                setMessages({messages:[]});
+                setRealtimechat([]);
                 alert("Chat cleaned!")
             }
         }
