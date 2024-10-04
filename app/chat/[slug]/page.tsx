@@ -28,6 +28,7 @@ import { RoomHeaderDetails } from "@/packages/zod";
 import { room_member_details_schema } from "@/packages/zod";
 import { isSidebarHidden } from "@/lib/store/atom/sidebar";
 import { member_online_state } from "@/lib/store/atom/status";
+import { useToast } from "@/hooks/use-toast";
 
 export type RecievedMessage={
     type:string,
@@ -42,6 +43,8 @@ export type RecievedMessage={
 }
 
 export default function Chat({params}:{params:{slug:string}}){
+    const { toast } = useToast();
+
     const chat_ref = useRef<HTMLDivElement>(null);
     const [messages,setMessages]=useState<ChatMessageData>();
     const [realtimechat, setRealtimechat] = useState<JSX.Element[]>([]);
@@ -206,12 +209,16 @@ export default function Chat({params}:{params:{slug:string}}){
                 },
                 credentials:"include"
             })
-            if(resp.status===200)
+            if(resp.status === 200)
             {
                 setChat([]);
                 setMessages({messages:[]});
                 setRealtimechat([]);
-                alert("Chat cleaned!")
+                toast({
+                    variant: "destructive",
+                    title: "Chat deleted successfully!",
+                    duration: 3000
+                });
             }
         }
 
