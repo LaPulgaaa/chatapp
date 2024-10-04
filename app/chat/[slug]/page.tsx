@@ -195,14 +195,11 @@ export default function Chat({params}:{params:{slug:string}}){
             return;
         }
         else{
-            const resp=await fetch('http://localhost:3001/chat/updateFrom',{
-                method:'PATCH',
+            const resp=await fetch(`/api/message/${params.slug}`,{
+                method:'PUT',
                 body:JSON.stringify({
                     date:new Date(),
                     did:did,
-                    //@ts-ignore
-                    user_id: session.data!.id,
-                    chat_id:params.slug
                 }),
                 headers:{
                     'Content-Type':"application/json"

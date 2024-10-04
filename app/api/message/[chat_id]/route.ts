@@ -77,3 +77,39 @@ export async function GET(req:NextRequest,
         },{status: 400})
     }
 }
+
+export async function PUT(req: NextRequest,{params}:{ params: { chat_id: string }}){
+    const { date, did }:{ date: Date, did: number} = await req.json();
+    const chat_id = params.chat_id;
+
+    const token = getToken({ req });
+
+    if(token === null)
+        return Response.json({
+            message: "Unauthorized"
+    },{ status: 401 });
+
+    try{
+        //@ts-ignore
+        const user_id = token.id;
+        const updated_directory = await prisma.directory.update({
+            where:{
+                AND:[{userId:user_id},{chat_id:chat_id}],
+                id:did
+            },
+            data:{
+                after:date
+            }
+        });
+
+        return Response.json({
+            message: "Chat cleared successfully",
+            data: updated_directory
+        },{ status: 200 });
+    }catch(err){
+        console.log(err);
+        return Response.json({
+            message: "Could not delete chat"
+        },{ status:500})
+    }
+}

@@ -85,31 +85,6 @@ router.delete("/leaveChat",authenticate,async(req,res)=>{
     }
 })
 
-router.patch("/updateFrom",authenticate,async(req,res)=>{
-    const {date,user_id,chat_id,did}:{date:Date,user_id:string,chat_id:string,did:number}=req.body;
-
-    try{
-        const updated_directory=await prisma.directory.update({
-            where:{
-                AND:[{userId:user_id},{chat_id:chat_id}],
-                id:did
-            },
-            data:{
-                after:date
-            }
-            
-        })
-        res.status(200).json({
-            msg:"timeline updated successfully",
-            data:updated_directory
-        })
-    }catch(err)
-    {
-        console.log(err);
-        res.send("internal server error!")
-    }
-})
-
 router.get("/getMembers/:room_id",authenticate,async(req,res)=>{
     const room_id = req.params.room_id;
     try{
