@@ -5,7 +5,14 @@ import { useRecoilState } from "recoil";
 
 import { useForm } from "react-hook-form";
 import { Button } from "./ui/button";
-import {Dialog,DialogClose,DialogContent,DialogDescription,DialogFooter,DialogHeader,DialogTitle,DialogTrigger,} 
+import {
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle
+} 
 from "@/components/ui/dialog";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form,FormControl,FormField,FormLabel,FormItem,FormMessage } from "./ui/form";
@@ -15,7 +22,6 @@ import { Textarea } from "./ui/textarea";
 import { UserStateChats } from "@/lib/store/atom/chats";
 import { Signal } from "@/app/home/signal";
 import { RoomType, create_room_schema } from "@/packages/zod";
-import { PlusIcon } from "lucide-react";
 
 export default function CreateRoom(){
     const session = useSession();
@@ -112,8 +118,6 @@ export default function CreateRoom(){
                                         type='submit' className="w-full">Create room</Button>
                                     </DialogClose>
                                 </DialogFooter>
-                                    
-
                         </form>
                     </Form>
             </DialogContent>
