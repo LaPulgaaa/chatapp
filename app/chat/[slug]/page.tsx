@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useRecoilValue, useRecoilState} from "recoil";
 import { useRouter } from "next/navigation";
-import { ChevronLeftIcon, ChevronRightIcon, ListEndIcon,} from "lucide-react";
+import { ChevronLeftIcon, ChevronRightIcon, ListEndIcon, SendHorizonal } from "lucide-react";
 import { DarkLight } from "@/components/DarkLight";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
@@ -324,7 +324,7 @@ export default function Chat({params}:{params:{slug:string}}){
                     onClick={()=>{
                         if(compose.trim().length > 0)
                             sendMessage();
-                    }} className="mx-4">Send</Button>
+                    }} className="mx-4"><SendHorizonal/></Button>
                     </div>
                 </ScrollArea>
                 <Members room_id={params.slug}/>
