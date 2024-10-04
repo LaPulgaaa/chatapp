@@ -8,6 +8,7 @@ import { ThemeProvider } from "@/components/providers/theme-provider";
 import {AuthProvider} from "@/components/Provider";
 // const inter = Inter({ subsets: ["latin"] });
 import { cn } from "../lib/utils"
+import { Toaster } from "@/components/ui/toaster";
  
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -42,6 +43,7 @@ export default function RootLayout({
             >
            
             {children}
+            <Toaster/>
             </ThemeProvider>
             </AuthProvider>
             </body>
