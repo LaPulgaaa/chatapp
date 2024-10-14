@@ -2,7 +2,7 @@ import { ScrollArea } from "./ui/scroll-area";
 import { Dialog,DialogTrigger } from "./ui/dialog";
 import JoinRoomDialog from "@/components/JoinRoom";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { CopyPlusIcon, HeartPulseIcon, MessageCircleIcon, PlusSquare, UserIcon} from "lucide-react";
+import { CopyPlusIcon, HeartPulseIcon, MessageCircleIcon, PlusSquare, UserIcon, UserSearchIcon} from "lucide-react";
 import { MessageSquareDotIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -40,6 +40,9 @@ export default function Sidebar(){
             </div>}
             <div className="text-center sm:text-left grid grid-cols-1 divide-y">
                 <div className="flex cursor-pointer my-[1/2] w-full hover:bg-gray-500 p-2 dark:hover:bg-gray-800 rounded-md ease-out duration-300 transition-all"><MessageCircleIcon/><p className="ml-2">Direct Messages</p></div>
+                <Link 
+                href={'/home/explore'}
+                className="flex cursor-pointer my-[1/2] w-full hover:bg-gray-500 p-2 dark:hover:bg-gray-800 rounded-md ease-out duration-300 transition-all"><UserSearchIcon/><p className="ml-2">Explore</p></Link>
                 <div className="flex cursor-pointer my-[1/2] w-full hover:bg-gray-500 p-2 dark:hover:bg-gray-800 rounded-md ease-out duration-300 transition-all"><HeartPulseIcon/><p className="ml-3">Set Status</p></div>
                 <Dialog>
                     <DialogTrigger>

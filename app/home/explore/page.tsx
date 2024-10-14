@@ -6,7 +6,11 @@ import { search_by_username } from "./actions";
 
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { SearchIcon } from "lucide-react";
+import { MessageCircleIcon, SearchIcon, UserIcon } from "lucide-react";
+import Link from "next/link";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 type ProfileSearch = {
     username: string,
@@ -18,6 +22,7 @@ export default function Search(){
     const [search, setSearch] = useState<ProfileSearch[]>([]);
     const [cred, setCred] = useState<string>("");
     const session = useSession();
+    const router = useRouter();
 
     useEffect(()=>{
         if(cred.length > 3 && session.status === "authenticated"){
@@ -34,7 +39,7 @@ export default function Search(){
         }
     },[cred])
     return(
-        <div className="flex flex-col my-24 mx-24">
+        <div className="flex flex-col my-6 mx-24">
             <div className="flex w-full rounded-md border-2">
                 <SearchIcon className="mt-2 mx-2"/>
                 <Input 
@@ -46,7 +51,9 @@ export default function Search(){
                 }}
                 />
             </div>
-            <div>
+            <ScrollArea
+            className="h-[720px] mt-2"
+            >
                 {
                     search.map((member) => {
                         let initials = member.username.substring(0,2);
@@ -55,10 +62,10 @@ export default function Search(){
                             initials = names.map((name)=> name.charAt(0)).join("");
                         }
                         return(
-                            <div className="bg-slate-800 rounded-md">
-                                <div key={member.username} 
-                                className={`flex justify-between rounded-md p-1 w-full h-[72px] m-1`}>
-                                <div className="flex item-center p-2">
+                            <div 
+                            key={member.username} 
+                            className={`flex justify-between rounded-md p-1 w-full h-[72px] my-1 bg-slate-800`}>
+                                <div className="flex item-center p-2 w-4/5">
                                     <Avatar className="mr-1">
                                         <AvatarImage src={member.avatarurl ?? ""}/>
                                         <AvatarFallback>{initials}</AvatarFallback>
@@ -68,13 +75,23 @@ export default function Search(){
                                         <div className="italic text-muted-foreground truncate w-[124px] text-[15px]">{member.name ?? "User does not have a name"}</div>
                                     </div>
                                 </div>
+                                <div className="flex justify-end w-1/5 mt-2 space-x-2 mx-2">
+                                    <Button
+                                    size={"icon"}
+                                    variant={"secondary"}
+                                    ><MessageCircleIcon/></Button>
+                                    <Button
+                                    onClick={()=> router.push(`/home/explore/${member.username}`)}
+                                    size={"icon"}
+                                    variant={"ghost"}
+                                    ><UserIcon/></Button>
+                                </div>
                                 <br/>
-                            </div>
                             </div>
                         )
                     })
                 }
-            </div>
+            </ScrollArea>
         </div>
     )
 }

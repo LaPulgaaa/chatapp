@@ -1,6 +1,6 @@
 'use server'
 
-import { prisma } from "../../packages/prisma/prisma_client";
+import { prisma } from "../../../packages/prisma/prisma_client";
 
 export async function search_by_username(cred: string, host_username: string, host_name: string){
     try{

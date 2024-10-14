@@ -1,8 +1,10 @@
+'use client'
+
 import { ScrollArea } from "./ui/scroll-area";
 import { Dialog,DialogTrigger } from "./ui/dialog";
 import JoinRoomDialog from "@/components/JoinRoom";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { HeartPulseIcon, MessageCircleIcon, PlusIcon, PlusSquare, UserIcon} from "lucide-react";
+import { HeartPulseIcon, MessageCircleIcon, PlusSquare, UserIcon, UserSearchIcon} from "lucide-react";
 import { MessageSquareDotIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
@@ -40,6 +42,10 @@ export default function CandleSidebar(){
                 <Button 
                 className="mt-1 p-1"
                 variant={"ghost"} size={"icon"}><MessageCircleIcon/></Button>
+                <Button
+                onClick={() => router.push("/home/explore")} 
+                className="mt-1 p-1"
+                variant={"ghost"} size={"icon"}><UserSearchIcon/></Button>
                 <Button 
                 className="mt-1 p-1"
                 variant={"ghost"} size={"icon"}><HeartPulseIcon/></Button>
