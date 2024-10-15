@@ -26,6 +26,12 @@ model Member{
 
   directory Directory[]
 
+  fromFriends FriendShip[] @relation("from")
+
+  toFriends FriendShip[] @relation("to")
+
+  dms DirectMessage[]
+
   deleted Boolean @default(false)
 
   @@unique([username])
@@ -71,4 +77,37 @@ model Chat {
   lastmsgAt DateTime @default(now())
 
   deleted Boolean @default(false)
+}
+
+model FriendShip{
+  id String @id @default(cuid())
+
+  blocked Boolean @default(false)
+  messageFrom DateTime @default(now())
+  lastmsgAt DateTime @default(now())
+
+  fromId String
+  from Member @relation("from", fields: [fromId], references: [username])
+
+  toId String
+  to Member @relation("to", fields: [toId], references: [username])
+
+  messages DirectMessage[]
+
+  @@unique([fromId,toId])
+}
+
+model DirectMessage {
+  id Int @id @default(autoincrement())
+
+  content String @db.Text
+  createdAt DateTime @default(now())
+
+  deleted Boolean @default(false)
+
+  friendshipId String
+  friendship FriendShip @relation(fields: [friendshipId], references: [id])
+
+  senderId String
+  sendBy Member @relation(fields: [senderId], references: [id])
 }

@@ -134,3 +134,23 @@ export const user_details_edit_form_schema = z.object({
     about: z.string().optional(),
     status: z.string().optional(),
 })
+
+export const direct_messages_schema = z.array(z.object({
+    id: z.string(),
+    blocked: z.boolean(),
+    lastmsgAt: z.string(),
+    to: z.object({
+        username: z.string(),
+        avatarurl: z.string().nullable(),
+        about: z.string().nullable(),
+    }),
+    messages: z.array(z.object({
+        content: z.string(),
+        createdAt: z.string(),
+        sendBy: z.object({
+            username: z.string(),
+        })
+    }))
+}));
+
+export type DirectMessages = z.output<typeof direct_messages_schema>;
