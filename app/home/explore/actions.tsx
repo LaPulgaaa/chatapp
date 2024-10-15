@@ -24,6 +24,7 @@ export async function search_by_username(cred: string, host_username: string, ho
             select: {
                 username: true,
                 avatarurl: true,
+                about: true,
                 name: true,
             },
             take: 10,

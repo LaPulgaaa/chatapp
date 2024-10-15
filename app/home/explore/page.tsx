@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
 type ProfileSearch = {
     username: string,
     avatarurl: string | null,
+    about: string | null,
     name: string | null,
 };
 
@@ -72,7 +73,9 @@ export default function Search(){
                                     </Avatar>
                                     <div className="mx-1 px-1 mx-1">
                                         <div>{member.username}</div>
-                                        <div className="italic text-muted-foreground truncate w-[124px] text-[15px]">{member.name ?? "User does not have a name"}</div>
+                                        <div className="italic text-muted-foreground truncate w-[124px] text-[15px]">
+                                            { member.about }
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="flex justify-end w-1/5 mt-2 space-x-2 mx-2">
