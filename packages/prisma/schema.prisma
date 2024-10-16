@@ -113,5 +113,5 @@ model DirectMessage {
   friendship FriendShip @relation(fields: [friendshipId], references: [id])
 
   senderId String
-  sendBy Member @relation(fields: [senderId], references: [id])
+  sendBy Member @relation(fields: [senderId], references: [username])
 }
