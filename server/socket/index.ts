@@ -2,6 +2,7 @@ import { WebSocketServer } from 'ws';
 import { RedisSubscriptionManager } from './redisClient';
 import { createClient } from 'redis';
 import { prisma } from '../../packages/prisma/prisma_client';
+import { createId } from '@paralleldrive/cuid2';
 
 const client=createClient();
 

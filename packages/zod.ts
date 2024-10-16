@@ -150,7 +150,8 @@ export const direct_messages_schema = z.array(z.object({
         sendBy: z.object({
             username: z.string(),
         })
-    }))
+    })),
+    connectionId: z.string(),
 }));
 
 export type DirectMessages = z.output<typeof direct_messages_schema>;

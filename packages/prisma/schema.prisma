@@ -86,6 +86,8 @@ model FriendShip{
   messageFrom DateTime @default(now())
   lastmsgAt DateTime @default(now())
 
+  connectionId String
+
   fromId String
   from Member @relation("from", fields: [fromId], references: [username])
 
@@ -104,6 +106,8 @@ model DirectMessage {
   createdAt DateTime @default(now())
 
   deleted Boolean @default(false)
+
+  connectionId String
 
   friendshipId String
   friendship FriendShip @relation(fields: [friendshipId], references: [id])

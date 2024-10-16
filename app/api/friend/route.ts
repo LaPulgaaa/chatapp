@@ -26,6 +26,7 @@ export async function GET(req: NextRequest){
                         about: true,
                     },
                 },
+                connectionId: true,
                 blocked: true,
                 lastmsgAt: true,
                 messages: {
