@@ -57,11 +57,6 @@ export default function Home(){
     const [dms, setDms] = useRecoilState(DirectMessageState);
     //@ts-ignore
     const id: string | undefined = session.data?.id;
-    useEffect(()=>{
-        if(id !== undefined)
-        Signal.get_instance(id)
-
-    },[id]);
 
     useEffect(()=>{
         if(!id){

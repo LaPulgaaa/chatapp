@@ -3,6 +3,7 @@
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
 import CandleSidebar from "@/components/candleSidebar";
+import Connect from "./connect";
 
 export default function ChatLayout({children}:{children:React.ReactNode}){
     return (
@@ -17,6 +18,7 @@ export default function ChatLayout({children}:{children:React.ReactNode}){
                 <div className = {`w-5/6 mr-4 ml-2 pt-2`}>{children}</div>
             </div>
             </div>
+            <Connect/>
         </div>
     )
 
