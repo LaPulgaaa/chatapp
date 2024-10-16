@@ -69,15 +69,8 @@ export class Signal{
                 username,
             }
         });
-        if(this.initialised === false){
-            this.buffered_messages.push({
-                id: this.id++,
-                message: msg,
-            });
-            return ;
-        }
-        this.ws.send(msg);
-
+        
+        this.handle_send(msg);
     }
 
     private BULK_SUBSCRIBE(user_id: string){
@@ -88,13 +81,8 @@ export class Signal{
             }
         });
 
-        if(this.initialised === false){
-            this.buffered_messages.push({
-                id: this.id++,
-                message: msg,
-            })
-            return;
-        }
+        this.handle_send(msg);
+    }
 
         this.ws.send(msg);
     }
@@ -109,16 +97,7 @@ export class Signal{
             }
         });
 
-        if(this.initialised === false){
-            this.buffered_messages.push({
-                id: this.id++,
-                message: msg,
-            });
-
-            return;
-        }
-
-        this.ws.send(msg);
+        this.handle_send(msg);
     }
 
     private BULK_UNSUBSCRIBE(user_id: string){
@@ -129,15 +108,7 @@ export class Signal{
             }
         });
 
-        if(this.initialised === false){
-            this.buffered_messages.push({
-                id: this.id++,
-                message: msg,
-            })
-            return;
-        }
-
-        this.ws.send(msg);
+        this.handle_send(msg);
     }
 
     UNSUBSCRIBE(room_id: string, username?: string){
@@ -149,15 +120,7 @@ export class Signal{
             }
         });
 
-        if(this.initialised === false){
-            this.buffered_messages.push({
-                id: this.id++,
-                message: msg,
-            });
-            return ;
-        }
-
-        this.ws.send(msg);
+        this.handle_send(msg);
     }
 
     REGISTER_CALLBACK( key: string, callback:(message: string)=>void ){
@@ -176,5 +139,18 @@ export class Signal{
         this.BULK_UNSUBSCRIBE(this.username);
         this.initialised = false;
         this.ws.close();
+    }
+
+    private handle_send(msg: string){
+        if(this.initialised === false){
+            this.buffered_messages.push({
+                id: this.id++,
+                message: msg,
+            });
+
+            return;
+        }
+
+        this.ws.send(msg);
     }
 }

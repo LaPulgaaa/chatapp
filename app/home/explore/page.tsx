@@ -80,6 +80,9 @@ export default function Search(){
                                 </div>
                                 <div className="flex justify-end w-1/5 mt-2 space-x-2 mx-2">
                                     <Button
+                                    onClick={() => {
+                                        router.push(`/direct/${member.username}`)
+                                    }}
                                     size={"icon"}
                                     variant={"secondary"}
                                     ><MessageCircleIcon/></Button>
