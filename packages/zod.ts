@@ -135,7 +135,7 @@ export const user_details_edit_form_schema = z.object({
     status: z.string().optional(),
 })
 
-export const direct_messages_schema = z.array(z.object({
+export const direct_msg_schema = z.object({
     id: z.string(),
     blocked: z.boolean(),
     lastmsgAt: z.string(),
@@ -146,12 +146,46 @@ export const direct_messages_schema = z.array(z.object({
     }),
     messages: z.array(z.object({
         content: z.string(),
-        createdAt: z.string(),
         sendBy: z.object({
             username: z.string(),
         })
     })),
     connectionId: z.string(),
-}));
+});
 
-export type DirectMessages = z.output<typeof direct_messages_schema>;
+export const direct_messages_schema = z.array(direct_msg_schema);
+
+export type DirectMessage = z.output<typeof direct_msg_schema>;
+
+export type DirectMessages = DirectMessage[];
+
+export const friend_search_result_schema = z.discriminatedUnion("is_friend", [
+    z.object({
+        is_friend: z.literal(false),
+        friendship_data: z.undefined(),
+    }),
+    z.object({
+        is_friend: z.literal(true),
+        friendship_data: z.object({
+            connectionId: z.string(),
+            messageFrom: z.string(),
+            blocked: z.boolean(),
+            messages: z.array(z.object({
+                id: z.number(),
+                content: z.string(),
+                createdAt: z.string(),
+                sendBy: z.object({
+                    username: z.string(),
+                })
+            }))
+        })
+    })
+]).and(z.object({
+    status: z.string().nullable(),
+    about: z.string().nullable(),
+    favorite: z.array(z.string()),
+    name: z.string().nullable(),
+    avatarurl: z.string().nullable(),
+}))
+
+export type FriendSearchResult = z.output<typeof friend_search_result_schema>;
