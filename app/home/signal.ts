@@ -84,7 +84,17 @@ export class Signal{
         this.handle_send(msg);
     }
 
-        this.ws.send(msg);
+    INVITE(user_id: string, invitee_id: string,content: string){
+        const msg = JSON.stringify({
+            type: "invite",
+            payload:{
+                userId: user_id,
+                inviteeId: invitee_id,
+                content,
+            }
+        });
+
+        this.handle_send(msg);
     }
 
     ADD_ROOM(user_id: string, room_id: string){

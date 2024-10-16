@@ -65,6 +65,60 @@ export async function ws(wss:WebSocketServer){
                 RedisSubscriptionManager.get_instance().subscribe(ws,roomId,wsId.toString(),userId);
             }
 
+            if(data.type === "invite"){
+                const userId = data.payload.userId;
+                const inviteeId = data.payload.inviteeId;
+                const content = data.payload.content;
+                let conc_id = createId();
+                try{
+                    
+                    const resp = await prisma.$transaction(async(tx) => {
+                        const from_link = await tx.friendShip.create({
+                            data: {
+                                fromId: userId,
+                                toId: inviteeId,
+                                connectionId: conc_id,
+                            },
+                            select: {
+                                id: true,
+                            }
+                        });
+                        await tx.friendShip.create({
+                            data: {
+                                fromId: inviteeId,
+                                toId: userId,
+                                connectionId: conc_id,
+                            }
+                        })
+                        await tx.directMessage.create({
+                            data: {
+                                friendshipId: from_link.id,
+                                content: content,
+                                senderId: userId,
+                                connectionId: conc_id,
+                            }
+                        });
+
+                        return from_link.id;
+                    });
+
+                }catch(err){
+                    console.log(err);
+                    return;
+                }
+
+                const maybe_invitee_online = Object.values(users).find((user) => user.userId === inviteeId);
+
+                if(maybe_invitee_online !== undefined){
+                    maybe_invitee_online.ws.send(JSON.stringify({
+                        type: "invite",
+                        payload: {
+                            requestBy: userId
+                        }
+                    }));
+                }
+            }
+
             if(data.type === "bulk_leave"){
                 const userId = data.payload.userId;
                 try{
