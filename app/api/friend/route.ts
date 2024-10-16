@@ -1,6 +1,11 @@
 import { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { prisma } from "@/packages/prisma/prisma_client";
+import type { DirectMessage } from "@/packages/zod";
+
+type DirectMessagesServer = (Omit<DirectMessage, "lastmsgAt"> & {
+    lastmsgAt: Date,
+})[]
 
 export async function GET(req: NextRequest){
     const token = await getToken({ req });
@@ -29,31 +34,54 @@ export async function GET(req: NextRequest){
                 connectionId: true,
                 blocked: true,
                 lastmsgAt: true,
-                messages: {
-                    take: 1,
+                messageFrom: true,
+                id: true,
+            }
+        });
+
+        let friendships_with_last_dm:DirectMessagesServer = [];
+
+        await Promise.all(resp.map(async(frnd) => {
+            try{
+                const message = await prisma.directMessage.findFirst({
                     where: {
-                        deleted: false,
-                    },
-                    orderBy: {
-                        createdAt: "desc"
+                        connectionId: frnd.connectionId,
+                        createdAt: {
+                            gte: frnd.messageFrom
+                        },
                     },
                     select: {
                         content: true,
-                        createdAt: true,
                         sendBy: {
                             select: {
                                 username: true,
                             }
                         }
+                    },
+                    orderBy: {
+                        createdAt: "desc"
                     }
-                },
-                id: true,
+
+                });
+
+                friendships_with_last_dm.push({
+                    ...frnd,
+                    messages: message !== null ? [message] : [],
+                });
+
+            }catch(err){
+                console.log(err);
+                friendships_with_last_dm.push({
+                    ...frnd,
+                    messages: [],
+                })
             }
-        });
+            })
+        )
 
         return Response.json({
             message: "SUCCESS",
-            raw_data: resp,
+            raw_data: friendships_with_last_dm,
         },{ status: 200 });
     }catch(err){
         console.log(err);
