@@ -67,7 +67,7 @@ export default function Chat({params}:{params:{slug:string}}){
             if(session.status !== "authenticated")
                 return ;
             try{
-                const resp=await fetch(`/api/message/${params.slug}`,{
+                const resp=await fetch(`/api/message/chat/${params.slug}`,{
                     credentials:"include",
                     next:{
                         revalidate: 30
@@ -198,7 +198,7 @@ export default function Chat({params}:{params:{slug:string}}){
             return;
         }
         else{
-            const resp=await fetch(`/api/message/${params.slug}`,{
+            const resp=await fetch(`/api/message/chat/${params.slug}`,{
                 method:'PUT',
                 body:JSON.stringify({
                     date:new Date(),
