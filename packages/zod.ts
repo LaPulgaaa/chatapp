@@ -159,6 +159,15 @@ export type PrivateChat = z.output<typeof private_chat_schema>;
 
 export type PrivateChats = PrivateChat[];
 
+export const direct_msg_schema = z.object({
+    id: z.number(),
+    content: z.string(),
+    createdAt: z.string(),
+    sendBy: z.object({
+        username: z.string(),
+    })
+});
+
 export const friend_search_result_schema = z.discriminatedUnion("is_friend", [
     z.object({
         is_friend: z.literal(false),
@@ -170,14 +179,7 @@ export const friend_search_result_schema = z.discriminatedUnion("is_friend", [
             connectionId: z.string(),
             messageFrom: z.string(),
             blocked: z.boolean(),
-            messages: z.array(z.object({
-                id: z.number(),
-                content: z.string(),
-                createdAt: z.string(),
-                sendBy: z.object({
-                    username: z.string(),
-                })
-            }))
+            messages: z.array(direct_msg_schema),
         })
     })
 ]).and(z.object({
@@ -189,3 +191,5 @@ export const friend_search_result_schema = z.discriminatedUnion("is_friend", [
 }))
 
 export type FriendSearchResult = z.output<typeof friend_search_result_schema>;
+
+export type DirectMessage = z.output<typeof direct_msg_schema>;
