@@ -7,10 +7,10 @@ import { Signal } from "./signal";
 import CreateRoom from "@/components/CreateRoom";
 import { useRecoilState} from "recoil";
 import { useEffect } from "react";
-import { direct_messages_schema, user_chat_response_schema } from "@/packages/zod";
+import { private_chats_schema, user_chat_response_schema } from "@/packages/zod";
 import { UserStateChats } from "@/lib/store/atom/chats";
 import { useRouter } from "next/navigation";
-import type { ChatReponse, DirectMessages } from "@/packages/zod";
+import type { ChatReponse, PrivateChats } from "@/packages/zod";
 import { useSession } from "next-auth/react";
 import { DirectMessageState } from "@/lib/store/atom/dm";
 
@@ -91,7 +91,7 @@ export default function Home(){
             try{
                 const resp = await fetch('/api/friend');
                 const { raw_data } = await resp.json();
-                const data = direct_messages_schema.parse(raw_data);
+                const data = private_chats_schema.parse(raw_data);
                 setDms(data);
             }catch(err){
                 console.log(err);
@@ -115,7 +115,7 @@ export default function Home(){
 }
 
 const RoomTabs = memo(
-    function({rooms, dms}:{rooms:ChatReponse, dms:DirectMessages}){
+    function({rooms, dms}:{rooms:ChatReponse, dms:PrivateChats}){
     const router = useRouter();
 
     // `rooms` is a state variable so we can not mutate it

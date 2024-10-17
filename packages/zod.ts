@@ -135,7 +135,7 @@ export const user_details_edit_form_schema = z.object({
     status: z.string().optional(),
 })
 
-export const direct_msg_schema = z.object({
+export const private_chat_schema = z.object({
     id: z.string(),
     blocked: z.boolean(),
     lastmsgAt: z.string(),
@@ -153,11 +153,11 @@ export const direct_msg_schema = z.object({
     connectionId: z.string(),
 });
 
-export const direct_messages_schema = z.array(direct_msg_schema);
+export const private_chats_schema = z.array(private_chat_schema);
 
-export type DirectMessage = z.output<typeof direct_msg_schema>;
+export type PrivateChat = z.output<typeof private_chat_schema>;
 
-export type DirectMessages = DirectMessage[];
+export type PrivateChats = PrivateChat[];
 
 export const friend_search_result_schema = z.discriminatedUnion("is_friend", [
     z.object({

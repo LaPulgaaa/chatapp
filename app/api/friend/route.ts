@@ -1,9 +1,9 @@
 import { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { prisma } from "@/packages/prisma/prisma_client";
-import type { DirectMessage } from "@/packages/zod";
+import type { PrivateChat } from "@/packages/zod";
 
-type DirectMessagesServer = (Omit<DirectMessage, "lastmsgAt"> & {
+type DirectMessagesServer = (Omit<PrivateChat, "lastmsgAt"> & {
     lastmsgAt: Date,
 })[]
 
