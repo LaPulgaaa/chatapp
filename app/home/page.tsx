@@ -152,7 +152,7 @@ const RoomTabs = memo(
                             <div key={convo.id} 
                             className="p-3 rounded-md m-1 cursor-pointer hover:bg-gray-400 border-2 ease-out duration-300 transition-all"
                             onClick={()=>{
-                                router.push(`/direct/${convo.to.username}`)
+                                router.push(`/dm/${convo.to.username}`)
                             }}
                             >
                                 <div className="flex justify-between">
