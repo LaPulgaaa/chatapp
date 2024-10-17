@@ -82,7 +82,7 @@ export default function Search(){
                                         <Button
                                         onClick={() => {
                                             //@ts-ignore
-                                            router.push(`/direct/${member.username}`)
+                                            router.push(`/dm/${member.username}`)
                                         }}
                                         size={"icon"}
                                         variant={"secondary"}
