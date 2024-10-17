@@ -1,7 +1,7 @@
 'use client'
 
 import { Avatar,AvatarFallback } from "./ui/avatar"
-import type { RecievedMessage } from "@/app/home/chat/[slug]/page"
+import type { RecievedMessage } from "@/app/chat/[slug]/page"
 import { useSession } from "next-auth/react";
 
 export default function Message({data}:{data:RecievedMessage}){
