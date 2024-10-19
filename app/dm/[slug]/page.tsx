@@ -54,6 +54,21 @@ export default function Direct({params}:{params:{slug: string}}){
             Signal.get_instance().REGISTER_CALLBACK("MSG_CALLBACK",pm_recieve_callback);
             Signal.get_instance().REGISTER_CALLBACK("ONLINE_CALLBACK",update_member_online_status);
         }
+
+        return () => {
+            if(
+                session.status === "authenticated" &&
+                recipient_state.state === "hasValue" &&
+                recipient_state.getValue() !== undefined &&
+                recipient_state.getValue()!.is_friend === true
+            ){
+                //@ts-ignore
+                const username = session.data.username;
+                Signal.get_instance(username).UNSUBSCRIBE(recipient_state.getValue()!.friendship_data!.connectionId,username);
+                Signal.get_instance().DEREGISTER("MSG_CALLBACK");
+                Signal.get_instance().DEREGISTER("ONLINE_CALLBACK");
+            }
+        }
     },[session.status,recipient_state.state]);
 
 
