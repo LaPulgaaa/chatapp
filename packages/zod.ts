@@ -193,6 +193,7 @@ export const friend_search_result_schema = z.discriminatedUnion("is_friend", [
             messageFrom: z.string(),
             blocked: z.boolean(),
             messages: z.array(direct_msg_schema),
+            is_active: z.boolean(),
         })
     })
 ]).and(z.object({

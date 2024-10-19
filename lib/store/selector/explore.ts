@@ -7,7 +7,9 @@ export const get_friend_by_username = selectorFamily<FriendSearchResult | undefi
     get: ({ username }:{ username: string}) => 
         async() => {
             try{
-                const resp = await fetch(`/api/search/${username}`);
+                const resp = await fetch(`http://localhost:3001/dm/search/${username}`,{
+                    credentials: "include",
+                });
                 const { raw_data } = await resp.json();
                 const data = friend_search_result_schema.parse(raw_data);
                 return data;

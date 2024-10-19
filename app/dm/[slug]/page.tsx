@@ -49,6 +49,7 @@ export default function Direct({params}:{params:{slug: string}}){
             const username = session.data.username;
             //@ts-ignore
             const user_id = session.data.id;
+            setActive(recipient_state.getValue()!.friendship_data!.is_active);
             Signal.get_instance(username).SUBSCRIBE(recipient_state.getValue()!.friendship_data!.connectionId,user_id,username);
             Signal.get_instance().REGISTER_CALLBACK("MSG_CALLBACK",pm_recieve_callback);
             Signal.get_instance().REGISTER_CALLBACK("ONLINE_CALLBACK",update_member_online_status);

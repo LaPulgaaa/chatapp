@@ -1,17 +1,21 @@
-import { NextRequest } from "next/server";
-import { getToken } from "next-auth/jwt";
-import { prisma } from "@/packages/prisma/prisma_client";
 import assert from "minimalistic-assert";
 
-export async function GET(req: NextRequest,{params}:{params:{slug: string}}){
-    const search_username = params.slug;
+import express from "express";
+import { prisma } from "../../packages/prisma/prisma_client";
+import { getToken } from "next-auth/jwt";
+import { RedisSubscriptionManager } from "../socket/redisClient";
+
+const router = express.Router();
+
+router.get("/search/:username",async(req,res)=>{
+    const search_username = req.params.username;
     const token = await getToken({req});
 
     if(token === null)
     {
-        return Response.json({
+        return res.status(400).json({
             message: "UNAUTHORISED ACCESS"
-        },{ status:400 });
+        });
     }
 
     try{
@@ -54,10 +58,10 @@ export async function GET(req: NextRequest,{params}:{params:{slug: string}}){
                 is_friend: false,
             }
 
-            return Response.json({
+            return res.status(200).json({
                 message: 'SUCCESS',
                 raw_data: data,
-            },{ status: 200 })
+            });
         }
 
         const messages = await prisma.directMessage.findMany({
@@ -75,22 +79,29 @@ export async function GET(req: NextRequest,{params}:{params:{slug: string}}){
                 }
             }
         })
+        let is_recipient_online = false; 
+        const dm_participants = RedisSubscriptionManager.get_instance().getRoomMembers(friendship_status.connectionId);
+        if(dm_participants !== undefined && dm_participants.has(search_username)){
+            is_recipient_online = true;
+        }
 
         const data = {
             ...search_result,
             is_friend: true,
-            friendship_data: {...friendship_status, messages},
+            friendship_data: {...friendship_status, messages, is_active: is_recipient_online},
         };
 
-        return Response.json({
+        return res.status(200).json({
             message: "SUCCESS",
             raw_data: data,
-        },{ status: 200 });
+        });
 
     }catch(err){
         console.log(err);
-        return Response.json({
+        return res.status(200).json({
             message: 'SERVER ERROR'
-        },{ status: 500 });
+        });
     }
-}
+})
+
+export default router;
