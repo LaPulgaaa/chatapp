@@ -4,7 +4,7 @@ import { ScrollArea } from "./ui/scroll-area";
 import { Dialog,DialogTrigger } from "./ui/dialog";
 import JoinRoomDialog from "@/components/JoinRoom";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { HeartPulseIcon, MessageCircleIcon, PlusSquare, UserIcon, UserSearchIcon} from "lucide-react";
+import { HeartPulseIcon, PlusSquare, SettingsIcon, UserSearchIcon} from "lucide-react";
 import { MessageSquareDotIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
@@ -67,7 +67,7 @@ export default function CandleSidebar(){
                 variant={"ghost"}
                 onClick={()=>router.push("/home/profile")}
                 >
-                    <UserIcon/>
+                    <SettingsIcon/>
                 </Button>
             </div>
             

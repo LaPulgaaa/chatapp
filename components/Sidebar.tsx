@@ -2,7 +2,7 @@ import { ScrollArea } from "./ui/scroll-area";
 import { Dialog,DialogTrigger } from "./ui/dialog";
 import JoinRoomDialog from "@/components/JoinRoom";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { CopyPlusIcon, HeartPulseIcon, MessageCircleIcon, PlusSquare, UserIcon, UserSearchIcon} from "lucide-react";
+import {  HeartPulseIcon, PlusSquare, SettingsIcon, UserSearchIcon} from "lucide-react";
 import { MessageSquareDotIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -58,7 +58,7 @@ export default function Sidebar(){
                 <div className="flex cursor-pointer my-[1/2] w-full hover:bg-gray-500 p-2 dark:hover:bg-gray-800 rounded-md ease-out duration-300 transition-all"
                 onClick={()=>router.push("/home/profile")}
                 >
-                    <UserIcon/><p className="ml-2">Profile</p>
+                    <SettingsIcon/><p className="ml-2">Profile</p>
                 </div>
             </div>
             
