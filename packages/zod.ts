@@ -188,6 +188,7 @@ export const friend_search_result_schema = z.discriminatedUnion("is_friend", [
     z.object({
         is_friend: z.literal(true),
         friendship_data: z.object({
+            id: z.string(),
             connectionId: z.string(),
             messageFrom: z.string(),
             blocked: z.boolean(),

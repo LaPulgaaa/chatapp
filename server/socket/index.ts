@@ -53,8 +53,18 @@ export async function ws(wss:WebSocketServer){
                             chat_id: true,
                         }
                     });
+                    const dms = await prisma.friendShip.findMany({
+                        where: {
+                            fromId: userId
+                        },
+                        select: {
+                            connectionId: true,
+                        }
+                    })
+                    console.log(dms);
+                    const dm_arr = dms!.map((dm) => dm.connectionId);
                     const rooms_arr = rooms_subscribed.map((rooms)=> rooms.chat_id);
-                    RedisSubscriptionManager.get_instance().bulk_subscribe(ws,rooms_arr,wsId.toString(),userId);
+                    RedisSubscriptionManager.get_instance().bulk_subscribe(ws,[...rooms_arr,...dm_arr],wsId.toString(),userId);
                 }catch(err){
                     console.log(err);
                 }
@@ -134,8 +144,17 @@ export async function ws(wss:WebSocketServer){
                             chat_id: true,
                         }
                     });
+                    const dms = await prisma.friendShip.findMany({
+                        where: {
+                            fromId: userId,
+                        },
+                        select: {
+                            connectionId: true,
+                        }
+                    })
                     const rooms_arr = rooms_subscribed.map((rooms)=> rooms.chat_id);
-                    RedisSubscriptionManager.get_instance().bulk_unsubscribe(userId,rooms_arr);
+                    const dms_conc_id_arr = dms.map((dm) => dm.connectionId);
+                    RedisSubscriptionManager.get_instance().bulk_unsubscribe(userId,[...rooms_arr,...dms_conc_id_arr]);
                 }catch(err){
                     console.log(err);
                 }

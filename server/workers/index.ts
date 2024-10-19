@@ -50,6 +50,35 @@ async function process_msg(message:WorkerPayload){
                     lastmsgAt: createdAt
                 }
             })
+        }
+        else{
+            await prisma.directMessage.create({
+                data: {
+                    friendshipId: message.friendshipId,
+                    connectionId: message.concId,
+                    content: message.content,
+                    createdAt: message.createdAt,
+                    senderId: message.sender,
+                },
+                select: {
+                    friendship: {
+                        select: {
+                            fromId: true,
+                            toId: true,
+                        }
+                    }
+                }
+            });
+
+            await prisma.friendShip.updateMany({
+                where: {
+                    connectionId: message.concId
+                },
+                data: {
+                    lastmsgAt: new Date(message.createdAt)
+                }
+            })
+        }
     }catch(err){
         console.log(err);
     }
