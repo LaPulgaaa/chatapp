@@ -18,7 +18,6 @@ import DirectMessageHistory from "../history";
 import type { RecievedMessage } from "@/app/chat/[slug]/page";
 import type { UnitDM } from "../dm_ui";
 import DmRender from "../dm_ui";
-import { Badge } from "@/components/ui/badge";
 
 
 export default function Direct({params}:{params:{slug: string}}){
@@ -126,18 +125,9 @@ export default function Direct({params}:{params:{slug: string}}){
                             </Avatar>
                             <div className="mx-1 px-1 mx-1">
                                 <h3 className="scroll-m-20 text-xl font-semibold">{params.slug}</h3>
-                                <div className="italic text-muted-foreground truncate w-[124px] text-[15px]">{data.status ?? "NA"}</div>
+                                <p className={`italic text-muted-foreground truncate w-[124px] text-[15px] ${active ? "text-rose-800" : "text-green-400"}`}>{active ? "Active" : "Offline"}</p>
                             </div>
                         </div>
-                        <Badge 
-                        className={`
-                        h-6 mt-2 mr-1
-                        ${active ? "bg-rose-600" : "bg-green-400"}
-                        `}>
-                            {
-                                active ? "Active" : "Offline"
-                            }
-                        </Badge>
                 </div>
                 <ScrollArea id="chatbox"
                     className="flex flex-col h-full rounded-md border m-2">
