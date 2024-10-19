@@ -39,9 +39,6 @@ export default function CandleSidebar(){
                     </Avatar>
                     </Link>
                 }
-                <Button 
-                className="mt-1 p-1"
-                variant={"ghost"} size={"icon"}><MessageCircleIcon/></Button>
                 <Button
                 onClick={() => router.push("/home/explore")} 
                 className="mt-1 p-1"

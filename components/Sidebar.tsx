@@ -39,7 +39,6 @@ export default function Sidebar(){
                 <br/>
             </div>}
             <div className="text-center sm:text-left grid grid-cols-1 divide-y">
-                <div className="flex cursor-pointer my-[1/2] w-full hover:bg-gray-500 p-2 dark:hover:bg-gray-800 rounded-md ease-out duration-300 transition-all"><MessageCircleIcon/><p className="ml-2">Direct Messages</p></div>
                 <Link 
                 href={'/home/explore'}
                 className="flex cursor-pointer my-[1/2] w-full hover:bg-gray-500 p-2 dark:hover:bg-gray-800 rounded-md ease-out duration-300 transition-all"><UserSearchIcon/><p className="ml-2">Explore</p></Link>
