@@ -145,13 +145,12 @@ export default function Direct({params}:{params:{slug: string}}){
                         {
                             data.is_friend && 
                             <DirectMessageHistory 
-                            friend_avatar= {data.avatarurl}
                             dms={ data.friendship_data.messages } 
                             username={username}/>
                         }
                         {
                             inbox.map((live_dm) => {
-                                return <DmRender dm={live_dm} username={username} friend_avatar={data.avatarurl}/>
+                                return <DmRender dm={live_dm} username={username}/>
                             })
                         }
                     </div>
