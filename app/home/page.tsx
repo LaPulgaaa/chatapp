@@ -144,7 +144,7 @@ const RoomTabs = memo(
                             <p className="hidden md:block">{get_last_msg_time(convo.lastmsgAt)}</p>
                             </div>
 
-                            <p className="border-l-2 pl-6 italic">{convo.discription}</p>
+                            <p className="border-l-2 pl-6 italic text-muted-foreground">{convo.discription}</p>
                         </div>
                     }
                     else {
@@ -160,7 +160,7 @@ const RoomTabs = memo(
                                 <p className="hidden md:block">{get_last_msg_time(convo.lastmsgAt)}</p>
                                 </div>
 
-                                <p className="border-l-2 pl-6 italic">{convo.messages[0]?.content}</p>
+                                <p className="border-l-2 pl-6 italic text-muted-foreground">{convo.messages[0]?.content}</p>
                             </div>
                         )
                     }
