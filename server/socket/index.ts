@@ -144,11 +144,13 @@ export async function ws(wss:WebSocketServer){
                 const message=data.payload.message;
                 const msg_type: "chat" | "dm" = data.payload.msg_type;
                 const {id, ...content} = message;
+                const createdAt = new Date().toISOString();
                 const msg_data = JSON.stringify({
                     type:"message",
                     payload:{
                         roomId,
-                        message: content
+                        message: content,
+                        createdAt,
                     }
                 });
                 RedisSubscriptionManager.get_instance().addChatMessage(roomId,"MSG_CALLBACK",msg_data);

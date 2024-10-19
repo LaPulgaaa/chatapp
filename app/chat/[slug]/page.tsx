@@ -38,7 +38,9 @@ export type RecievedMessage={
             content:string,
             user:string,
             name?: string,
-        }
+        },
+        createdAt: string,
+    
     }
 }
 
