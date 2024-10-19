@@ -142,6 +142,7 @@ export async function ws(wss:WebSocketServer){
             {
                 const roomId=data.payload.roomId;
                 const message=data.payload.message;
+                const msg_type: "chat" | "dm" = data.payload.msg_type;
                 const {id, ...content} = message;
                 const msg_data = JSON.stringify({
                     type:"message",
@@ -152,11 +153,25 @@ export async function ws(wss:WebSocketServer){
                 });
                 RedisSubscriptionManager.get_instance().addChatMessage(roomId,"MSG_CALLBACK",msg_data);
 
-                await client.lPush("message",JSON.stringify({
-                    content:message.content,
-                    chatId:roomId,
-                    memberId:id
-                }))
+                if(msg_type === "chat"){
+                    await client.lPush("message",JSON.stringify({
+                        type: "chat",
+                        content:message.content,
+                        chatId:roomId,
+                        createdAt,
+                        memberId:id
+                    }))
+                }
+                else {
+                    await client.lPush("message",JSON.stringify({
+                        type: "dm",
+                        content:message.content,
+                        concId: roomId,
+                        createdAt,
+                        friendshipId: data.payload.friendshipId,
+                        sender: message.user,
+                    }))
+                }
             }
 
             if(data.type === "leave"){

@@ -29,8 +29,15 @@ export async function start_worker(){
 
 async function process_msg(message:WorkerPayload){
     try{
+        if(message.type === "chat")
+        {
             const {createdAt} = await prisma.message.create({
-            data:message,
+            data:{
+                memberId: message.memberId,
+                content: message.content,
+                chatId: message.chatId,
+                createdAt: message.createdAt
+            },
             select:{
                 createdAt: true
             }

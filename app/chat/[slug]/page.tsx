@@ -178,6 +178,7 @@ export default function Chat({params}:{params:{slug:string}}){
             type:"message",
             payload:{
                 roomId:params.slug,
+                msg_type: "chat",
                 message:{
                     content:compose,
                     //@ts-ignore

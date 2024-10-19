@@ -100,11 +100,23 @@ export const member_profile_schema=z.object({
 
 export type MemberProfile=z.infer<typeof member_profile_schema>;
 
-export const worker_payload=z.object({
-    content:z.string(),
-    chatId:z.string(),
-    memberId:z.string()
-})
+export const worker_payload = z.discriminatedUnion("type",[
+    z.object({
+        type: z.literal("chat"),
+        content: z.string(),
+        chatId: z.string(),
+        createdAt: z.string(),
+        memberId: z.string(),
+    }),
+    z.object({
+        type: z.literal("dm"),
+        content: z.string(),
+        concId: z.string(),
+        createdAt: z.string(),
+        friendshipId: z.string(),
+        sender: z.string(),
+    })
+])
 
 //z.output is an alias for z.infer
 export type WorkerPayload=z.output<typeof worker_payload>;
