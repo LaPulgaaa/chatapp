@@ -105,7 +105,7 @@ export default function Chat({params}:{params:{slug:string}}){
         if(room_id !== undefined && session.status === "authenticated" )
         {
             //@ts-ignore
-            Signal.get_instance(session.data.id).SUBSCRIBE(params.slug, session.data.id, session.data.username);
+            Signal.get_instance(session.data.username).SUBSCRIBE(params.slug, session.data.id, session.data.username);
             Signal.get_instance().REGISTER_CALLBACK("MSG_CALLBACK",recieve_msg);
             Signal.get_instance().REGISTER_CALLBACK("ONLINE_CALLBACK",update_member_online_status);
         }

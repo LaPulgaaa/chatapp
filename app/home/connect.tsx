@@ -20,12 +20,15 @@ export default function Connect(){
             title: "Invited"
         });
         refresh_dms();
+        assert(session.status === "authenticated");
+        //@ts-ignore
+        Signal.get_instance().ADD_ROOM(session.data.username, data.connection_id);
     }
     
     useEffect(()=>{
         if(session.status === "authenticated"){
             //@ts-ignore
-            Signal.get_instance(session.data.id).REGISTER_CALLBACK("INVITE",recieve_invite_callback);
+            Signal.get_instance(session.data.username).REGISTER_CALLBACK("INVITE",recieve_invite_callback);
         }
     },[session.status])
 

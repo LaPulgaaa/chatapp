@@ -45,7 +45,9 @@ export async function ws(wss:WebSocketServer){
                 try{
                     const rooms_subscribed = await prisma.directory.findMany({
                         where:{
-                            userId,
+                            user: {
+                                username: userId
+                            },
                         },
                         select:{
                             chat_id: true,
@@ -124,7 +126,9 @@ export async function ws(wss:WebSocketServer){
                 try{
                     const rooms_subscribed = await prisma.directory.findMany({
                         where:{
-                            userId,
+                            user: {
+                                username: userId,
+                            }
                         },
                         select:{
                             chat_id: true,
