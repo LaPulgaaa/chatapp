@@ -2,9 +2,6 @@
 
 import { memo } from "react";
 
-import { Signal } from "./signal";
-
-import CreateRoom from "@/components/CreateRoom";
 import { useRecoilState} from "recoil";
 import { useEffect } from "react";
 import { private_chats_schema, user_chat_response_schema } from "@/packages/zod";
@@ -71,7 +68,7 @@ export default function Home(){
                     },
                     cache: "no-cache"
                 });
-                //TODO:add zod here before using the returned data
+
                 const {raw_data}=await resp.json();
                 if(Array.isArray(raw_data) && raw_data.length>0)
                 {
@@ -107,7 +104,8 @@ export default function Home(){
                     <h4 className="scroll-m-20 p-2 text-2xl font-semibold tracking-tigh">
                         Catch up on missed chats!
                     </h4>
-                    <RoomTabs rooms={rooms} dms={dms}/>
+                    {/* @ts-ignore */}
+                    <RoomTabs rooms={rooms} dms={dms} username={session.data.username}/>
                 </div> : <div>Loading</div>
             }
         </div>
@@ -115,7 +113,7 @@ export default function Home(){
 }
 
 const RoomTabs = memo(
-    function({rooms, dms}:{rooms:ChatReponse, dms:PrivateChats}){
+    function({rooms, dms, username}:{rooms:ChatReponse, dms:PrivateChats, username: string}){
     const router = useRouter();
 
     // `rooms` is a state variable so we can not mutate it
@@ -144,7 +142,12 @@ const RoomTabs = memo(
                             <p className="hidden md:block">{get_last_msg_time(convo.lastmsgAt)}</p>
                             </div>
 
-                            <p className="border-l-2 pl-6 italic text-muted-foreground">{convo.discription}</p>
+                            <div className="border-l-2 pl-6 italic text-muted-foreground flex">
+                                {
+                                    convo.messages[0]?.sender.username !== username && <p>{convo.messages[0]?.sender.username}: </p>
+                                }
+                                <p>{convo.messages[0]?.content}</p>
+                            </div>
                         </div>
                     }
                     else {

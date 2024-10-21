@@ -55,6 +55,13 @@ export const user_chat_response_schema=z.array(
             id:z.string(),
             name:z.string(),
             conn_id: z.string(),
+            messages: z.array(z.object({
+                content: z.string(),
+                sender: z.object({
+                    username: z.string(),
+                }),
+                createdAt: z.string(),
+            })),
         }),
     
 )
