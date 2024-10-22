@@ -21,18 +21,23 @@ import { useToast } from "@/hooks/use-toast";
 import { UserDetails } from "@/lib/store/atom/userDetails";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { user_details_edit_form_schema } from "@/packages/zod";
+import { Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+
 
 type FormValue = z.output<typeof user_details_edit_form_schema>;
 
+const AVATAR_PROD_URL = "https://avatar.varuncodes.com";
+
 export default function Profile(){
-    const { update } = useSession();
+    const { update,data,status } = useSession();
     const router = useRouter();
     const user_state = useRecoilValueLoadable(UserDetails);
     const refresh_state = useRecoilRefresher_UNSTABLE(UserDetails);
     const [fav,setFav] = useState<string>("");
     const [favsdirty,setFavsDirty] = useState<boolean>(false);
     const [favs,setFavs] = useState<string[]>([]);
-    const user_details = user_state.contents;
+    const user_details = user_state.getValue();
+    const [avatar,setAvatar] = useState<string>("");
 
     const { toast } = useToast();
 
@@ -54,17 +59,17 @@ export default function Profile(){
             const loaded_state = user_state.contents;
             setValue("username",loaded_state?.username ?? "");
             setValue("name",loaded_state?.name ?? "");
-            setValue("avatarurl",loaded_state?.avatarurl ?? "");
             setValue("status",loaded_state?.status ?? "");
             setValue("about",loaded_state?.about ?? "");
-            setFavs([...loaded_state?.favorite ?? []])
+            setFavs([...loaded_state?.favorite ?? []]);
+            setAvatar(loaded_state?.avatarurl ?? "");
         }
 
     },[user_state.state])
 
     useEffect(()=>{
         if(user_state.state === "hasValue" &&
-            JSON.stringify(favs) === JSON.stringify(user_details.favorite)
+            JSON.stringify(favs) === JSON.stringify(user_details?.favorite)
         ){
             setFavsDirty(false);
         }
@@ -76,7 +81,8 @@ export default function Profile(){
                 method: 'PATCH',
                 body: JSON.stringify({
                     ...form_data,
-                    favorite: favs
+                    favorite: favs,
+                    avatarurl: avatar === "" ? "" : `${AVATAR_PROD_URL}/${form_data.username}`,
                 }),
                 credentials: "include"
             });
@@ -92,6 +98,60 @@ export default function Profile(){
             }
         }catch(err){
             console.log(err);
+        }
+    }
+
+    async function upload_avatar(e: React.ChangeEvent<HTMLInputElement>){
+
+        if(status !== "authenticated")
+            return;
+
+        //@ts-ignore
+        const username = data.username;
+
+        const uploaded_files = e.target.files;
+
+        if(uploaded_files === null)
+            return;
+
+        const uploaded_avatar_file = uploaded_files[0];
+
+        const uploaded_avatar_url = URL.createObjectURL(uploaded_avatar_file);
+
+        setAvatar(uploaded_avatar_url);
+
+        const resp = await fetch("/api/avatar",{
+            method:"POST",
+            body: JSON.stringify({
+                key: username,
+                content_type: uploaded_avatar_file.type,
+            })
+        });
+
+        const { raw_data: { presigned_url }}:{raw_data: {presigned_url: string }} = await resp.json();
+        
+        console.log(presigned_url)
+        const upload_to_s3_resp = await fetch(presigned_url,{
+            method: 'PUT',
+            headers: {
+                'Content-Type': uploaded_avatar_file.type
+            },
+            body: uploaded_avatar_file,
+            mode: "cors"
+        });
+
+        if(upload_to_s3_resp.ok){
+            toast({
+                title: "Avatar changed successfully!!",
+            })
+        }
+        else{
+            setAvatar("");
+            toast({
+                variant:"destructive",
+                title: "Avatar upload failed!",
+                description: "Please try to upload once again."
+            })
         }
     }
 
@@ -113,7 +173,7 @@ export default function Profile(){
                 <div className="">
                     <div className="flex space-x-8 pt-4 m-4">
                         <Avatar className="mt-2 w-[74px] h-[74px]">
-                            <AvatarImage height={"100px"} src={user_details?.avatarurl ?? ""}/>
+                            <AvatarImage className="contain" src={avatar ?? ""}/>
                             <AvatarFallback>{user_details?.username?.substring(0,2) ?? ""}</AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col space-y-2">
@@ -127,10 +187,33 @@ export default function Profile(){
                             }
                         </div>
                         <div className="flex space-x-2">
-                            <Button disabled = {true}>Upload Avatar</Button>
+                            <Dialog>
+                                <DialogTrigger asChild>
+                                <Button>Upload Avatar</Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                    <DialogTitle>Upload avatar</DialogTitle>
+                                    <div className="flex flex-col items-center space-y-8">
+                                        <Avatar className="w-[136px] h-[136px]">
+                                            <AvatarImage src={avatar}/>
+                                        </Avatar>
+                                        <Input
+                                        type="file"
+                                        placeholder="Choose a file."
+                                        onChange={upload_avatar}
+                                        />
+                                        <DialogClose>
+                                            <div className="flex justify-end space-x-2">
+                                                <Button variant={"ghost"}>Cancel</Button>
+                                                <Button>Save</Button>
+                                            </div>
+                                        </DialogClose>
+                                    </div>
+                                </DialogContent>
+                            </Dialog>
                             <Button 
                             onClick={()=>{
-                                setValue("avatarurl","");
+                                setAvatar("");
                             }}
                             variant={"secondary"}>Remove Avatar</Button>
                         </div>
