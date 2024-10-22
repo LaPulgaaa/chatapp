@@ -36,12 +36,12 @@ export const NEXTAUTH_CONFIG:NextAuthOptions = {
     
                         if(user){
                             return {
+                                ...params.token,
                                 id:user.id,
                                 username: user.username,
                                 email: user.email,
-                                avatar_url: user.avatarurl,
                                 name: user.name,
-                                ...params.token
+                                avatar_url: user.avatarurl,
                             }
                         };
 
@@ -63,12 +63,12 @@ export const NEXTAUTH_CONFIG:NextAuthOptions = {
                         });
     
                         return {
+                            ...params.token,
                             id:new_user.id,
                             username: new_user.username,
                             email: new_user.email,
-                            avatar_url: new_user.avatarurl,
                             name: new_user.name,
-                            ...params.token
+                            avatar_url: new_user.avatarurl,
                         }
                 }
                 
