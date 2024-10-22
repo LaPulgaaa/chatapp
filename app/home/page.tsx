@@ -132,7 +132,7 @@ const RoomTabs = memo(
                         user_chat_uuid.set(convo.id, convo.conn_id);
 
                         return <div key={convo.id} 
-                        className="p-3 rounded-md m-1 cursor-pointer hover:bg-gray-400 border-2 ease-out duration-300 transition-all"
+                        className="p-3 rounded-md m-1 cursor-pointer hover:bg-gray-300 hover:dark:bg-slate-800 border-2 ease-out duration-300 transition-all"
                         onClick={()=>{
                             router.push(`/chat/${convo.id}`)
                         }}
@@ -153,7 +153,7 @@ const RoomTabs = memo(
                     else {
                         return (
                             <div key={convo.id} 
-                            className="p-3 rounded-md m-1 cursor-pointer hover:bg-gray-400 border-2 ease-out duration-300 transition-all"
+                            className="p-3 rounded-md m-1 cursor-pointer hover:bg-gray-300 hover:dark:bg-slate-800 border-2 ease-out duration-300 transition-all"
                             onClick={()=>{
                                 router.push(`/dm/${convo.to.username}`)
                             }}
