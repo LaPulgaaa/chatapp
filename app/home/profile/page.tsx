@@ -230,7 +230,7 @@ export default function Profile(){
                                     <FormControl>
                                     <div className="flex border-[1.5px] rounded-md">
                                       <p className="text-sm text-muted-foreground px-2 mt-3">chat.city/</p>
-                                      <Input type="text" {...field}/>
+                                      <Input disabled type="text" {...field}/>
                                     </div>
                                     </FormControl>
                                     <FormMessage/>
