@@ -1,7 +1,7 @@
 'use client'
 
-import { Avatar,AvatarFallback } from "./ui/avatar"
-import type { RecievedMessage } from "@/app/chat/[slug]/page"
+import { Avatar,AvatarFallback, AvatarImage } from "./ui/avatar"
+import type { RecievedMessage } from "@/app/chat/[slug]/page";
 import { useSession } from "next-auth/react";
 
 export default function Message({data}:{data:RecievedMessage}){
@@ -25,24 +25,25 @@ export default function Message({data}:{data:RecievedMessage}){
     //@ts-ignore
     className={`flex m-2 ${data.payload.message.user === username ? 'justify-end':data.payload.message.user==='pulgabot'?' justify-center':''}  `}>
     <Avatar 
-    className={`w-[35px] h-[35px] mr-2 border-2 border-slate-400 bg-slate-200 dark:bg-slate-900 mt-1 p-4 ${data.payload.
+    className={`w-[35px] h-[35px] mr-2 mt-1 ${data.payload.
     // @ts-ignore
     message.user === username ? 'hidden':''}`}>
-        
+        <AvatarImage src={`https://avatar.varuncodes.com/${data.payload.message.user}`}/>
         <AvatarFallback>
             {initials}
         </AvatarFallback>
     </Avatar>
 
-    <div className={` border-2 pb-1 mr-2 p-2 bg-slate-200 dark:bg-slate-900  max-w-prose rounded-md flex`}>
+    <div className={` pb-1 mr-2 p-2 bg-slate-200 dark:bg-slate-900 max-w-prose rounded-md flex`}>
         <p className="italic text-wrap">{data.payload.message.content}</p>
         <p className="flex justify-end text-[10px] mt-3 ml-2">{(hour_min[0]+":"+ hour_min[1])}</p>
     </div>
     <Avatar 
-    className={`w-[35px] h-[35px] mr-2 border-2 border-slate-400 bg-slate-200 dark:bg-slate-900 mt-1 p-4 ${data.payload.
+    className={`w-[35px] h-[35px] mr-2 mt-1 ${data.payload.
     // @ts-ignore
     message.user === username ? '':'hidden'}`}>
-        <AvatarFallback>{initials}</AvatarFallback>
+        <AvatarImage src={`https://avatar.varuncodes.com/${username}`}/>
+        <AvatarFallback className="bg-slate-200 dark:bg-slate-900 p-4">{initials}</AvatarFallback>
     </Avatar>
     </div>
 }
