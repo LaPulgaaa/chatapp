@@ -257,12 +257,8 @@ export default function Chat({params}:{params:{slug:string}}){
         return <Inbox key={message.id} data={message}/>
     })
 
-    return <div className="h-svh pb-24 mt-4">
-            <div className="flex justify-between">
-                    <Button variant={`outline`} size={`icon`} className="ml-4"
-                        onClick={()=>router.push("/home")}
-                        ><ChevronLeftIcon/>
-                    </Button>
+    return <div className="h-full pb-24">
+            <div className="flex justify-between mt-2 mx-2">
                 {
                     room_details && (
                         <>
