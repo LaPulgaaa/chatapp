@@ -142,12 +142,14 @@ const RoomTabs = memo(
                             <p className="hidden md:block">{get_last_msg_time(convo.lastmsgAt)}</p>
                             </div>
 
-                            <div className="border-l-2 pl-6 italic text-muted-foreground flex">
+                            {
+                                convo.messages.length > 0 ? <div className="border-l-2 pl-6 italic text-muted-foreground flex">
                                 {
                                     convo.messages[0]?.sender.username !== username && <p>{convo.messages[0]?.sender.username}: </p>
                                 }
                                 <p>{convo.messages[0]?.content}</p>
-                            </div>
+                                </div> : <div className="pl-6 border-l-2">No messages yet.</div>
+                            }
                         </div>
                     }
                     else {

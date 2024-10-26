@@ -21,6 +21,9 @@ export async function GET(req:NextRequest){
                 chat: {
                     include: {
                         messages: {
+                            where: {
+                                deleted: false,
+                            },
                             select: {
                                 content: true,
                                 sender: {
