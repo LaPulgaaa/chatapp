@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { get_friend_by_username } from "@/lib/store/selector/explore";
 import { Signal } from "@/app/home/signal";
 import DirectMessageHistory from "../history";
-import type { RecievedMessage } from "@/app/chat/[slug]/page";
+import type { RecievedMessage } from "@/app/(message)/chat/[slug]/page";
 import type { UnitDM } from "../dm_ui";
 import DmRender from "../dm_ui";
 
