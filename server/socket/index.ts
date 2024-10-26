@@ -61,7 +61,6 @@ export async function ws(wss:WebSocketServer){
                             connectionId: true,
                         }
                     })
-                    console.log(dms);
                     const dm_arr = dms!.map((dm) => dm.connectionId);
                     const rooms_arr = rooms_subscribed.map((rooms)=> rooms.chat_id);
                     RedisSubscriptionManager.get_instance().bulk_subscribe(ws,[...rooms_arr,...dm_arr],wsId.toString(),userId);
