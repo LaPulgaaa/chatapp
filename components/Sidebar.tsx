@@ -45,7 +45,7 @@ export default function Sidebar(){
                 <div className="flex cursor-pointer my-[1/2] w-full hover:bg-gray-500 p-2 dark:hover:bg-gray-800 rounded-md ease-out duration-300 transition-all"><HeartPulseIcon/><p className="ml-3">Set Status</p></div>
                 <Dialog>
                     <DialogTrigger>
-                        <div className="flex cursor-pointer my-[1/2] w-full hover:bg-gray-500 p-2 dark:hover:bg-gray-800 rounded-md ease-out duration-300 transition-all"><PlusSquare/> <p className="ml-3">Create Room</p></div>
+                        <div className="flex cursor-pointer my-[1/2] w-full hover:bg-gray-500 p-2 dark:hover:bg-gray-800 rounded-md ease-out duration-300 transition-all"><PlusSquare/> <p className="ml-3">Add Room</p></div>
                     </DialogTrigger>
                         <CreateRoom/>
                 </Dialog>
