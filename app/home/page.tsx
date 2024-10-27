@@ -4,7 +4,7 @@ import { memo } from "react";
 
 import { useRecoilState} from "recoil";
 import { useEffect } from "react";
-import { private_chats_schema, user_chat_response_schema } from "@/packages/zod";
+import { private_chats_schema, user_chats_response_schema } from "@/packages/zod";
 import { UserStateChats } from "@/lib/store/atom/chats";
 import { useRouter } from "next/navigation";
 import type { ChatReponse, PrivateChats } from "@/packages/zod";
@@ -72,7 +72,7 @@ export default function Home(){
                 const {raw_data}=await resp.json();
                 if(Array.isArray(raw_data) && raw_data.length>0)
                 {
-                    const data = user_chat_response_schema.parse(raw_data);
+                    const data = user_chats_response_schema.parse(raw_data);
                     console.log(data);
                     setRooms(data);
                 }

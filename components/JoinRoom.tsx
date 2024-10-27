@@ -8,7 +8,7 @@ import { UserStateChats } from "@/lib/store/atom/chats";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Signal } from "@/app/home/signal";
-import { revalidateTag } from "next/cache";
+import { user_chat_schema } from "@/packages/zod";
 
 
 export default function JoinRoomDialog(){
@@ -53,7 +53,7 @@ export default function JoinRoomDialog(){
             if(resp.status === 200)
             {
                 console.log("room found");
-                const room_info=raw_resp.raw_data;
+                const room_info = user_chat_schema.parse(raw_resp.raw_data);
                 setRooms([...rooms, room_info]);
                 //@ts-ignore
                 Signal.get_instance().ADD_ROOM(session.data.id,room_info.id)

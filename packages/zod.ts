@@ -46,24 +46,25 @@ export const create_room_schema=z.object({
 
 export type RoomType=z.infer<typeof create_room_schema>;
 
-export const user_chat_response_schema=z.array(
-    z.object({
-            createdAt:z.string(),
-            lastmsgAt: z.string(),
-            deleted:z.boolean(),
-            discription:z.string(),
-            id:z.string(),
-            name:z.string(),
-            conn_id: z.string(),
-            messages: z.array(z.object({
-                content: z.string(),
-                sender: z.object({
-                    username: z.string(),
-                }),
-                createdAt: z.string(),
-            })),
+export const user_chat_schema = z.object({
+    createdAt:z.string(),
+    lastmsgAt: z.string(),
+    deleted:z.boolean(),
+    discription:z.string(),
+    id:z.string(),
+    name:z.string(),
+    conn_id: z.string(),
+    messages: z.array(z.object({
+        content: z.string(),
+        sender: z.object({
+            username: z.string(),
         }),
-    
+        createdAt: z.string(),
+    })),
+})
+
+export const user_chats_response_schema=z.array(
+    user_chat_schema, 
 )
 
 export const unit_message_schema= z.object({
@@ -94,7 +95,7 @@ export const room_details_response_schema = z.intersection(
 export type ChatMessageData=z.infer<typeof chat_messages_response_schema>;
 export type UnitMessage=z.infer<typeof unit_message_schema>;
 
-export type ChatReponse=z.infer<typeof user_chat_response_schema>;
+export type ChatReponse=z.infer<typeof user_chats_response_schema>;
 
 export const member_profile_schema=z.object({
     username:z.string(),

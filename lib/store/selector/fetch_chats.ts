@@ -1,4 +1,4 @@
-import { user_chat_response_schema } from "@/packages/zod";
+import { user_chats_response_schema } from "@/packages/zod";
 import { ChatReponse } from "@/packages/zod";
 import { selector } from "recoil";
 
@@ -17,7 +17,7 @@ export const fetch_user_chats = selector<ChatReponse>({
             const {raw_data}=await resp.json();
             if(Array.isArray(raw_data) && raw_data.length>0)
             {
-                const data = user_chat_response_schema.parse(raw_data);
+                const data = user_chats_response_schema.parse(raw_data);
                 console.log(data);
                 return data;
             }
