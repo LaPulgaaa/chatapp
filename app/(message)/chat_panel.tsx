@@ -39,9 +39,9 @@ export default function ChatPanel(){
                                     return(
                                         <SidebarMenuItem>
                                             <SidebarMenuButton asChild>
-                                                <a href={`/dm/${dm.to.username}`}>
+                                                <Link href={`/dm/${dm.to.username}`}>
                                                     <span>{dm.to.username}</span>
-                                                </a>
+                                                </Link>
                                             </SidebarMenuButton>
                                         </SidebarMenuItem>
                                     )
@@ -62,9 +62,9 @@ export default function ChatPanel(){
                                     return(
                                         <SidebarMenuItem>
                                             <SidebarMenuButton asChild>
-                                                <a href={`/chat/${chat.id}`}>
+                                                <Link href={`/chat/${chat.id}`}>
                                                     <span>{chat.name}</span>
-                                                </a>
+                                                </Link>
                                             </SidebarMenuButton>
                                         </SidebarMenuItem> 
                                     )
