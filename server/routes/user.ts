@@ -68,7 +68,7 @@ router.post("/signup",async(req,res)=>{
         res.cookie("token",token,{
             sameSite:"lax",
             maxAge:60*60*24*1000,
-            domain:"localhost",
+            domain: `chat.varuncodes.com`,
             httpOnly:true
         })
 
@@ -106,7 +106,7 @@ router.post("/login",async(req,res)=>{
             res.cookie("token",token,{
                 sameSite:"lax",
                 maxAge:60*60*3*1000,
-                domain:"localhost",
+                domain:`chat.varuncodes.com`,
                 httpOnly:true
             })
             res.status(200).json({
@@ -191,7 +191,7 @@ router.patch("/editProfile",authenticate,async(req,res)=>{
         res.cookie("token",new_token,{
             sameSite: "lax",
             httpOnly: true,
-            domain: "localhost",
+            domain: `chat.varuncodes.com`,
             maxAge: 60*60*3*1000
         })
         

@@ -9,7 +9,7 @@ import dmRouter from "./server/routes/dm";
 export const express_app=express();
 
 const corsOptions={
-    origin:"http://localhost:3000",
+    origin:`https://chat.varuncodes.com`,
     methods:'GET,PUT,POST,DELETE,PATCH',
     credentials:true,
 

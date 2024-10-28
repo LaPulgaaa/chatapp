@@ -7,7 +7,7 @@ import { express_app } from './bin';
 import {ws} from './server/socket/index'
 
 const port=3001;
-const hostname='localhost';
+const hostname=`chatbackend.varuncodes.com`;
 const dev=process.env.NODE_ENV !== 'production';
 const app=next({dev,hostname,port});
 

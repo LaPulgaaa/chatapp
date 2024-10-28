@@ -8,7 +8,7 @@ export async function leave_room(
     ){
     
     try{
-        const resp=await fetch(`http://localhost:3001/chat/leaveChat`,{
+        const resp=await fetch(`https://chatbackend.varuncodes.com/chat/leaveChat`,{
                     method:'DELETE',
                     body:JSON.stringify({
                         memberId:opts.member_id,

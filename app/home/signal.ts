@@ -1,4 +1,3 @@
-const BASE_URL = "ws://localhost"
 const PORT = 3001;
 
 type BufferedMessage = {
@@ -17,7 +16,7 @@ export class Signal{
     private username: string;
 
     private constructor(id: string){
-        this.ws = new WebSocket(`${BASE_URL}:${PORT}`);
+        this.ws = new WebSocket(`wss://chatws.varuncodes.com`);
         this.id = 1;
         this.username = id;
         this.init_ws();
