@@ -54,7 +54,7 @@ router.get("/search/:username",async(req,res)=>{
 
         if(friendship_status === null){
             const data = {
-                ...search_result,
+                profile_info: search_result,
                 is_friend: false,
             }
 
@@ -86,7 +86,7 @@ router.get("/search/:username",async(req,res)=>{
         }
 
         const data = {
-            ...search_result,
+            profile_info: search_result,
             is_friend: true,
             friendship_data: {...friendship_status, messages, is_active: is_recipient_online},
         };

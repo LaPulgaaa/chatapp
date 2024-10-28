@@ -204,14 +204,20 @@ export const friend_search_result_schema = z.discriminatedUnion("is_friend", [
             is_active: z.boolean(),
         })
     })
-]).and(z.object({
-    status: z.string().nullable(),
-    about: z.string().nullable(),
-    favorite: z.array(z.string()),
-    name: z.string().nullable(),
-    avatarurl: z.string().nullable(),
-}))
+]).and(
+    z.object({
+            profile_info: z.object({
+                status: z.string().nullable(),
+                about: z.string().nullable(),
+                favorite: z.array(z.string()),
+                name: z.string().nullable(),
+                avatarurl: z.string().nullable(),
+            })
+    })
+);
 
 export type FriendSearchResult = z.output<typeof friend_search_result_schema>;
+
+export type DmProfileInfo = FriendSearchResult["profile_info"];
 
 export type DirectMessage = z.output<typeof direct_msg_schema>;

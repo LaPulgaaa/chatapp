@@ -18,6 +18,8 @@ import DirectMessageHistory from "../history";
 import type { RecievedMessage } from "@/app/(message)/chat/[slug]/page";
 import type { UnitDM } from "../dm_ui";
 import DmRender from "../dm_ui";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import ProfileDialog from "../profile_dialog";
 
 
 export default function Direct({params}:{params:{slug: string}}){
@@ -134,16 +136,21 @@ export default function Direct({params}:{params:{slug: string}}){
             {
                 session.status === "authenticated" ? <div className="flex flex-col w-full h-svh">
                 <div className={`flex rounded-md h-[72px] mx-2 mt-2 mb-1 border-2`}>
-                        <div className="flex item-center p-2 ml-2">
-                            <Avatar className="mr-1 mt-1">
-                                <AvatarImage src={data.avatarurl ?? ""}/>
-                                <AvatarFallback>{params.slug.substring(0,2)}</AvatarFallback>
-                            </Avatar>
-                            <div className="mx-1 px-1 mx-1">
-                                <h3 className="scroll-m-20 text-xl font-semibold">{params.slug}</h3>
-                                <p className={`italic text-muted-foreground truncate w-[124px] text-[15px] ${active ? "text-rose-800" : "text-green-400"}`}>{active ? "Active" : "Offline"}</p>
-                            </div>
-                        </div>
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <div className="flex item-center p-2 ml-2">
+                                <Avatar className="mr-1 mt-1">
+                                    <AvatarImage src={`https://avatar.varuncodes.com/${params.slug}`}/>
+                                    <AvatarFallback>{params.slug.substring(0,2)}</AvatarFallback>
+                                </Avatar>
+                                <div className="mx-1 px-1 mx-1">
+                                    <h3 className="scroll-m-20 text-xl font-semibold">{params.slug}</h3>
+                                    <p className={`italic text-muted-foreground truncate w-[124px] text-[15px] ${active ? "text-rose-800" : "text-green-400"}`}>{active ? "Active" : "Offline"}</p>
+                                </div>
+                                </div>
+                            </DialogTrigger>
+                            <ProfileDialog profile_info={{...data.profile_info, username: params.slug }} />
+                        </Dialog>
                 </div>
                 <ScrollArea id="chatbox"
                     className="flex flex-col h-full rounded-md border m-2">
