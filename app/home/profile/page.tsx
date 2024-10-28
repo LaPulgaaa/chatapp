@@ -173,7 +173,7 @@ export default function Profile(){
                 <div className="">
                     <div className="flex space-x-8 pt-4 m-4">
                         <Avatar className="mt-2 w-[74px] h-[74px]">
-                            <AvatarImage className="contain" src={avatar ?? ""}/>
+                            <AvatarImage className="contain" src={`https://avatar.varuncodes.com/${user_details?.username}`}/>
                             <AvatarFallback>{user_details?.username?.substring(0,2) ?? ""}</AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col space-y-2">
