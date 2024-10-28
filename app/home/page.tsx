@@ -11,7 +11,7 @@ import type { ChatReponse, PrivateChats } from "@/packages/zod";
 import { useSession } from "next-auth/react";
 import { DirectMessageState } from "@/lib/store/atom/dm";
 
-export function get_last_msg_time(lastmsgAt: string): string {
+function get_last_msg_time(lastmsgAt: string): string {
 
     let last_msg_date = new Date(lastmsgAt);
     let now_date = new Date();
@@ -45,8 +45,6 @@ export function get_last_msg_time(lastmsgAt: string): string {
     }
 
 }
-
-export let user_chat_uuid = new Map<string,string>();
 
 export default function Home(){
     const session = useSession();
@@ -96,6 +94,8 @@ export default function Home(){
         }
 
         get_dms();
+
+        //eslint-disable-next-line react-hooks/exhaustive-deps
     },[id])
 
     return(
@@ -112,6 +112,7 @@ export default function Home(){
     )
 }
 
+//eslint-disable-next-line react/display-name
 const RoomTabs = memo(
     function({rooms, dms, username}:{rooms:ChatReponse, dms:PrivateChats, username: string}){
     const router = useRouter();
@@ -129,7 +130,6 @@ const RoomTabs = memo(
             {
                 sorted_acc_to_time?.map((convo)=>{
                     if(convo.type === "chat"){
-                        user_chat_uuid.set(convo.id, convo.conn_id);
 
                         return <div key={convo.id} 
                         className="p-3 rounded-md m-1 cursor-pointer hover:bg-gray-300 hover:dark:bg-slate-800 border-2 ease-out duration-300 transition-all"

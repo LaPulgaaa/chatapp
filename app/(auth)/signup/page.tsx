@@ -18,9 +18,8 @@ import { GitHubLogoIcon } from "@radix-ui/react-icons";
 
 type FormValue = z.output<typeof user_signup_form_schema>
 
-export default function signup(){
+export default function Signup(){
     const router=useRouter();
-
     const form=useForm<FormValue>({
         resolver:zodResolver(user_signup_form_schema),
         defaultValues:{

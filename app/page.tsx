@@ -14,13 +14,13 @@ export default function Home() {
   useEffect(()=>{
     if(session.status === "authenticated")
       router.push("/home");
-  },[session.status])
+  },[session.status,router])
   return (
     <div>
       <Navbar/>
       <div className="grid justify-items-center m-48">
         <h1 className="italic scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-7xl">
-          Chiller's Chat
+          Chiller&apos;s Chat
         </h1>
         <h2 className="scroll-m-20 border-b pb-2 m-12 text-3xl font-semibold tracking-tight first:mt-0 hover:italic">
           Cause distance should never be a problem.

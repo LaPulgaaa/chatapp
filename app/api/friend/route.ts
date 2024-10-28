@@ -5,7 +5,21 @@ import type { PrivateChat } from "@/packages/zod";
 
 type DirectMessagesServer = (Omit<PrivateChat, "lastmsgAt"> & {
     lastmsgAt: Date,
-})[]
+})[];
+
+type Friend = {
+    id: string;
+    to: {
+        about: string | null;
+        username: string;
+        avatarurl: string | null;
+    };
+    blocked: boolean;
+    lastmsgAt: Date;
+    connectionId: string;
+    messageFrom: Date;
+}
+
 
 export async function GET(req: NextRequest){
     const token = await getToken({ req });
@@ -41,7 +55,7 @@ export async function GET(req: NextRequest){
 
         let friendships_with_last_dm:DirectMessagesServer = [];
 
-        await Promise.all(resp.map(async(frnd) => {
+        await Promise.all(resp.map(async(frnd:Friend) => {
             try{
                 const message = await prisma.directMessage.findFirst({
                     where: {

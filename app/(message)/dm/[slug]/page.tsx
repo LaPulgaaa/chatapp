@@ -71,7 +71,8 @@ export default function Direct({params}:{params:{slug: string}}){
                 Signal.get_instance().DEREGISTER("ONLINE_CALLBACK");
             }
         }
-    },[session.status,recipient_state.state]);
+        //eslint-disable-next-line react-hooks/exhaustive-deps
+    },[session.status,recipient_state]);
 
 
     function pm_recieve_callback(raw_data: string){
@@ -163,7 +164,7 @@ export default function Direct({params}:{params:{slug: string}}){
                         }
                         {
                             inbox.map((live_dm) => {
-                                return <DmRender dm={live_dm} username={username}/>
+                                return <DmRender key={live_dm.id} dm={live_dm} username={username}/>
                             })
                         }
                     </div>

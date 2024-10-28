@@ -18,7 +18,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-import { user_chat_uuid } from "@/app/home/page";
 import Message from "@/components/Message";
 import type { ChatMessageData } from "@/packages/zod";
 import { room_details_response_schema } from "@/packages/zod";
@@ -99,13 +98,13 @@ export default function Chat({params}:{params:{slug:string}}){
         }
         fetch_messages();
 
-    },[session.status])
+    },[session.status,params.slug,router])
 
     useEffect(()=>{
         if(room_id !== undefined && session.status === "authenticated" )
         {
             //@ts-ignore
-            Signal.get_instance(session.data.username).SUBSCRIBE(params.slug, session.data.id, session.data.username);
+            Signal.get_instance(session.data.username).SUBSCRIBE(room_id, session.data.id, session.data.username);
             Signal.get_instance().REGISTER_CALLBACK("MSG_CALLBACK",recieve_msg);
             Signal.get_instance().REGISTER_CALLBACK("ONLINE_CALLBACK",update_member_online_status);
         }
@@ -120,7 +119,8 @@ export default function Chat({params}:{params:{slug:string}}){
                 Signal.get_instance().DEREGISTER("ONLINE_CALLBACK");
             }
         }
-    },[room_id,user_id])
+        //eslint-disable-next-line react-hooks/exhaustive-deps
+    },[room_id,user_id,session.status])
     function recieve_msg(raw_data: string){
         const data:RecievedMessage = JSON.parse(`${raw_data}`);
         console.log("recieved a message"+data) 
@@ -227,7 +227,7 @@ export default function Chat({params}:{params:{slug:string}}){
 
     }
     async function may_be_leave_room(){
-        const opcode_id=user_chat_uuid.get(params.slug);
+        const opcode_id = rooms.find((room) => room.id === params.slug)?.conn_id
         if(opcode_id===undefined || session.status === "authenticated")
         {
             alert("Could not leave the chat!");
@@ -337,7 +337,7 @@ export default function Chat({params}:{params:{slug:string}}){
 
 }
 
-export function Members({room_id}:{room_id: string}){
+function Members({room_id}:{room_id: string}){
     const ishidden= useRecoilValue(isSidebarHidden);
     const [memberStatus, setMemberStatus] = useRecoilState(member_online_state);
     useEffect(()=>{
@@ -362,7 +362,7 @@ export function Members({room_id}:{room_id: string}){
             }
         }
         fetch_members();
-    },[room_id]);
+    },[room_id,setMemberStatus]);
     return (
         <ScrollArea className={`hidden ${ishidden === true ? "lg:hidden" : "lg:block"} w-[400px]`}>
             <div>

@@ -1,12 +1,12 @@
 'use client'
 
-import { DirectMessageState } from "@/lib/store/atom/dm";
-import { useSession } from "next-auth/react";
 import { useEffect } from "react";
-import { useRecoilRefresher_UNSTABLE } from "recoil";
-import { Signal } from "./signal";
-import { useToast } from "@/hooks/use-toast";
 import assert from "minimalistic-assert";
+import { useSession } from "next-auth/react";
+import { useRecoilRefresher_UNSTABLE } from "recoil";
+import { useToast } from "@/hooks/use-toast";
+import { DirectMessageState } from "@/lib/store/atom/dm";
+import { Signal } from "./signal";
 
 
 export default function Connect(){
@@ -30,7 +30,8 @@ export default function Connect(){
             //@ts-ignore
             Signal.get_instance(session.data.username).REGISTER_CALLBACK("INVITE",recieve_invite_callback);
         }
-    },[session.status])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    },[session.status,session.data])
 
     return(
         <></>

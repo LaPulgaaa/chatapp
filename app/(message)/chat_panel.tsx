@@ -37,7 +37,7 @@ export default function ChatPanel(){
                             {
                                 dms.getValue().map((dm) => {
                                     return(
-                                        <SidebarMenuItem>
+                                        <SidebarMenuItem key={dm.id}>
                                             <SidebarMenuButton asChild>
                                                 <Link href={`/dm/${dm.to.username}`}>
                                                     <span>{dm.to.username}</span>
@@ -60,7 +60,7 @@ export default function ChatPanel(){
                             {
                                 chats.getValue().map((chat) => {
                                     return(
-                                        <SidebarMenuItem>
+                                        <SidebarMenuItem key={chat.id}>
                                             <SidebarMenuButton asChild>
                                                 <Link href={`/chat/${chat.id}`}>
                                                     <span>{chat.name}</span>

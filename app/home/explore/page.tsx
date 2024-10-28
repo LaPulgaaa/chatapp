@@ -38,7 +38,7 @@ export default function Search(){
         else {
             setSearch([]);
         }
-    },[cred])
+    },[cred,session.data,session.status])
     return(
         <div className="flex flex-col my-6 mx-24">
             <div className="flex w-full rounded-md border-2">

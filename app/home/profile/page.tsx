@@ -64,8 +64,8 @@ export default function Profile(){
             setFavs([...loaded_state?.favorite ?? []]);
             setAvatar(loaded_state?.avatarurl ?? "");
         }
-
-    },[user_state.state])
+        //eslint-disable-next-line react-hooks/exhaustive-deps
+    },[user_state.state,user_state.contents])
 
     useEffect(()=>{
         if(user_state.state === "hasValue" &&
@@ -73,7 +73,8 @@ export default function Profile(){
         ){
             setFavsDirty(false);
         }
-    },[favs]);
+        //eslint-disable-next-line react-hooks/exhaustive-deps
+    },[favs,user_state.state]);
 
     async function onSubmit(form_data: FormValue){
         try{
@@ -179,9 +180,9 @@ export default function Profile(){
                         <div className="flex flex-col space-y-2">
                         <div>
                             {
-                                favs.map((fav)=>{
+                                favs.map((fav,_index)=>{
                                     return(
-                                        <Badge className="m-1">{fav}</Badge>
+                                        <Badge key={_index} className="m-1">{fav}</Badge>
                                     )
                                 })
                             }

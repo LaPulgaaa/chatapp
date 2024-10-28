@@ -12,8 +12,8 @@ export default function ProfileDialog({profile_info}: {profile_info: DmProfileIn
                 </h4>
                 <div className="space-x-2">
                 {
-                    profile_info.favorite.map((fav) => {
-                        return <Badge>{fav}</Badge>
+                    profile_info.favorite.map((fav,_index) => {
+                        return <Badge key={_index}>{fav}</Badge>
                     })
                 }
                 </div>

@@ -2,6 +2,26 @@ import { prisma } from "@/packages/prisma/prisma_client";
 import { getToken } from "next-auth/jwt";
 import { NextRequest } from "next/server";
 
+type Room = {
+    id: string;
+    chat: {
+        messages: {
+            content: string;
+            createdAt: Date;
+            sender: {
+                username: string;
+            };
+        }[];
+    } & {
+        id: string;
+        name: string;
+        discription: string;
+        createdAt: Date;
+        lastmsgAt: Date;
+        deleted: boolean;
+    };
+};
+
 export async function GET(req:NextRequest){
     const token = await getToken({req})
 
@@ -43,7 +63,7 @@ export async function GET(req:NextRequest){
                 id: true
             }
         })
-        let raw_data = message_subscribed_rooms.map((room)=>{
+        let raw_data = message_subscribed_rooms.map((room: Room)=>{
             return {...room.chat,conn_id: room.id};
         });
 

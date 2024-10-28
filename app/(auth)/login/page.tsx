@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import { useSession } from "next-auth/react";
 
-export default function login(){
+export default function Login(){
     const session = useSession();
     const [username,setUsername]=useState("");
     const [password,setPassword]=useState("");
@@ -19,7 +19,7 @@ export default function login(){
     useEffect(()=>{
       if(session.status === "authenticated")
         router.push("/home");
-    },[])
+    },[router,session.status])
 
   async function joinRoom(){
     try{
@@ -91,7 +91,7 @@ return(
           
         </Card>
         
-        <Button variant={"link"} onClick={()=>router.push("/signup")}>Don't have an account ?</Button>
+        <Button variant={"link"} onClick={()=>router.push("/signup")}>Don`&apos;`t have an account ?</Button>
       </div>
     </div>
   )
