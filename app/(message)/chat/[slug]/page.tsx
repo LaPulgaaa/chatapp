@@ -10,7 +10,7 @@ import Inbox from "@/components/Inbox";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useRecoilValue, useRecoilState} from "recoil";
+import { useRecoilValue, useRecoilState, useRecoilValueLoadable} from "recoil";
 import { useRouter } from "next/navigation";
 import { ChevronLeftIcon, ChevronRightIcon, ListEndIcon, SendHorizonal } from "lucide-react";
 import { DarkLight } from "@/components/DarkLight";
@@ -28,6 +28,7 @@ import { room_member_details_schema } from "@/packages/zod";
 import { isSidebarHidden } from "@/lib/store/atom/sidebar";
 import { member_online_state } from "@/lib/store/atom/status";
 import { useToast } from "@/hooks/use-toast";
+import { fetch_user_chats } from "@/lib/store/selector/fetch_chats";
 
 export type RecievedMessage={
     type:string,
@@ -62,6 +63,13 @@ export default function Chat({params}:{params:{slug:string}}){
     //@ts-ignore
     const user_id = session.data?.id;
     const [memberStatus,setMemberStatus] = useRecoilState(member_online_state);
+    const roomsStateData = useRecoilValueLoadable(fetch_user_chats);
+
+    useEffect(()=>{
+        if(roomsStateData.state === "hasValue" && roomsStateData.getValue()){
+            const all_rooms_data = roomsStateData.getValue()
+        }
+    },[roomsStateData.state])
     
     useEffect(()=>{
         async function fetch_messages(){
@@ -257,8 +265,8 @@ export default function Chat({params}:{params:{slug:string}}){
         return <Inbox key={message.id} data={message}/>
     })
 
-    return <div className="h-full pb-24">
-            <div className="flex justify-between mt-2 mx-2">
+    return <div className="h-svh w-full pb-24">
+            <div className="flex justify-between mt-2 mx-1">
                 {
                     room_details && (
                         <>
@@ -306,9 +314,9 @@ export default function Chat({params}:{params:{slug:string}}){
                                
             </div>
             
-            <div className="mx-4 mt-4 h-full flex">
+            <div className="mt-2 h-[100%] flex w-full">
                 <ScrollArea id="chatbox"
-                className="flex flex-col h-full rounded-md border w-full">
+                className="flex flex-col w-full h-full rounded-md border m-2">
                     <div className="mb-16" ref={chat_ref}>
                         <div>{InboxComponent}</div>
                         <div>{realtimechat}</div>
