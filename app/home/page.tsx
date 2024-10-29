@@ -143,7 +143,7 @@ const RoomTabs = memo(
                             </div>
 
                             {
-                                convo.messages.length > 0 ? <div className="border-l-2 pl-6 italic text-muted-foreground flex">
+                                convo.messages?.length > 0 ? <div className="border-l-2 pl-6 italic text-muted-foreground flex">
                                 {
                                     convo.messages[0]?.sender.username !== username && <p>{convo.messages[0]?.sender.username}: </p>
                                 }
