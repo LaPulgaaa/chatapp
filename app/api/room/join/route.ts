@@ -44,7 +44,7 @@ export async function POST(req: NextRequest){
             
             return Response.json({
                 msg:"Joined new room",
-                raw_data:{...room, conn_id: directory.id, messages: []},
+                raw_data:{...room, conn_id: room_opcode.id, messages: []},
                 raw_opcode:room_opcode,
                 directory_id:directory.id
             }, { status: 200 })
