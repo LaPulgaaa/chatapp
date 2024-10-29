@@ -51,9 +51,6 @@ export async function GET(req:NextRequest,
                         }
                     }
                 },
-                name: true,
-                discription: true,
-                createdAt: true,
             }
         });
         if(data!==null)

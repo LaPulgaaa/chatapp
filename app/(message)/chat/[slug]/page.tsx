@@ -29,6 +29,7 @@ import { isSidebarHidden } from "@/lib/store/atom/sidebar";
 import { member_online_state } from "@/lib/store/atom/status";
 import { useToast } from "@/hooks/use-toast";
 import { fetch_user_chats } from "@/lib/store/selector/fetch_chats";
+import assert from "minimalistic-assert";
 
 export type RecievedMessage={
     type:string,
@@ -67,8 +68,17 @@ export default function Chat({params}:{params:{slug:string}}){
 
     useEffect(()=>{
         if(roomsStateData.state === "hasValue" && roomsStateData.getValue()){
-            const all_rooms_data = roomsStateData.getValue()
+            const all_rooms_data = roomsStateData.getValue();
+            const narrowed_room = all_rooms_data.find((room) => room.id === params.slug);
+            assert(narrowed_room !== undefined);
+
+            setRoomDetails({
+                name: narrowed_room.name,
+                discription: narrowed_room.discription,
+                createdAt: narrowed_room.createdAt,
+            });
         }
+    //eslint-disable-next-line react-hooks/exhaustive-deps
     },[roomsStateData.state])
     
     useEffect(()=>{
@@ -89,13 +99,6 @@ export default function Chat({params}:{params:{slug:string}}){
                 setMessages({
                     messages: data.messages
                 });
-
-                setRoomDetails({
-                    name: data.name,
-                    discription: data.discription,
-                    createdAt: data.createdAt,
-                })
-                
                
             }catch(err)
             {
@@ -256,15 +259,6 @@ export default function Chat({params}:{params:{slug:string}}){
         }
     }
 
-    if(messages===undefined)
-    {
-        return <div>Loading....</div>
-    }
-
-    const InboxComponent=messages.messages.map((message)=>{
-        return <Inbox key={message.id} data={message}/>
-    })
-
     return <div className="h-svh w-full pb-24">
             <div className="flex justify-between mt-2 mx-1">
                 {
@@ -318,7 +312,13 @@ export default function Chat({params}:{params:{slug:string}}){
                 <ScrollArea id="chatbox"
                 className="flex flex-col w-full h-full rounded-md border m-2">
                     <div className="mb-16" ref={chat_ref}>
-                        <div>{InboxComponent}</div>
+                        <div>
+                        {
+                            messages ? messages.messages.map((message)=>{
+                            return <Inbox key={message.id} data={message}/>
+                            }) : <div className="flex flex-col items-center justify-center mt-4">Loading...</div>
+                        }
+                        </div>
                         <div>{realtimechat}</div>
                     </div>
                     <div className="absolute bottom-0 w-full mb-3 flex">
