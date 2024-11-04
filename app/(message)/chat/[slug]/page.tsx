@@ -140,7 +140,7 @@ export default function Chat({params}:{params:{slug:string}}){
             }
         }
         //eslint-disable-next-line react-hooks/exhaustive-deps
-    },[room_id,user_id,session.status])
+    },[session.status])
     function recieve_msg(raw_data: string){
         const data:RecievedMessage = JSON.parse(`${raw_data}`);
         console.log("recieved a message"+data) 
