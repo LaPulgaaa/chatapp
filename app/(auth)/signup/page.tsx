@@ -1,6 +1,6 @@
 'use client'
 
-import { TypeOf, z } from "zod";
+import { z } from "zod";
 
 import {zodResolver} from '@hookform/resolvers/zod'
 import { Button } from "@/components/ui/button";
@@ -8,13 +8,13 @@ import { Card,CardTitle,CardContent,CardHeader, CardDescription, CardFooter } fr
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { user_signup_form_schema } from "@/packages/zod";
-import { Join } from '@/packages/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import { signIn } from "next-auth/react";
-import { GithubIcon } from "lucide-react";
 import { GitHubLogoIcon } from "@radix-ui/react-icons";
+import { create_user } from "./actions";
+import { toast } from "@/hooks/use-toast";
 
 type FormValue = z.output<typeof user_signup_form_schema>
 
@@ -33,24 +33,33 @@ export default function Signup(){
 
     async function onSubmit(values:FormValue){
         try{
-            const resp=await fetch("http://localhost:3001/user/signup",{
-              method:"POST",
-              body:JSON.stringify(values),
-              headers:{
-                'Content-Type':"application/json"
-              },
-              credentials:"include"
-            })
+            const user = await create_user(values);
 
-            if(resp.status==201)
+            if(user !== undefined)
             {
-              router.push("/home");
-              window.localStorage.setItem("token","valid");
+              const creds = {
+                email: user.email,
+                password: user.password,
+              };
+              const resp = await signIn<"credentials">("credentials",{
+                ...creds,
+                redirect: false,
+              });
+
+              if(resp?.ok){
+                router.push('/home');
+                window.localStorage.setItem("token","valid");
+              }
+              else{
+                form.setError("root",{ message: "Could not create user" });
+              }
             }
-
-            if(resp.status == 403)
-            {
-              alert("User with same username and password exists!");
+            else{
+              toast({
+                title: "Could not create user",
+                variant: "destructive",
+                description: "Please try again!!"
+              })
             }
 
         }catch(err)
@@ -120,8 +129,7 @@ export default function Signup(){
             )}
             />
         </CardContent>
-        </form>
-          <CardFooter className=''>
+        <CardFooter className=''>
             <Button 
             disabled = {
               !isDirty || 
@@ -129,7 +137,8 @@ export default function Signup(){
               isSubmitting
             }
             type='submit' className="w-full mx-4">Sign up</Button>
-          </CardFooter>
+        </CardFooter>
+        </form>
         </Form>
         </div>
         <div className="mx-10 mb-4">

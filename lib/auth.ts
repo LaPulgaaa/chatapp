@@ -1,9 +1,53 @@
 import GithubProvider from "next-auth/providers/github";
+import CredentialProvider from 'next-auth/providers/credentials';
 import type { NextAuthOptions, SessionStrategy  } from "next-auth";
 import { prisma } from "@/packages/prisma/prisma_client";
 
 export const NEXTAUTH_CONFIG:NextAuthOptions = {
     providers: [
+        CredentialProvider({
+            id: "credentials",
+            name: "chat",
+            type: "credentials",
+            credentials: {
+                email: { label: "Email", type: "email", placeholder: 'johndoe123@gmail'},
+                password: { label: "Password", type: "password", placeholder: "your super secret password"}
+            },
+            async authorize(credentials){
+                if(!credentials)
+                {
+                    throw new Error("Credentials not available");
+                }
+
+                const existing_user = await prisma.member.findUnique({
+                    where: {
+                        email: credentials.email
+                    },
+                    select:{
+                        id: true,
+                        username: true,
+                        avatarurl: true,
+                        name: true,
+                        email: true,
+                        password: true,
+                    }
+                });
+
+                if(existing_user === null)
+                {
+                    throw new Error("User not found");
+                }
+
+                if(existing_user.password !== credentials.password){
+                    throw new Error("Incorrect passwords");
+                }
+
+
+                return {
+                    ...existing_user,
+                }
+            }
+        }),
         GithubProvider({
             clientId: process.env.GITHUB_ID!,
             clientSecret: process.env.GITHUB_SECRET!,
@@ -19,7 +63,7 @@ export const NEXTAUTH_CONFIG:NextAuthOptions = {
             }
             if(params.token.sub){
 
-                if(params.trigger === "signIn")
+                if(params.trigger === "signIn" || params.trigger === "update")
                 {
                         const user = await prisma.member.findUnique({
                             where:{
