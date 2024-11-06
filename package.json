@@ -12,8 +12,7 @@
     "dev:combined": "npm run dev & npx next dev",
     "prisma:migrate": "npx prisma migrate dev --schema=./packages/prisma/schema.prisma",
     "prisma:generate": "npx prisma generate --schema=./packages/prisma/schema.prisma",
-    "dev:docker": "npm run prisma:generate && npm run prisma:migrate & npx next dev",
-    "postinstall": "prisma generate --schema=./packages/prisma/schema.prisma"
+    "dev:docker": "npm run prisma:generate && npm run prisma:migrate & npx next dev"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.4.2",
