@@ -169,7 +169,7 @@ export class Signal{
     }
 
     private send_heartbeats(){
-        setTimeout(()=>{
+        setInterval(()=>{
             const message = JSON.stringify({
                 type: "lubb",
                 payload: {
@@ -178,7 +178,8 @@ export class Signal{
             });
             if(this.initialised == true)
             this.ws.send(message);
-            this.send_heartbeats();
+            else
+            Signal.get_instance(this.username).handle_send(message);
         },10000)
     }
 }
