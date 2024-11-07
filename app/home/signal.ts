@@ -37,7 +37,8 @@ export class Signal{
             this.buffered_messages.map(({message})=>{
                 this.ws.send(message);
             })
-            console.log("connection made with the server")
+            console.log("connection made with the server");
+            this.send_heartbeats();
         }
 
         this.ws.onmessage = (event) => {
@@ -51,9 +52,12 @@ export class Signal{
         }
 
         this.ws.onclose = () =>{
+            //@ts-ignore
+            delete Signal.instance;
+            this.initialised = false;
             setTimeout(()=>{
+                Signal.get_instance(this.username);
                 this.backoff_interval += 1000;
-                this.init_ws();
             },this.backoff_interval)
         }
 
@@ -162,5 +166,19 @@ export class Signal{
         }
 
         this.ws.send(msg);
+    }
+
+    private send_heartbeats(){
+        setTimeout(()=>{
+            const message = JSON.stringify({
+                type: "lubb",
+                payload: {
+                    stamp: Date.now()
+                }
+            });
+            if(this.initialised == true)
+            this.ws.send(message);
+            this.send_heartbeats();
+        },10000)
     }
 }

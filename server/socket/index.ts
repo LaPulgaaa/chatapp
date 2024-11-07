@@ -20,9 +20,17 @@ export async function ws(wss:WebSocketServer){
 
         const wsId=count++;
         console.log("connection made")
-        
+
         ws.on("message",async(message:string)=>{
             const data=JSON.parse(`${message}`);
+            if(data.type === "lubb"){
+                ws.send(JSON.stringify({
+                    type: "dubb",
+                    payload:{
+                        stamp: Date.now(),
+                    }
+                }));
+            }
             if(data.type==="join")
             {
                 const msg_data = JSON.stringify(
