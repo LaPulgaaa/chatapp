@@ -5,7 +5,7 @@ import type { WorkerPayload } from "../../packages/zod";
 import { prisma } from "../../packages/prisma/prisma_client";
 
 
-const client=createClient();
+const client=createClient({ url: "redis://redis:6379" });
 
 export async function start_worker(){
     console.log("start redis worker")

@@ -5,12 +5,15 @@ services:
       context: .
       dockerfile: Dockerfile
     image: chat
+    depends_on:
+      - redis
     restart: unless-stopped
     container_name: chat_app
     ports:
-      - 3000:3000
+      - 3001:3001
     environment:
       - DATABASE_URL=postgres://postgres:mysecretpassword@mypostgres:5432/postgres
+      - REDIS_URL=redis://redis:6379
   
   postgres:
     image: postgres:15-alpine

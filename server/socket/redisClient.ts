@@ -17,9 +17,9 @@ export class RedisSubscriptionManager{
     }>;
 
     private constructor(){
-        this.subscriber=createClient();
+        this.subscriber=createClient({url: "redis://redis:6379"});
         this.subscriber.connect();
-        this.publisher=createClient();
+        this.publisher=createClient({url: "redis://redis:6379"});
         this.publisher.connect();
         this.subscription=new Map<string,string[]>();
         this.reverseSubscription=new Map<string,{
