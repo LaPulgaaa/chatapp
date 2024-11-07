@@ -13,14 +13,15 @@ RUN echo "$(node -v)"
 RUN echo "$(npm -v)"
 RUN npm install 
 
+RUN mkdir -p ./packages/prisma 
 COPY ./packages/prisma/schema.prisma ./packages/prisma
-
-WORKDIR /usr/src/app
 
 COPY . .
 
 # express server port: 3001
 EXPOSE 3001
+
+RUN ["npm","run","prisma:generate"]
 
 RUN npm run build
 
