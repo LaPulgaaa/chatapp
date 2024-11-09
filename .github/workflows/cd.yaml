@@ -2,7 +2,7 @@ name: Docker-CD pipeline
 on: 
   push:
     branches:
-      - master
+      - docker
 
 concurrency: 
   group: "${{ github.workflow }}-${{ github.head_ref || github.run_id }}"
