@@ -4,7 +4,7 @@ import { createClient } from 'redis';
 import { prisma } from '../../packages/prisma/prisma_client';
 import { createId } from '@paralleldrive/cuid2';
 
-const client=createClient({url: "redis://redis:6379"});
+const client=createClient({url: process.env.REDIS_URL});
 
 const users:{
     [wsId:string]:{
