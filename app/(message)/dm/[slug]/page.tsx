@@ -2,7 +2,7 @@
 
 import assert from "minimalistic-assert";
 import Link from "next/link";
-import React,{ useState, useEffect } from "react";
+import React,{ useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { SendHorizonal, ChevronLeft } from "lucide-react";
@@ -23,6 +23,7 @@ import ProfileDialog from "../profile_dialog";
 
 
 export default function Direct({params}:{params:{slug: string}}){
+    const dm_ref = useRef<HTMLDivElement>(null);
     const [compose,setCompose] = useState<string>("");
     const [disable,setDisable] = useState<boolean>(true);
     const router = useRouter();
@@ -41,6 +42,36 @@ export default function Direct({params}:{params:{slug: string}}){
             setDisable(false);
         }
     },[compose])
+
+    useEffect(()=>{
+        const chat_node = dm_ref.current;
+        if(chat_node!==null)
+        {
+            const chat_history_comps = chat_node.querySelectorAll("#history");
+            if(chat_history_comps.length < 1)
+                return;
+            const last_comp_idx = chat_history_comps.length - 1;
+            chat_history_comps[last_comp_idx].scrollIntoView({
+                behavior: "instant",
+                inline: "center"
+            })
+        }
+    },[history,sweeped])
+
+    useEffect(()=>{
+        const chat_node = dm_ref.current;
+        if(chat_node!==null)
+        {
+            const recent_msg_comps = chat_node.querySelectorAll("#recent");
+            if(recent_msg_comps.length < 1)
+                return;
+            const last_recent_idx = recent_msg_comps.length - 1;
+            recent_msg_comps[last_recent_idx].scrollIntoView({
+                behavior: "smooth",
+                inline: "center"
+            })
+        }
+    },[inbox])
 
     useEffect(()=>{
         if(
@@ -189,7 +220,7 @@ export default function Direct({params}:{params:{slug: string}}){
                 </div>
                 <ScrollArea id="chatbox"
                     className="flex flex-col h-full rounded-md border m-2">
-                    <div className="mb-16">
+                    <div className="mb-16" ref={dm_ref}>
                         {
                             data.is_friend && 
                             <DirectMessageHistory 
@@ -198,7 +229,7 @@ export default function Direct({params}:{params:{slug: string}}){
                         }
                         {
                             inbox.map((live_dm) => {
-                                return <DmRender key={live_dm.id} dm={live_dm} username={username}/>
+                                return <DmRender id="recent" key={live_dm.id} dm={live_dm} username={username}/>
                             })
                         }
                     </div>

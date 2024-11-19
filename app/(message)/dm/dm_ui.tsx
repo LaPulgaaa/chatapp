@@ -14,13 +14,13 @@ export type UnitDM = {
     };
 };
 
-export default function DmRender({dm, username}:{dm: UnitDM, username: string}){
+export default function DmRender({dm, username,id }:{dm: UnitDM, username: string,id: string}){
     function create_timestamp(createdAt:string){
         const time =  (new Date(createdAt).toTimeString().split(" ")[0]).split(":").slice(0,-1);
         return `${time[0]}:${time[1]}`;
     }
     return(
-        <div key={dm.id}>
+        <div key={dm.id} id={id}>
         {
             dm.sendBy.username !== username ? 
             <div className="flex m-2">

@@ -11,7 +11,7 @@ export default function DirectMessageHistory(
             {
                 dms.map((dm)=>{
                     return(
-                        <DmRender key={dm.id} dm={dm} username={username}/>
+                        <DmRender id="history" key={dm.id} dm={dm} username={username}/>
                     )
                 })
             }
