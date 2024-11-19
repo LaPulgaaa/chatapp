@@ -1,10 +1,3 @@
-
-import { 
-    Avatar,
-    AvatarImage,
-    AvatarFallback
-} from "@/components/ui/avatar";
-
 export type UnitDM = {
     id: number;
     content: string;

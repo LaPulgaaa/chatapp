@@ -1,10 +1,8 @@
 'use client'
 
 import assert from "minimalistic-assert";
-import Link from "next/link";
 import React,{ useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { SendHorizonal, ChevronLeft } from "lucide-react";
 import { useRecoilValueLoadable } from "recoil";
 
@@ -26,7 +24,6 @@ export default function Direct({params}:{params:{slug: string}}){
     const dm_ref = useRef<HTMLDivElement>(null);
     const [compose,setCompose] = useState<string>("");
     const [disable,setDisable] = useState<boolean>(true);
-    const router = useRouter();
     const session = useSession();
     const recipient_state = useRecoilValueLoadable(get_friend_by_username({username: params.slug}));
     const [inbox,setInbox] = useState<UnitDM[]>([]);
