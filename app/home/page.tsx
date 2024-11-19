@@ -2,14 +2,12 @@
 
 import { memo } from "react";
 
-import { useRecoilState} from "recoil";
-import { useEffect } from "react";
-import { private_chats_schema, user_chats_response_schema } from "@/packages/zod";
-import { UserStateChats } from "@/lib/store/atom/chats";
+import { useRecoilValueLoadable} from "recoil";
 import { useRouter } from "next/navigation";
 import type { ChatReponse, PrivateChats } from "@/packages/zod";
 import { useSession } from "next-auth/react";
-import { DirectMessageState } from "@/lib/store/atom/dm";
+import { fetch_user_chats } from "@/lib/store/selector/fetch_chats";
+import { fetch_dms } from "@/lib/store/selector/fetch_dms";
 
 function get_last_msg_time(lastmsgAt: string): string {
 
@@ -48,55 +46,10 @@ function get_last_msg_time(lastmsgAt: string): string {
 
 export default function Home(){
     const session = useSession();
-    const [rooms,setRooms]=useRecoilState(UserStateChats);
-    const [dms, setDms] = useRecoilState(DirectMessageState);
+    const roomsStateData = useRecoilValueLoadable(fetch_user_chats);
+    const dmStateData = useRecoilValueLoadable(fetch_dms);
     //@ts-ignore
     const id: string | undefined = session.data?.id;
-
-    useEffect(()=>{
-        if(!id){
-            return;
-        }
-        async function get_user_chats(){
-            try{
-                const resp=await fetch(`/api/room`,{
-                    next: {
-                        revalidate: 60,
-                        tags: ['rooms']
-                    },
-                    cache: "no-cache"
-                });
-
-                const {raw_data}=await resp.json();
-                if(Array.isArray(raw_data) && raw_data.length>0)
-                {
-                    const data = user_chats_response_schema.parse(raw_data);
-                    console.log(data);
-                    setRooms(data);
-                }
-                
-            }catch(err)
-            {
-                console.log(err);
-            }
-        }
-        get_user_chats();
-
-        async function get_dms(){
-            try{
-                const resp = await fetch('/api/friend');
-                const { raw_data } = await resp.json();
-                const data = private_chats_schema.parse(raw_data);
-                setDms(data);
-            }catch(err){
-                console.log(err);
-            }
-        }
-
-        get_dms();
-
-        //eslint-disable-next-line react-hooks/exhaustive-deps
-    },[id])
 
     return(
         <div className="lg:col-span-4 mr-4 ml-2 pt-2">
@@ -104,8 +57,13 @@ export default function Home(){
                     <h4 className="scroll-m-20 p-2 text-2xl font-semibold tracking-tigh">
                         Catch up on missed chats!
                     </h4>
-                    {/* @ts-ignore */}
-                    <RoomTabs rooms={rooms} dms={dms} username={session.data.username}/>
+                    
+                    {
+                        roomsStateData.state === "hasValue" &&
+                        dmStateData.state === "hasValue" && 
+                        //@ts-ignore
+                        <RoomTabs rooms={roomsStateData.getValue()!} dms={dmStateData.getValue()!} username={session.data.username}/>
+                    }
                 </div> : <div>Loading</div>
             }
         </div>
