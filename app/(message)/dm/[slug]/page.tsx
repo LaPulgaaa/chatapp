@@ -1,6 +1,7 @@
 'use client'
 
 import assert from "minimalistic-assert";
+import Link from "next/link";
 import React,{ useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { SendHorizonal } from "lucide-react";
