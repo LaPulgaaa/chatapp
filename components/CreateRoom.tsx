@@ -1,7 +1,7 @@
 'use client'
 
 import { useSession } from "next-auth/react";
-import { useRecoilState } from "recoil";
+import { useRecoilRefresher_UNSTABLE } from "recoil";
 
 import { useForm } from "react-hook-form";
 import { Button } from "./ui/button";
@@ -19,13 +19,13 @@ import { Form,FormControl,FormField,FormLabel,FormItem,FormMessage } from "./ui/
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 
-import { UserStateChats } from "@/lib/store/atom/chats";
 import { Signal } from "@/app/home/signal";
 import { RoomType, create_room_schema } from "@/packages/zod";
+import { fetch_user_chats } from "@/lib/store/selector/fetch_chats";
 
 export default function CreateRoom(){
     const session = useSession();
-    const [rooms,setRooms]=useRecoilState(UserStateChats)
+    const refresh_chats = useRecoilRefresher_UNSTABLE(fetch_user_chats);
     const form=useForm<RoomType>({
         resolver:zodResolver(create_room_schema),
         defaultValues:{
@@ -57,7 +57,7 @@ export default function CreateRoom(){
                     const {created_chat}=await resp.json();
                     //@ts-ignore
                     Signal.get_instance().ADD_ROOM(session.data.id!,created_chat.id);
-                    setRooms([created_chat,...rooms]);
+                    refresh_chats();
                 }
             }catch(err)
             {
