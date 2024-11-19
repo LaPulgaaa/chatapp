@@ -59,13 +59,10 @@ export default function Home(){
                     </h4>
                     
                     {
-                        (
-                            roomsStateData.state === "hasValue" &&
-                            dmStateData.state === "hasValue"
-                        ) ?
+                        roomsStateData.state === "hasValue" &&
+                        dmStateData.state === "hasValue" && 
                         //@ts-ignore
-                        <RoomTabs rooms={roomsStateData.getValue()!} dms={dmStateData.getValue()!} username={session.data.username}/> :
-                        <div>Loading chats....</div>
+                        <RoomTabs rooms={roomsStateData.getValue()!} dms={dmStateData.getValue()!} username={session.data.username}/>
                     }
                 </div> : <div>Loading</div>
             }
