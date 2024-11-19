@@ -88,10 +88,11 @@ export async function ws(wss:WebSocketServer){
                 const userId = data.payload.userId;
                 const inviteeId = data.payload.inviteeId;
                 const content = data.payload.content;
+                const createdAt = new Date().toISOString();
                 let conc_id = createId();
                 try{
                     
-                    const resp = await prisma.$transaction(async(tx) => {
+                    await prisma.$transaction(async(tx) => {
                         const from_link = await tx.friendShip.create({
                             data: {
                                 fromId: userId,
@@ -121,20 +122,43 @@ export async function ws(wss:WebSocketServer){
                         return from_link.id;
                     });
 
+                    RedisSubscriptionManager.get_instance().subscribe(ws,conc_id,wsId.toString(),userId);
+
+                    const maybe_invitee_online = Object.entries(users).find(([_,user]) => user.userId === inviteeId);
+
+                    if(maybe_invitee_online !== undefined){
+                        const [inviteeWsId, user_details ] = maybe_invitee_online;
+                        RedisSubscriptionManager.get_instance()
+                        .subscribe(user_details.ws,conc_id,inviteeWsId,user_details.userId);
+
+                        user_details.ws.send(JSON.stringify({
+                            type: "INVITE",
+                            data: JSON.stringify({
+                                payload: {
+                                    requestBy: userId,
+                                    content,
+                                }
+                            })
+                        }));
+                    }
+
+                    const msg_data = JSON.stringify({
+                        type:"message",
+                        payload:{
+                            roomId: conc_id,
+                            message: {
+                                content,
+                                user: userId,
+                            },
+                            createdAt,
+                        }
+                    });
+
+                    RedisSubscriptionManager.get_instance().addChatMessage(conc_id,"MSG_CALLBACK",msg_data)
+
                 }catch(err){
                     console.log(err);
                     return;
-                }
-
-                const maybe_invitee_online = Object.values(users).find((user) => user.userId === inviteeId);
-
-                if(maybe_invitee_online !== undefined){
-                    maybe_invitee_online.ws.send(JSON.stringify({
-                        type: "invite",
-                        payload: {
-                            requestBy: userId
-                        }
-                    }));
                 }
             }
 

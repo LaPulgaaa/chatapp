@@ -29,6 +29,8 @@ export default function Direct({params}:{params:{slug: string}}){
     const session = useSession();
     const recipient_state = useRecoilValueLoadable(get_friend_by_username({username: params.slug}));
     const [inbox,setInbox] = useState<UnitDM[]>([]);
+    const [history,setHistory] = useState<UnitDM[]>([]);
+    const [sweeped,setSweeped] = useState<UnitDM[]>([]);
     const [active, setActive] = useState<boolean>(false);
 
     useEffect(()=>{
@@ -46,16 +48,48 @@ export default function Direct({params}:{params:{slug: string}}){
         recipient_state.state === "hasValue" && 
         recipient_state.getValue() !== undefined && 
         recipient_state.getValue()!.is_friend === true
-    ){
+        ){
             //@ts-ignore
             const username = session.data.username;
             //@ts-ignore
             const user_id = session.data.id;
+            const conc_id = recipient_state.getValue()!.friendship_data!.connectionId;
             setActive(recipient_state.getValue()!.friendship_data!.is_active);
-            Signal.get_instance(username).SUBSCRIBE(recipient_state.getValue()!.friendship_data!.connectionId,user_id,username);
-            Signal.get_instance().REGISTER_CALLBACK("MSG_CALLBACK",pm_recieve_callback);
-            Signal.get_instance().REGISTER_CALLBACK("ONLINE_CALLBACK",update_member_online_status);
+            setHistory(recipient_state.getValue()!.friendship_data!.messages);
+            Signal.get_instance(username).SUBSCRIBE(conc_id,user_id,username);
+            
         }
+        Signal.get_instance().REGISTER_CALLBACK("MSG_CALLBACK",pm_recieve_callback);
+        Signal.get_instance().REGISTER_CALLBACK("ONLINE_CALLBACK",update_member_online_status);
+
+        async function sweep_lastest_dms(){
+            if(
+                session.status === "authenticated" && 
+                recipient_state.state === "hasValue" && 
+                recipient_state.getValue() !== undefined
+            )
+            {
+                try{
+                    const friendship_data = recipient_state.getValue()!.friendship_data!;
+                    const conc_id = friendship_data.connectionId;
+                    const last_msg = friendship_data.messages.slice(-1)
+                    if(last_msg.length > 0){
+                        const resp = await fetch(`/api/message/dm/${conc_id}`,{
+                            method: 'POST',
+                            body: JSON.stringify({
+                                last_msg_id: last_msg[0].id,
+                            })
+                        });
+                        const { data }:{ data: UnitDM[]} = await resp.json();
+                        setSweeped(data);
+                    }
+                }catch(err){
+                    console.log(err);
+                }
+            }
+        }
+
+        sweep_lastest_dms();
 
         return () => {
             if(
@@ -67,9 +101,9 @@ export default function Direct({params}:{params:{slug: string}}){
                 //@ts-ignore
                 const username = session.data.username;
                 Signal.get_instance(username).UNSUBSCRIBE(recipient_state.getValue()!.friendship_data!.connectionId,username);
-                Signal.get_instance().DEREGISTER("MSG_CALLBACK");
-                Signal.get_instance().DEREGISTER("ONLINE_CALLBACK");
             }
+            Signal.get_instance().DEREGISTER("MSG_CALLBACK");
+            Signal.get_instance().DEREGISTER("ONLINE_CALLBACK");
         }
         //eslint-disable-next-line react-hooks/exhaustive-deps
     },[session.status,recipient_state]);
@@ -127,9 +161,9 @@ export default function Direct({params}:{params:{slug: string}}){
                     friendshipId: data!.friendship_data.id,
                 }
             }
-            setCompose("");
             Signal.get_instance().SEND(JSON.stringify(broadcast_data));
         }
+        setCompose("");
     }
     
     return (
@@ -159,7 +193,7 @@ export default function Direct({params}:{params:{slug: string}}){
                         {
                             data.is_friend && 
                             <DirectMessageHistory 
-                            dms={ data.friendship_data.messages } 
+                            dms={ [...history,...sweeped] } 
                             username={username}/>
                         }
                         {

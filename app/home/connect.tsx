@@ -1,28 +1,31 @@
 'use client'
 
 import { useEffect } from "react";
-import assert from "minimalistic-assert";
 import { useSession } from "next-auth/react";
 import { useRecoilRefresher_UNSTABLE } from "recoil";
 import { useToast } from "@/hooks/use-toast";
 import { DirectMessageState } from "@/lib/store/atom/dm";
 import { Signal } from "./signal";
+import { usePathname,useRouter } from "next/navigation";
 
 
 export default function Connect(){
     const session = useSession();
     const { toast } = useToast();
     const refresh_dms = useRecoilRefresher_UNSTABLE(DirectMessageState);
+    const pathname = usePathname();
+    const router = useRouter();
 
     function recieve_invite_callback(raw_data: string){
         const data = JSON.parse(raw_data);
         toast({
-            title: "Invited"
+            title: data.payload.requestBy,
+            description: data.payload.content,
         });
         refresh_dms();
-        assert(session.status === "authenticated");
-        //@ts-ignore
-        Signal.get_instance().ADD_ROOM(session.data.username, data.connection_id);
+        if(pathname === "/home"){
+            router.refresh();
+        }
     }
     
     useEffect(()=>{
