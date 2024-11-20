@@ -53,7 +53,7 @@ export const user_chat_schema = z.object({
     discription:z.string(),
     id:z.string(),
     name:z.string(),
-    conn_id: z.string(),
+    conn_id: z.number(),
     messages: z.array(z.object({
         content: z.string(),
         sender: z.object({
@@ -72,7 +72,7 @@ export const unit_message_schema= z.object({
     content:z.string(),
     createdAt:z.string(),
     deleted:z.boolean(),
-    id:z.string(),
+    id:z.number(),
     memberId:z.string(),
     sender:z.object({
         username:z.string(),
