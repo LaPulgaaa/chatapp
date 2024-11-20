@@ -80,8 +80,10 @@ export const unit_message_schema= z.object({
     })
 })
 
+export const chat_messages_schema = z.array(unit_message_schema);
+
 export const chat_messages_response_schema=z.object({
-    messages:z.array(unit_message_schema)
+    messages: chat_messages_schema,
 });
 
 export const room_details_response_schema = chat_messages_response_schema;
