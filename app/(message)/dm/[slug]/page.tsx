@@ -102,7 +102,7 @@ export default function Direct({params}:{params:{slug: string}}){
                     const conc_id = friendship_data.connectionId;
                     const last_msg = friendship_data.messages.slice(-1)
                     if(last_msg.length > 0){
-                        const resp = await fetch(`/api/message/dm/${conc_id}`,{
+                        const resp = await fetch(`/api/message/dm/sweep/${conc_id}`,{
                             method: 'POST',
                             body: JSON.stringify({
                                 last_msg_id: last_msg[0].id,

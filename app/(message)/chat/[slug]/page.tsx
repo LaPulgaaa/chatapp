@@ -20,16 +20,16 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import Message from "@/components/Message";
 import type { ChatMessageData } from "@/packages/zod";
-import { room_details_response_schema } from "@/packages/zod";
 import { leave_room } from "@/app/home/util";
 import { UserStateChats } from "@/lib/store/atom/chats";
-import { RoomHeaderDetails } from "@/packages/zod";
+import { RoomHeaderDetails, chat_messages_schema } from "@/packages/zod";
 import { room_member_details_schema } from "@/packages/zod";
 import { isSidebarHidden } from "@/lib/store/atom/sidebar";
 import { member_online_state } from "@/lib/store/atom/status";
 import { useToast } from "@/hooks/use-toast";
 import { fetch_user_chats } from "@/lib/store/selector/fetch_chats";
 import assert from "minimalistic-assert";
+import { fetch_chat_msgs } from "@/lib/store/selector/fetch_chat_msgs";
 
 export type RecievedMessage={
     type:string,
@@ -50,6 +50,7 @@ export default function Chat({params}:{params:{slug:string}}){
 
     const chat_ref = useRef<HTMLDivElement>(null);
     const [messages,setMessages]=useState<ChatMessageData>();
+    const [sweeped,setSweeped] = useState<ChatMessageData['messages']>([]);
     const [realtimechat, setRealtimechat] = useState<JSX.Element[]>([]);
     const [compose,setCompose]=useState<string>("");
     const [chat,setChat]=useState<RecievedMessage[]>([]);
@@ -65,6 +66,7 @@ export default function Chat({params}:{params:{slug:string}}){
     const user_id = session.data?.id;
     const [memberStatus,setMemberStatus] = useRecoilState(member_online_state);
     const roomsStateData = useRecoilValueLoadable(fetch_user_chats);
+    const roomDetailState = useRecoilValueLoadable(fetch_chat_msgs({chat_id: params.slug}));
 
     useEffect(()=>{
         if(roomsStateData.state === "hasValue" && roomsStateData.getValue()){
@@ -82,34 +84,38 @@ export default function Chat({params}:{params:{slug:string}}){
     },[roomsStateData.state])
     
     useEffect(()=>{
-        async function fetch_messages(){
-            if(session.status !== "authenticated")
-                return ;
-            try{
-                const resp=await fetch(`/api/message/chat/${params.slug}`,{
-                    credentials:"include",
-                    next:{
-                        revalidate: 30
-                    }
-                });
-                const {raw_data,directory_id}=await resp.json();
-                setDid(directory_id);
+        if(roomDetailState.state === "hasValue" && roomDetailState.getValue() !== undefined){
+            const data = roomDetailState.getValue();
+            if(data === undefined)
+                return router.back();
 
-                const data = room_details_response_schema.parse(raw_data);
-                setMessages({
-                    messages: data.messages
-                });
-               
-            }catch(err)
-            {
-                alert(err);
-                console.log(err);
-                router.back();
+            setDid(data.did);
+            setMessages({
+                messages: data.messages
+            });
+        }
+
+        async function sweep_recent_chat_msgs(){
+            if(roomDetailState.state === "hasValue" && roomDetailState.getValue() !== undefined){
+                const last_msg = roomDetailState.getValue()!.messages.slice(-1);
+                try{
+                    const resp = await fetch(`/api/message/chat/sweep/${params.slug}`,{
+                        method: "POST",
+                        body: JSON.stringify({
+                            last_msg_id: last_msg[0]?.id ?? -1,
+                        })
+                    });
+                    const { raw_data } = await resp.json();
+                    const data = chat_messages_schema.parse(raw_data);
+                    setSweeped(data);
+                }catch(err){
+                    console.log(err);
+                }
             }
         }
-        fetch_messages();
 
-    },[session.status,params.slug,router])
+        sweep_recent_chat_msgs();
+    },[roomDetailState.state])
 
     useEffect(()=>{
         if(room_id !== undefined && session.status === "authenticated" )
@@ -315,6 +321,13 @@ export default function Chat({params}:{params:{slug:string}}){
                         <div>
                         {
                             messages ? messages.messages.map((message)=>{
+                            return <Inbox key={message.id} data={message}/>
+                            }) : <div className="flex flex-col items-center justify-center mt-4">Loading...</div>
+                        }
+                        </div>
+                        <div>
+                        {
+                            sweeped ? sweeped.map((message)=>{
                             return <Inbox key={message.id} data={message}/>
                             }) : <div className="flex flex-col items-center justify-center mt-4">Loading...</div>
                         }
