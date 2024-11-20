@@ -2,11 +2,7 @@ import { selectorFamily } from "recoil";
 import type { ChatMessageData } from "@/packages/zod";
 import { room_details_response_schema } from "@/packages/zod";
 
-type RoomDetails = ChatMessageData & {
-    did: number,
-}
-
-export const fetch_chat_msgs = selectorFamily<RoomDetails | undefined, { chat_id: string }>({
+export const fetch_chat_msgs = selectorFamily<ChatMessageData["messages"] | undefined, { chat_id: string }>({
     key: "fetch_chat_msgs",
     get: ({chat_id}:{chat_id: string}) => 
         async() => {
@@ -17,13 +13,10 @@ export const fetch_chat_msgs = selectorFamily<RoomDetails | undefined, { chat_id
                         revalidate: 30
                     }
                 });
-                const {raw_data,directory_id}=await resp.json();
+                const { raw_data }=await resp.json();
 
                 const data = room_details_response_schema.parse(raw_data);
-                return {
-                    messages: data.messages,
-                    did: directory_id,
-                };
+                return data.messages;
             }catch(err)
             {
                 alert(err);

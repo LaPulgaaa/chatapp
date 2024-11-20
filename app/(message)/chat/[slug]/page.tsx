@@ -10,7 +10,7 @@ import Inbox from "@/components/Inbox";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useRecoilValue, useRecoilState, useRecoilValueLoadable} from "recoil";
+import { useRecoilValue, useRecoilState, useRecoilValueLoadable, useRecoilStateLoadable} from "recoil";
 import { useRouter } from "next/navigation";
 import { ChevronLeftIcon, ChevronRightIcon, ListEndIcon, SendHorizonal } from "lucide-react";
 import { DarkLight } from "@/components/DarkLight";
@@ -29,7 +29,7 @@ import { member_online_state } from "@/lib/store/atom/status";
 import { useToast } from "@/hooks/use-toast";
 import { fetch_user_chats } from "@/lib/store/selector/fetch_chats";
 import assert from "minimalistic-assert";
-import { fetch_chat_msgs } from "@/lib/store/selector/fetch_chat_msgs";
+import { chat_details_state } from "@/lib/store/atom/chat_details_state";
 
 export type RecievedMessage={
     type:string,
@@ -49,7 +49,6 @@ export default function Chat({params}:{params:{slug:string}}){
     const { toast } = useToast();
 
     const chat_ref = useRef<HTMLDivElement>(null);
-    const [messages,setMessages]=useState<ChatMessageData>();
     const [sweeped,setSweeped] = useState<ChatMessageData['messages']>([]);
     const [realtimechat, setRealtimechat] = useState<JSX.Element[]>([]);
     const [compose,setCompose]=useState<string>("");
@@ -66,7 +65,7 @@ export default function Chat({params}:{params:{slug:string}}){
     const user_id = session.data?.id;
     const [memberStatus,setMemberStatus] = useRecoilState(member_online_state);
     const roomsStateData = useRecoilValueLoadable(fetch_user_chats);
-    const roomDetailState = useRecoilValueLoadable(fetch_chat_msgs({chat_id: params.slug}));
+    const [roomDetailState,setRoomDetailState] = useRecoilStateLoadable(chat_details_state({chat_id: params.slug}));
 
     useEffect(()=>{
         if(roomsStateData.state === "hasValue" && roomsStateData.getValue()){
@@ -83,39 +82,41 @@ export default function Chat({params}:{params:{slug:string}}){
     //eslint-disable-next-line react-hooks/exhaustive-deps
     },[roomsStateData.state])
     
-    useEffect(()=>{
-        if(roomDetailState.state === "hasValue" && roomDetailState.getValue() !== undefined){
-            const data = roomDetailState.getValue();
-            if(data === undefined)
-                return router.back();
-
-            setDid(data.did);
-            setMessages({
-                messages: data.messages
+    async function sweep_latest_messages(last_msg_id: number | undefined){
+        try{
+            const resp = await fetch(`/api/message/chat/sweep/${params.slug}`,{
+                method: "POST",
+                body: JSON.stringify({
+                    last_msg_id: last_msg_id ?? -1,
+                })
             });
+            const { raw_data } = await resp.json();
+            const data = chat_messages_schema.parse(raw_data);
+            setSweeped(data);
+        }catch(err){
+            console.log(err);
         }
+    }
 
+    useEffect(()=>{
         async function sweep_recent_chat_msgs(){
             if(roomDetailState.state === "hasValue" && roomDetailState.getValue() !== undefined){
-                const last_msg = roomDetailState.getValue()!.messages.slice(-1);
-                try{
-                    const resp = await fetch(`/api/message/chat/sweep/${params.slug}`,{
-                        method: "POST",
-                        body: JSON.stringify({
-                            last_msg_id: last_msg[0]?.id ?? -1,
-                        })
-                    });
-                    const { raw_data } = await resp.json();
-                    const data = chat_messages_schema.parse(raw_data);
-                    setSweeped(data);
-                }catch(err){
-                    console.log(err);
-                }
+                setSweeped([]);
+                const last_msg = roomDetailState.getValue()!.slice(-1);
+                sweep_latest_messages(last_msg[0]?.id);
             }
         }
-
         sweep_recent_chat_msgs();
+        //eslint-disable-next-line react-hooks/exhaustive-deps
     },[roomDetailState.state])
+
+    useEffect(()=>{
+        if(sweeped.length > 0){
+            setRoomDetailState((prev_state) => [...prev_state ?? [],...sweeped]);
+            setRealtimechat([]);
+        }
+        //eslint-disable-next-line react-hooks/exhaustive-deps
+    },[sweeped])
 
     useEffect(()=>{
         if(room_id !== undefined && session.status === "authenticated" )
@@ -168,7 +169,7 @@ export default function Chat({params}:{params:{slug:string}}){
                     inline: "center"
                 })
             }
-    },[messages])
+    },[roomDetailState])
 
     useEffect(()=>{
         const chat_node = chat_ref.current;
@@ -182,6 +183,11 @@ export default function Chat({params}:{params:{slug:string}}){
                 behavior: "smooth",
                 inline: "center"
             })
+        }
+        if(realtimechat.length > 10){
+            setSweeped([]);
+            const last_msg = roomDetailState.getValue()!.slice(-1);
+            sweep_latest_messages(last_msg[0]?.id);
         }
     },[chat])
 
@@ -232,7 +238,6 @@ export default function Chat({params}:{params:{slug:string}}){
             if(resp.status === 200)
             {
                 setChat([]);
-                setMessages({messages:[]});
                 setRealtimechat([]);
                 toast({
                     variant: "destructive",
@@ -320,14 +325,7 @@ export default function Chat({params}:{params:{slug:string}}){
                     <div className="mb-16" ref={chat_ref}>
                         <div>
                         {
-                            messages ? messages.messages.map((message)=>{
-                            return <Inbox key={message.id} data={message}/>
-                            }) : <div className="flex flex-col items-center justify-center mt-4">Loading...</div>
-                        }
-                        </div>
-                        <div>
-                        {
-                            sweeped ? sweeped.map((message)=>{
+                            roomDetailState.state === "hasValue" ? roomDetailState.getValue()!.map((message)=>{
                             return <Inbox key={message.id} data={message}/>
                             }) : <div className="flex flex-col items-center justify-center mt-4">Loading...</div>
                         }
