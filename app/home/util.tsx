@@ -3,7 +3,7 @@ export async function leave_room(
     opts:{
     member_id: string,
     chat_id: string,
-    conn_id: string
+    conn_id: number
     }
     ){
     
