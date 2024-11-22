@@ -191,6 +191,7 @@ export default function Chat({params}:{params:{slug:string}}){
             const last_msg = roomDetailState.getValue()!.slice(-1);
             sweep_latest_messages(last_msg[0]?.id);
         }
+        //eslint-disable-next-line react-hooks/exhaustive-deps
     },[chat])
 
     useEffect(()=>{
