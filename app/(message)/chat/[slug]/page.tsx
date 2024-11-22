@@ -1,4 +1,7 @@
 "use client";
+
+import assert from "minimalistic-assert";
+
 import { useRef } from "react";
 
 import { Signal } from "@/app/home/signal";
@@ -17,6 +20,7 @@ import { DarkLight } from "@/components/DarkLight";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useToast } from "@/hooks/use-toast";
 
 import Message from "@/components/Message";
 import type { ChatMessageData } from "@/packages/zod";
@@ -26,9 +30,7 @@ import { RoomHeaderDetails, chat_messages_schema } from "@/packages/zod";
 import { room_member_details_schema } from "@/packages/zod";
 import { isSidebarHidden } from "@/lib/store/atom/sidebar";
 import { member_online_state } from "@/lib/store/atom/status";
-import { useToast } from "@/hooks/use-toast";
 import { fetch_user_chats } from "@/lib/store/selector/fetch_chats";
-import assert from "minimalistic-assert";
 import { chat_details_state } from "@/lib/store/atom/chat_details_state";
 
 export type RecievedMessage={
