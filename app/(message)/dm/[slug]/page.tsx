@@ -98,10 +98,10 @@ export default function Direct({params}:{params:{slug: string}}){
             )
             {
                 try{
-                    const friendship_data = recipient_state.getValue()!.friendship_data!;
-                    const conc_id = friendship_data.connectionId;
-                    const last_msg = friendship_data.messages.slice(-1)
-                    if(last_msg.length > 0){
+                    const friendship_data = recipient_state.getValue()!.friendship_data;
+                    const conc_id = friendship_data?.connectionId;
+                    const last_msg = friendship_data?.messages.slice(-1)
+                    if(last_msg !== undefined && conc_id !== undefined && last_msg.length > 0){
                         const resp = await fetch(`/api/message/dm/sweep/${conc_id}`,{
                             method: 'POST',
                             body: JSON.stringify({
