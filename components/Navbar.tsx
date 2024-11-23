@@ -15,7 +15,7 @@ export default function Navbar(){;
     return (
         <div className="p-4 font-bold flex justify-between cursor-pointer mx-4 mt-1">
             <Link href="/">
-                <h2>chat.city</h2>
+                <h2>chat</h2>
             </Link>
             <div className="flex justify-between">
                 {

@@ -168,7 +168,7 @@ export default function Profile(){
                         Profile
                     </h3>
                     <p className="text-muted-foreground">
-                        Manage your chat.city profile
+                        Manage your chat profile
                     </p>
                 </div>
                 <div className="">
@@ -230,7 +230,7 @@ export default function Profile(){
                                     <FormLabel>Username</FormLabel>
                                     <FormControl>
                                     <div className="flex border-[1.5px] rounded-md">
-                                      <p className="text-sm text-muted-foreground px-2 mt-3">chat.city/</p>
+                                      <p className="text-sm text-muted-foreground px-2 mt-3">/user/</p>
                                       <Input disabled type="text" {...field}/>
                                     </div>
                                     </FormControl>

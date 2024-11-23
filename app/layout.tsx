@@ -18,8 +18,8 @@ const fontSans = FontSans({
 
 
 export const metadata: Metadata = {
-  title: "chat.city",
-  description: "chat like there is no tommorow.",
+  title: "chat | Open source chat application",
+  description: "A chat application powered by redis pub/sub",
 };
 
 export default function RootLayout({
