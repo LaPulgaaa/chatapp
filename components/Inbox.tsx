@@ -22,9 +22,5 @@ export default function Inbox({data}:{data:UnitMessage}){
         <p className="italic text-wrap">{data.content}</p>
         <p className="flex justify-end text-[10px] mt-3 ml-2">{time[0]+":"+time[1]}</p>
     </div>
-    <Avatar className={`w-[35px] h-[35px] mr-2 mt-1 ${data.sender.username===username?'':'hidden'}`}>
-        <AvatarImage src={`https://avatar.varuncodes.com/${username}`}/>
-        <AvatarFallback className="p-4 bg-slate-200 dark:bg-slate-900">{initials}</AvatarFallback>
-    </Avatar>
     </div>
 }

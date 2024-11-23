@@ -38,12 +38,5 @@ export default function Message({data}:{data:RecievedMessage}){
         <p className="italic text-wrap">{data.payload.message.content}</p>
         <p className="flex justify-end text-[10px] mt-3 ml-2">{(hour_min[0]+":"+ hour_min[1])}</p>
     </div>
-    <Avatar 
-    className={`w-[35px] h-[35px] mr-2 mt-1 ${data.payload.
-    // @ts-ignore
-    message.user === username ? '':'hidden'}`}>
-        <AvatarImage src={`https://avatar.varuncodes.com/${username}`}/>
-        <AvatarFallback className="bg-slate-200 dark:bg-slate-900 p-4">{initials}</AvatarFallback>
-    </Avatar>
     </div>
 }
