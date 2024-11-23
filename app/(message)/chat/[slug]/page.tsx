@@ -353,13 +353,14 @@ export default function Chat({params}:{params:{slug:string}}){
                     }} className="mx-4"><SendHorizonal/></Button>
                     </div>
                 </ScrollArea>
-                <Members room_id={params.slug}/>
+                {/* @ts-ignore */}
+                { session.status === "authenticated" && <Members room_id={params.slug} username={session.data.username}/>}
             </div>
         </div>
 
 }
 
-function Members({room_id}:{room_id: string}){
+function Members({room_id,username}:{room_id: string,username: string}){
     const ishidden= useRecoilValue(isSidebarHidden);
     const [memberStatus, setMemberStatus] = useRecoilState(member_online_state);
     useEffect(()=>{
@@ -392,9 +393,12 @@ function Members({room_id}:{room_id: string}){
                     memberStatus.map((member)=>{
                         let initials = member.username.substring(0,2);
                         const names = member.name?.split(" ");
+                        let is_active = member.active;
                         if(names){
                             initials = names.map((name)=> name.charAt(0)).join("");
                         }
+                        if(member.username === username)
+                            is_active = true;
                         return (
                             <div key={member.username} 
                             className={`flex justify-between rounded-md p-1 w-full h-[72px] m-1`}>
@@ -411,10 +415,10 @@ function Members({room_id}:{room_id: string}){
                                     <Badge 
                                     className={`
                                     h-6 mt-4 mr-1
-                                    ${member.active ? "bg-rose-600" : "bg-green-400"}
+                                    ${is_active ? "bg-rose-600" : "bg-green-400"}
                                     `}>
                                         {
-                                            member.active ? "Active" : "Offline"
+                                            is_active ? "Active" : "Offline"
                                         }
                                     </Badge>
                                 <br/>
