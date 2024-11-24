@@ -30,8 +30,8 @@ import { RoomHeaderDetails, chat_messages_schema } from "@/packages/zod";
 import { room_member_details_schema } from "@/packages/zod";
 import { isSidebarHidden } from "@/lib/store/atom/sidebar";
 import { member_online_state } from "@/lib/store/atom/status";
-import { fetch_user_chats } from "@/lib/store/selector/fetch_chats";
 import { chat_details_state } from "@/lib/store/atom/chat_details_state";
+import { subscribed_chats_state } from "@/lib/store/atom/subscribed_chats_state";
 
 export type RecievedMessage={
     type:string,
@@ -66,7 +66,7 @@ export default function Chat({params}:{params:{slug:string}}){
     //@ts-ignore
     const user_id = session.data?.id;
     const [memberStatus,setMemberStatus] = useRecoilState(member_online_state);
-    const roomsStateData = useRecoilValueLoadable(fetch_user_chats);
+    const [roomsStateData,setRoomsStateData] = useRecoilStateLoadable(subscribed_chats_state);
     const [roomDetailState,setRoomDetailState] = useRecoilStateLoadable(chat_details_state({chat_id: params.slug}));
 
     useEffect(()=>{
@@ -83,6 +83,33 @@ export default function Chat({params}:{params:{slug:string}}){
         }
     //eslint-disable-next-line react-hooks/exhaustive-deps
     },[roomsStateData.state])
+
+    function update_last_sent_message(){
+        if(roomsStateData.state === "hasValue") {
+            const all_rooms_data = roomsStateData.getValue();
+            const narrowed_room = all_rooms_data.find((room) => room.id === params.slug);
+            assert(narrowed_room !== undefined);
+            const other_rooms = all_rooms_data.filter((room) => room.id !== narrowed_room.id);
+
+            if(sweeped.length === 0)
+                return;
+
+            const new_last_msg = sweeped.slice(-1)[0];
+            const room_details_with_updated_last_msg = {
+                ...narrowed_room,
+                messages: [{
+                    content: new_last_msg.content,
+                    createdAt: new_last_msg.createdAt,
+                    sender: {
+                        username: new_last_msg.sender.username,
+                    }
+                }]
+            }
+
+            setRoomsStateData([...other_rooms,room_details_with_updated_last_msg]);
+
+        }
+    }
     
     async function sweep_latest_messages(last_msg_id: number | undefined){
         try{
@@ -138,6 +165,7 @@ export default function Chat({params}:{params:{slug:string}}){
                 Signal.get_instance().DEREGISTER("MSG_CALLBACK");
                 Signal.get_instance().DEREGISTER("ONLINE_CALLBACK");
             }
+            update_last_sent_message();
         }
         //eslint-disable-next-line react-hooks/exhaustive-deps
     },[room_id,user_id,session.status])
