@@ -86,17 +86,43 @@ export default function Chat({params}:{params:{slug:string}}){
 
     function update_last_sent_message(){
         if(roomsStateData.state === "hasValue") {
+            console.log("is this being updated")
             const all_rooms_data = roomsStateData.getValue();
             const narrowed_room = all_rooms_data.find((room) => room.id === params.slug);
             assert(narrowed_room !== undefined);
             const other_rooms = all_rooms_data.filter((room) => room.id !== narrowed_room.id);
 
-            if(sweeped.length === 0)
+            let new_last_msg;
+
+            if(chat.length > 0)
+            {
+                const last_recent_msg = chat.slice(-1)[0];
+                new_last_msg = {
+                    createdAt: last_recent_msg.payload.createdAt,
+                    content: last_recent_msg.payload.message.content,
+                    sender: {
+                        username: last_recent_msg.payload.message.user,
+                    }
+                }
+            }
+            else if(sweeped.length > 0)
+            {
+                const last_sweeped_msg = sweeped.slice(-1)[0];
+                new_last_msg = {
+                    createdAt: last_sweeped_msg.createdAt,
+                    content: last_sweeped_msg.content,
+                    sender: {
+                        username: last_sweeped_msg.sender.username,
+                    }
+                }
+            }
+
+            if(new_last_msg === undefined)
                 return;
 
-            const new_last_msg = sweeped.slice(-1)[0];
             const room_details_with_updated_last_msg = {
                 ...narrowed_room,
+                lastmsgAt: new_last_msg.createdAt,
                 messages: [{
                     content: new_last_msg.content,
                     createdAt: new_last_msg.createdAt,
@@ -105,7 +131,6 @@ export default function Chat({params}:{params:{slug:string}}){
                     }
                 }]
             }
-
             setRoomsStateData([...other_rooms,room_details_with_updated_last_msg]);
 
         }
@@ -143,6 +168,7 @@ export default function Chat({params}:{params:{slug:string}}){
         if(sweeped.length > 0){
             setRoomDetailState((prev_state) => [...prev_state ?? [],...sweeped]);
             setRealtimechat([]);
+            update_last_sent_message();
         }
         //eslint-disable-next-line react-hooks/exhaustive-deps
     },[sweeped])
@@ -165,7 +191,6 @@ export default function Chat({params}:{params:{slug:string}}){
                 Signal.get_instance().DEREGISTER("MSG_CALLBACK");
                 Signal.get_instance().DEREGISTER("ONLINE_CALLBACK");
             }
-            update_last_sent_message();
         }
         //eslint-disable-next-line react-hooks/exhaustive-deps
     },[room_id,user_id,session.status])
