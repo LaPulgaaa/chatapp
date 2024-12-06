@@ -171,9 +171,13 @@ export default function Chat({params}:{params:{slug:string}}){
     },[session.status])
     function recieve_msg(raw_data: string){
         const data:RecievedMessage = JSON.parse(`${raw_data}`);
-        console.log("recieved a message"+data) 
-        setChat([...chat,data]);
-        setRealtimechat((realtimechat)=>[...realtimechat, <Message  key={(session.data?.user?.email?.substring(5) || "")+Date.now()} data={data}/>])
+        if(data.payload.roomId !== params.slug)
+        return;
+        else{
+            setChat([...chat,data]);
+            setRealtimechat((realtimechat)=>[...realtimechat, <Message  key={(session.data?.user?.email?.substring(5) || "")+Date.now()} data={data}/>])
+        }
+        
     }
 
     function update_member_online_status(raw_data: string){
