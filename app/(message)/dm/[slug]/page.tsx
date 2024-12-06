@@ -180,15 +180,21 @@ export default function Direct({params}:{params:{slug: string}}){
 
     function pm_recieve_callback(raw_data: string){
         const data:RecievedMessage = JSON.parse(raw_data);
-        const new_dm = {
-            id: Math.random()*1000,
-            content: data.payload.message.content,
-            createdAt: data.payload.createdAt,
-            sendBy: {
-                username: data.payload.message.user,
+        if(dmStateDetails.state !== "hasValue" || (dmStateDetails.state === "hasValue" && !dmStateDetails.getValue()?.is_friend))
+            return;
+        if(data.payload.roomId !== dmStateDetails.getValue()!.friendship_data!.connectionId)
+        return;
+        else{
+            const new_dm = {
+                id: Math.random()*1000,
+                content: data.payload.message.content,
+                createdAt: data.payload.createdAt,
+                sendBy: {
+                    username: data.payload.message.user,
+                }
             }
+            setInbox((inbox) => [...inbox,new_dm]);
         }
-        setInbox((inbox) => [...inbox,new_dm]);
     }
 
     function update_member_online_status(raw_data: string){
