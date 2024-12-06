@@ -70,7 +70,7 @@ export default function Home(){
                         <RoomTabs rooms={roomsStateData.getValue()!} dms={dmStateData.getValue()!} username={session.data.username}/> :
                         <div>Loading chats....</div>
                     }
-                </div> : <div>Loading</div>
+                </div> : <div>Loading...</div>
             }
         </div>
     )
