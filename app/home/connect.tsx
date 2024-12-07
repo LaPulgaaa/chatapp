@@ -4,17 +4,14 @@ import { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRecoilRefresher_UNSTABLE } from "recoil";
 import { useToast } from "@/hooks/use-toast";
-import { DirectMessageState } from "@/lib/store/atom/dm";
 import { Signal } from "./signal";
-import { usePathname,useRouter } from "next/navigation";
+import { fetch_dms } from "@/lib/store/selector/fetch_dms";
 
 
 export default function Connect(){
     const session = useSession();
     const { toast } = useToast();
-    const refresh_dms = useRecoilRefresher_UNSTABLE(DirectMessageState);
-    const pathname = usePathname();
-    const router = useRouter();
+    const refresh_dms = useRecoilRefresher_UNSTABLE(fetch_dms);
 
     function recieve_invite_callback(raw_data: string){
         const data = JSON.parse(raw_data);
@@ -23,11 +20,8 @@ export default function Connect(){
             description: data.payload.content,
         });
         refresh_dms();
-        if(pathname === "/home"){
-            router.refresh();
-        }
     }
-    
+
     useEffect(()=>{
         if(session.status === "authenticated"){
             //@ts-ignore
