@@ -10,13 +10,15 @@ export async function search_by_username(cred: string, host_username: string, ho
                     {
                         username: {
                             contains: cred,
-                            not: host_username
+                            not: host_username,
+                            mode: "insensitive"
                         }
                     },
                     {
                         name: {
                             contains: cred,
                             not: host_name,
+                            mode: "insensitive"
                         }
                     }
                 ]
