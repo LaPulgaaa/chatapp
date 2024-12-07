@@ -127,7 +127,7 @@ export class RedisSubscriptionManager{
     getRoomMembers(roomId: string){
         const member_details = this.reverseSubscription.get(roomId);
         if(member_details === undefined){
-            return undefined;
+            return new Set([]);
         }
         const member_ids = Object.values(member_details).flatMap((member)=> {
             if(member.uuid)
