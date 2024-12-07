@@ -142,6 +142,15 @@ export async function ws(wss:WebSocketServer){
                         }));
                     }
 
+                    ws.send(JSON.stringify({
+                        type: 'DM_INVITE_SUCCESS',
+                        data: JSON.stringify({
+                            payload: {
+                                request: "SUCCESS"
+                            }
+                        })
+                    }))
+
                     const msg_data = JSON.stringify({
                         type:"message",
                         payload:{

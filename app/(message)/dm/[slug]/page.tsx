@@ -20,6 +20,7 @@ import DmRender from "../dm_ui";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import ProfileDialog from "../profile_dialog";
 import { dm_details_state } from "@/lib/store/atom/dm_details_state";
+import { fetch_dms } from "@/lib/store/selector/fetch_dms";
 
 
 export default function Direct({params}:{params:{slug: string}}){
@@ -29,6 +30,7 @@ export default function Direct({params}:{params:{slug: string}}){
     const session = useSession();
     const [dmStateDetails,setDmStateDetails] = useRecoilStateLoadable(dm_details_state({username: params.slug}));
     const refresh_dm_state = useRecoilRefresher_UNSTABLE(dm_details_state({username: params.slug}));
+    const refresh_dms = useRecoilRefresher_UNSTABLE(fetch_dms);
     const [inbox,setInbox] = useState<UnitDM[]>([]);
     const [history,setHistory] = useState<UnitDM[]>([]);
     const [sweeped,setSweeped] = useState<UnitDM[]>([]);
@@ -159,6 +161,15 @@ export default function Direct({params}:{params:{slug: string}}){
             Signal.get_instance(username).SUBSCRIBE(conc_id,user_id,username);
             
         }
+        else if(
+            session.status === "authenticated" && 
+            dmStateDetails.state === "hasValue" &&
+            dmStateDetails.getValue()!.is_friend === false
+        ){
+            //@ts-ignore
+            const username = session.data.username;
+            Signal.get_instance(username).REGISTER_CALLBACK("DM_INVITE_SUCCESS",invite_success_callback);
+        }
         Signal.get_instance().REGISTER_CALLBACK("MSG_CALLBACK",pm_recieve_callback);
         Signal.get_instance().REGISTER_CALLBACK("ONLINE_CALLBACK",update_member_online_status);
 
@@ -198,6 +209,11 @@ export default function Direct({params}:{params:{slug: string}}){
         }
     }
 
+    function invite_success_callback(_raw_data: string){
+        refresh_dm_state();
+        refresh_dms();
+    }
+
     function update_member_online_status(raw_data: string){
         const data = JSON.parse(raw_data);
         const type: "MemberJoins" | "MemberLeaves" = data.type;
@@ -219,7 +235,6 @@ export default function Direct({params}:{params:{slug: string}}){
 
         if(data!.is_friend === false){
             Signal.get_instance().INVITE(username,params.slug,compose);
-            refresh_dm_state();
         }
         else{
             const broadcast_data={
