@@ -186,6 +186,15 @@ export async function ws(wss:WebSocketServer){
                     const rooms_arr = rooms_subscribed.map((rooms)=> rooms.chat_id);
                     const dms_conc_id_arr = dms.map((dm) => dm.connectionId);
                     RedisSubscriptionManager.get_instance().bulk_unsubscribe(userId,[...rooms_arr,...dms_conc_id_arr]);
+                    const msg_data = JSON.stringify(
+                        {
+                            type: "MemberLeaves",
+                            payload:{
+                                username: userId,
+                            }
+                        }
+                    )
+                    RedisSubscriptionManager.get_instance().addChatMessage(data.payload.roomId,"ONLINE_CALLBACK",msg_data);
                 }catch(err){
                     console.log(err);
                 }
