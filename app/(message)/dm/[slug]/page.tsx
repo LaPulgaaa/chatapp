@@ -35,6 +35,8 @@ export default function Direct({params}:{params:{slug: string}}){
     const [history,setHistory] = useState<UnitDM[]>([]);
     const [sweeped,setSweeped] = useState<UnitDM[]>([]);
     const [active, setActive] = useState<boolean>(false);
+    const [typing,setTyping] = useState<boolean>(false);
+    const [send,setSend] = useState(false);
 
     useEffect(()=>{
         if(compose.trim().length === 0){
@@ -85,6 +87,31 @@ export default function Direct({params}:{params:{slug: string}}){
         }
         //eslint-disable-next-line react-hooks/exhaustive-deps
     },[inbox])
+
+    function send_typing_notification(){
+        
+        if(dmStateDetails.state !== "hasValue" || dmStateDetails.getValue()?.is_friend === false)
+            return;
+        //@ts-ignore
+        const username = session.data.username;
+        const message = JSON.stringify({
+            type:"typing",
+            payload: {
+                user_id: username,
+                chat_id: dmStateDetails.getValue()?.friendship_data!.connectionId,
+            }
+        })
+        if(send === true)
+        {
+            setTimeout(() => {
+                setSend(false)
+            },1000)
+        }
+        else{
+            Signal.get_instance().SEND(message);
+            setSend(true);
+        }
+    }
 
     async function sweep_lastest_messages(conc_id: string, last_msg_id: number | undefined){
         try{
@@ -172,6 +199,7 @@ export default function Direct({params}:{params:{slug: string}}){
         }
         Signal.get_instance().REGISTER_CALLBACK("MSG_CALLBACK",pm_recieve_callback);
         Signal.get_instance().REGISTER_CALLBACK("ONLINE_CALLBACK",update_member_online_status);
+        Signal.get_instance().REGISTER_CALLBACK("TYPING_CALLBACK",typing_notif_callback);
 
         return () => {
             if(
@@ -189,6 +217,21 @@ export default function Direct({params}:{params:{slug: string}}){
         }
         //eslint-disable-next-line react-hooks/exhaustive-deps
     },[session.status,dmStateDetails]);
+
+    function typing_notif_callback(raw_data: string){
+        const data = JSON.parse(`${raw_data}`);
+
+        if(params.slug !== data.payload.user_id)
+            return;
+        if(dmStateDetails.getValue()?.friendship_data?.connectionId !== data.payload.chat_id)
+            return;
+
+        setTyping(true);
+
+        setTimeout(() => {
+            setTyping(false);
+        }, 4000);
+    }
 
     function pm_recieve_callback(raw_data: string){
         const data:RecievedMessage = JSON.parse(raw_data);
@@ -293,11 +336,26 @@ export default function Direct({params}:{params:{slug: string}}){
                             })
                         }
                     </div>
+                    <div className="absolute bottom-0 mb-10">
+                        {
+                            typing === true && 
+                            <div className="flex m-4 space-x-1 mb-6">
+                                <Avatar className="w-[35px] h-[35px] mt-2">
+                                    <AvatarImage src={`https://avatar.varuncodes.com/${params.slug}`}/>
+                                    <AvatarFallback>{params.slug.substring(0,2)}</AvatarFallback>
+                                </Avatar>
+                                <div className="bg-slate-200 dark:bg-slate-900 rounded-md p-1 px-2 mt-2 text-center">...</div>
+                            </div>
+                        }
+                    </div>
                     <div className="absolute bottom-0 w-full mb-3 flex">
                     <Input 
                     className="ml-4" 
                     value={compose}
-                    onChange={(e)=>setCompose(e.target.value)}
+                    onChange={(e)=>{
+                        setCompose(e.target.value);
+                        send_typing_notification();
+                    }}
                     onKeyDown={(e)=>{
                         if(e.key === "Enter" && compose.trim().length > 0)
                             sendMessage();
