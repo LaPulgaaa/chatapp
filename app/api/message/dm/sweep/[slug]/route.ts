@@ -20,6 +20,7 @@ export async function POST(req: NextRequest,{ params }:{ params: { slug: string 
                 id: {
                     gt: last_msg_id
                 },
+                deleted: false,
             },
             select: {
                 id: true,
