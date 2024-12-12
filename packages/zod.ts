@@ -35,7 +35,7 @@ export const message_schema=z.object({
 
 export type Message=z.infer<typeof message_schema>;
 
-export const create_room_schema=z.object({
+export const room_details_schema=z.object({
     name:z.string({
         required_error:"enter a valid name"
     }).min(1),
@@ -44,7 +44,7 @@ export const create_room_schema=z.object({
     }).min(6).max(50)
 })
 
-export type RoomType=z.infer<typeof create_room_schema>;
+export type RoomType=z.infer<typeof room_details_schema>;
 
 export const user_chat_schema = z.object({
     createdAt:z.string(),

@@ -76,7 +76,7 @@ export async function GET(req:NextRequest,
 }
 
 export async function PUT(req: NextRequest,{params}:{ params: { chat_id: string }}){
-    const { date, did }:{ date: Date, did: number} = await req.json();
+    const { name, discription }:{ name: string, discription: string} = await req.json();
     const chat_id = params.chat_id;
 
     const token = getToken({ req });
@@ -88,20 +88,19 @@ export async function PUT(req: NextRequest,{params}:{ params: { chat_id: string 
 
     try{
         //@ts-ignore
-        const user_id = token.id;
-        const updated_directory = await prisma.directory.update({
+        const resp = await prisma.chat.update({
             where:{
-                AND:[{userId:user_id},{chat_id:chat_id}],
-                id:did
+                id: chat_id
             },
-            data:{
-                after:date
+            data: {
+                name,
+                discription
             }
-        });
+        })
 
         return Response.json({
             message: "Chat cleared successfully",
-            data: updated_directory
+            data: resp
         },{ status: 200 });
     }catch(err){
         console.log(err);
