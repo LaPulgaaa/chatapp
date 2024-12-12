@@ -70,6 +70,7 @@ export async function GET(req: NextRequest){
                         createdAt: {
                             gte: frnd.messageFrom
                         },
+                        deleted: false,
                     },
                     select: {
                         id: true,
