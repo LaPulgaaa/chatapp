@@ -20,14 +20,14 @@ import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 
 import { Signal } from "@/app/home/signal";
-import { RoomType, create_room_schema } from "@/packages/zod";
+import { RoomType, room_details_schema } from "@/packages/zod";
 import { fetch_user_chats } from "@/lib/store/selector/fetch_chats";
 
 export default function CreateRoom(){
     const session = useSession();
     const refresh_chats = useRecoilRefresher_UNSTABLE(fetch_user_chats);
     const form=useForm<RoomType>({
-        resolver:zodResolver(create_room_schema),
+        resolver:zodResolver(room_details_schema),
         defaultValues:{
             name:"",
             discription:""

@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useRecoilValue, useRecoilState, useRecoilValueLoadable, useRecoilStateLoadable} from "recoil";
 import { useRouter } from "next/navigation";
-import { ChevronLeftIcon, ChevronRightIcon, ListEndIcon, SendHorizonal } from "lucide-react";
+import { ChevronLeftIcon, ChevronRightIcon, Edit, ListEndIcon, SendHorizonal } from "lucide-react";
 import { DarkLight } from "@/components/DarkLight";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
@@ -23,7 +23,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 
 import Message from "@/components/Message";
-import type { ChatMessageData } from "@/packages/zod";
+import { ChatMessageData, room_details_schema } from "@/packages/zod";
 import { leave_room } from "@/app/home/util";
 import { UserStateChats } from "@/lib/store/atom/chats";
 import { RoomHeaderDetails, chat_messages_schema } from "@/packages/zod";
@@ -32,6 +32,11 @@ import { isSidebarHidden } from "@/lib/store/atom/sidebar";
 import { member_online_state } from "@/lib/store/atom/status";
 import { chat_details_state } from "@/lib/store/atom/chat_details_state";
 import { subscribed_chats_state } from "@/lib/store/atom/subscribed_chats_state";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import EditRoomDetails from "../edit_room_details";
 
 export type RecievedMessage={
     type:string,
@@ -46,6 +51,8 @@ export type RecievedMessage={
     
     }
 }
+
+
 
 export default function Chat({params}:{params:{slug:string}}){
     const { toast } = useToast();
@@ -68,6 +75,7 @@ export default function Chat({params}:{params:{slug:string}}){
     const [memberStatus,setMemberStatus] = useRecoilState(member_online_state);
     const [roomsStateData,setRoomsStateData] = useRecoilStateLoadable(subscribed_chats_state);
     const [roomDetailState,setRoomDetailState] = useRecoilStateLoadable(chat_details_state({chat_id: params.slug}));
+    
 
     useEffect(()=>{
         if(roomsStateData.state === "hasValue" && roomsStateData.getValue()){
@@ -82,7 +90,7 @@ export default function Chat({params}:{params:{slug:string}}){
             });
         }
     //eslint-disable-next-line react-hooks/exhaustive-deps
-    },[roomsStateData.state])
+    },[roomsStateData])
 
     function update_last_sent_message(){
         if(roomsStateData.state === "hasValue") {
@@ -319,15 +327,33 @@ export default function Chat({params}:{params:{slug:string}}){
                                 {room_details.discription}
                                 </h5>
                             </div>
-                            <Button
-                            onClick={()=>setIshidden(!ishidden)}
-                            size={"icon"}
-                            variant={"ghost"}
-                            className="hidden lg:block">
-                                {
-                                    ishidden ? <ChevronLeftIcon/> : <ChevronRightIcon/>
-                                }
-                            </Button>
+                            <div className="flex space-x-2">
+                                <Button
+                                className="px-1"
+                                onClick={()=>setIshidden(!ishidden)}
+                                size={"icon"}
+                                variant={"ghost"}
+                                >
+                                    {
+                                        ishidden ? <ChevronLeftIcon/> : <ChevronRightIcon/>
+                                    }
+                                </Button>
+                                <Button
+                                className="px-1"
+                                size={"icon"}
+                                variant={"ghost"}
+                                >
+                                    <Dialog>
+                                        <DialogTrigger>
+                                            <Edit/>
+                                        </DialogTrigger>
+                                        <EditRoomDetails room_details={{
+                                            name: room_details!.name,
+                                            discription: room_details!.discription
+                                        }} chat_id={params.slug}/>
+                                    </Dialog>
+                                </Button>
+                            </div>
                         </div>
                         </>
                     )
