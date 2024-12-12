@@ -20,7 +20,7 @@ import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import ProfileDialog from "../profile_dialog";
 import { dm_details_state } from "@/lib/store/atom/dm_details_state";
 import { fetch_dms } from "@/lib/store/selector/fetch_dms";
-
+import { get_new_local_id } from "../../util";
 
 export default function Direct({params}:{params:{slug: string}}){
     const dm_ref = useRef<HTMLDivElement>(null);
@@ -239,15 +239,22 @@ export default function Direct({params}:{params:{slug: string}}){
         if(data.payload.roomId !== dmStateDetails.getValue()!.friendship_data!.connectionId)
         return;
         else{
-            const new_dm = {
-                id: Math.random()*1000,
-                content: data.payload.message.content,
-                createdAt: data.payload.createdAt,
-                sendBy: {
-                    username: data.payload.message.user,
+            const last_msg = dmStateDetails.getValue()!.friendship_data!.messages.slice(-1)[0];
+            
+            setInbox((inbox) => {
+                let last_local_msg = inbox.slice(-1);
+                const local_id = get_new_local_id(last_msg.id,last_local_msg[0]?.id);
+                console.log(local_id)
+                const new_dm = {
+                    id: local_id,
+                    content: data.payload.message.content,
+                    createdAt: data.payload.createdAt,
+                    sendBy: {
+                        username: data.payload.message.user,
+                    }
                 }
-            }
-            setInbox((inbox) => [...inbox,new_dm]);
+                return [...inbox,new_dm]
+            });
         }
     }
 
