@@ -23,7 +23,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 
 import Message from "@/components/Message";
-import { ChatMessageData, room_details_schema } from "@/packages/zod";
+import { ChatMessageData } from "@/packages/zod";
 import { leave_room } from "@/app/home/util";
 import { UserStateChats } from "@/lib/store/atom/chats";
 import { RoomHeaderDetails, chat_messages_schema } from "@/packages/zod";
@@ -32,9 +32,6 @@ import { isSidebarHidden } from "@/lib/store/atom/sidebar";
 import { member_online_state } from "@/lib/store/atom/status";
 import { chat_details_state } from "@/lib/store/atom/chat_details_state";
 import { subscribed_chats_state } from "@/lib/store/atom/subscribed_chats_state";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import EditRoomDetails from "../edit_room_details";
 
