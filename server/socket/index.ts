@@ -247,7 +247,19 @@ export async function ws(wss:WebSocketServer){
                     }))
                 }
             }
+            if(data.type === "typing"){
+                const { chat_id, user_id } = data.payload;
 
+                const msg_data = JSON.stringify({
+                    type: 'typing',
+                    payload: {
+                        chat_id,
+                        user_id
+                    }
+                })
+
+                RedisSubscriptionManager.get_instance().addChatMessage(chat_id,"TYPING_CALLBACK",msg_data)
+            }
             if(data.type === "leave"){
                 const msg_data = JSON.stringify(
                     {

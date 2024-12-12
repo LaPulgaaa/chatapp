@@ -72,7 +72,8 @@ export default function Chat({params}:{params:{slug:string}}){
     const [memberStatus,setMemberStatus] = useRecoilState(member_online_state);
     const [roomsStateData,setRoomsStateData] = useRecoilStateLoadable(subscribed_chats_state);
     const [roomDetailState,setRoomDetailState] = useRecoilStateLoadable(chat_details_state({chat_id: params.slug}));
-    
+    const [typing,setTyping] = useState<string[]>([]);
+    const [send,setSend] = useState(false);
 
     useEffect(()=>{
         if(roomsStateData.state === "hasValue" && roomsStateData.getValue()){
@@ -88,6 +89,29 @@ export default function Chat({params}:{params:{slug:string}}){
         }
     //eslint-disable-next-line react-hooks/exhaustive-deps
     },[roomsStateData])
+
+    function send_typing_notification(){
+        //@ts-ignore
+        const username = session.data.username;
+        const message = JSON.stringify({
+            type:"typing",
+            payload: {
+                user_id: username,
+                chat_id: params.slug,
+            }
+        })
+        if(send === true)
+        {
+            setTimeout(() => {
+                setSend(false)
+            },1000)
+        }
+        else{
+            Signal.get_instance().SEND(message);
+            setSend(true);
+        }
+    }
+
 
     function update_last_sent_message(){
         if(roomsStateData.state === "hasValue") {
@@ -185,6 +209,7 @@ export default function Chat({params}:{params:{slug:string}}){
             Signal.get_instance(session.data.username).SUBSCRIBE(room_id, session.data.id, session.data.username);
             Signal.get_instance().REGISTER_CALLBACK("MSG_CALLBACK",recieve_msg);
             Signal.get_instance().REGISTER_CALLBACK("ONLINE_CALLBACK",update_member_online_status);
+            Signal.get_instance().REGISTER_CALLBACK("TYPING_CALLBACK",typing_notif_callback);
         }
 
         
@@ -195,6 +220,7 @@ export default function Chat({params}:{params:{slug:string}}){
                 Signal.get_instance().UNSUBSCRIBE(params.slug,session.data.username);
                 Signal.get_instance().DEREGISTER("MSG_CALLBACK");
                 Signal.get_instance().DEREGISTER("ONLINE_CALLBACK");
+                Signal.get_instance().DEREGISTER("TYPING_CALLBACK");
             }
         }
         //eslint-disable-next-line react-hooks/exhaustive-deps
@@ -208,6 +234,27 @@ export default function Chat({params}:{params:{slug:string}}){
             setRealtimechat((realtimechat)=>[...realtimechat, <Message  key={(session.data?.user?.email?.substring(5) || "")+Date.now()} data={data}/>])
         }
         
+    }
+
+    function typing_notif_callback(raw_data: string){
+        const data = JSON.parse(`${raw_data}`);
+        //@ts-ignore
+        const username = session.data.username;
+        if(data.payload.user_id === username || data.payload.chat_id !== params.slug)
+            return;
+
+        setTyping((members) => {
+            if(members.find((member) => member === data.payload.user_id))
+            return [...members];
+
+            return [...members,data.payload.user_id]
+        });
+
+        setTimeout(()=>{
+            const left_members = typing.filter((member) => member !== data.payload.user_id);
+            setTyping(left_members);
+        },6000)
+
     }
 
     function update_member_online_status(raw_data: string){
@@ -415,11 +462,32 @@ export default function Chat({params}:{params:{slug:string}}){
                         </div>
                         <div>{realtimechat}</div>
                     </div>
+                    <div className="absolute bottom-0 mb-10">
+                        {
+                            typing.length > 0 && 
+                            <div className="flex m-4 space-x-1 mb-6">
+                                {
+                                    typing.map((member) => {
+                                        return(
+                                            <Avatar key={member} className="w-[35px] h-[35px] mt-2">
+                                                <AvatarImage src={`https://avatar.varuncodes.com/${member}`}/>
+                                                <AvatarFallback>{member.substring(0,2)}</AvatarFallback>
+                                            </Avatar>
+                                        )
+                                    })
+                                }
+                                <div className="bg-slate-200 dark:bg-slate-900 rounded-md p-1 px-2 mt-2 text-center">...</div>
+                            </div>
+                        }
+                    </div>
                     <div className="absolute bottom-0 w-full mb-3 flex">
                     <Input 
                     className="ml-4" 
                     value={compose}
-                    onChange={(e)=>setCompose(e.target.value)}
+                    onChange={(e)=>{
+                        setCompose(e.target.value);
+                        send_typing_notification();
+                    }}
                     onKeyDown={(e)=>{
                         if(e.key === "Enter" && compose.trim().length > 0)
                             sendMessage();
