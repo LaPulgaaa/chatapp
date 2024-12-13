@@ -303,7 +303,8 @@ export default function Direct({params}:{params:{slug: string}}){
     return (
         <div className="w-full h-svh">
             {
-                dmStateDetails.state === "hasValue" && session.status === "authenticated" ? <div className="flex flex-col w-full h-svh">
+                dmStateDetails.state === "hasValue" && dmStateDetails.getValue() && session.status === "authenticated" ? 
+                <div className="flex flex-col w-full h-svh">
                 <div className={`flex rounded-md h-[72px] mx-2 mt-2 mb-1 border-2`}>
                         <Dialog>
                             <DialogTrigger asChild>

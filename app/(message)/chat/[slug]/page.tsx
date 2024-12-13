@@ -429,7 +429,7 @@ export default function Chat({params}:{params:{slug:string}}){
                     <div className="mb-16" ref={chat_ref}>
                         <div>
                         {
-                            roomDetailState.state === "hasValue" ? roomDetailState.getValue()!.map((message)=>{
+                            (roomDetailState.state === "hasValue" && roomDetailState.getValue()) ? roomDetailState.getValue()!.map((message)=>{
                             return <Inbox key={message.id} data={message}/>
                             }) : <div className="flex flex-col items-center justify-center mt-4">Loading...</div>
                         }
