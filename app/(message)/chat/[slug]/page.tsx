@@ -55,6 +55,7 @@ export default function Chat({params}:{params:{slug:string}}){
     const { toast } = useToast();
 
     const chat_ref = useRef<HTMLDivElement>(null);
+    const type_ref = useRef<HTMLDivElement>(null);
     const [sweeped,setSweeped] = useState<ChatMessageData['messages']>([]);
     const [realtimechat, setRealtimechat] = useState<JSX.Element[]>([]);
     const [compose,setCompose]=useState<string>("");
@@ -256,8 +257,10 @@ export default function Chat({params}:{params:{slug:string}}){
         });
 
         setTimeout(()=>{
-            const left_members = typing.filter((member) => member !== data.payload.user_id);
-            setTyping(left_members);
+            setTyping((typing) => {
+                const left_members = typing.filter((member) => member !== data.payload.user_id);
+                return left_members;
+            });
         },6000)
 
     }
@@ -286,6 +289,19 @@ export default function Chat({params}:{params:{slug:string}}){
                 })
             }
     },[roomDetailState])
+
+    useEffect(() => {
+        const type_node = type_ref.current;
+        if(typing.length > 0 && type_node !== null){
+            const type_comp = type_node.querySelectorAll("#typing");
+            if(type_comp.length !== 0){
+                type_comp[type_comp.length-1].scrollIntoView({
+                    behavior: "smooth",
+                    inline: "center"
+                })
+            }
+        }
+    },[typing])
 
     useEffect(()=>{
         const chat_node = chat_ref.current;
@@ -457,7 +473,7 @@ export default function Chat({params}:{params:{slug:string}}){
             <div className="mt-2 h-[100%] flex w-full">
                 <ScrollArea id="chatbox"
                 className="flex flex-col w-full h-full rounded-md border m-2">
-                    <div className="mb-16" ref={chat_ref}>
+                    <div className="mb-2" ref={chat_ref}>
                         <div>
                         {
                             (roomDetailState.state === "hasValue" && roomDetailState.getValue()) ? roomDetailState.getValue()!.map((message)=>{
@@ -467,14 +483,14 @@ export default function Chat({params}:{params:{slug:string}}){
                         </div>
                         <div>{realtimechat}</div>
                     </div>
-                    <div className="absolute bottom-0 mb-10">
+                    <div className="mb-16">
                         {
                             typing.length > 0 && 
-                            <div className="flex m-4 space-x-1 mb-6">
+                            <div className="flex mb-4 m-3 space-x-1 mb-6">
                                 {
                                     typing.map((member) => {
                                         return(
-                                            <Avatar key={member} className="w-[35px] h-[35px] mt-2">
+                                            <Avatar id="typing" key={member} className="w-[35px] h-[35px] mt-2">
                                                 <AvatarImage src={`https://avatar.varuncodes.com/${member}`}/>
                                                 <AvatarFallback>{member.substring(0,2)}</AvatarFallback>
                                             </Avatar>
