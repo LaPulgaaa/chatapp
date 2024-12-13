@@ -64,7 +64,7 @@ export async function GET(req: NextRequest){
 
         await Promise.all(resp.map(async(frnd) => {
             try{
-                const message = await prisma.directMessage.findFirst({
+                const message = await prisma.directMessage.findMany({
                     where: {
                         connectionId: frnd.connectionId,
                         createdAt: {
@@ -80,16 +80,12 @@ export async function GET(req: NextRequest){
                                 username: true,
                             }
                         }
-                    },
-                    orderBy: {
-                        createdAt: "desc"
                     }
-
                 });
 
                 friendships_with_last_dm.push({
                     ...frnd,
-                    messages: message !== null ? [message] : [],
+                    messages: message,
                 });
 
             }catch(err){
