@@ -232,3 +232,19 @@ export type FriendSearchResult = z.output<typeof friend_search_result_schema>;
 export type DmProfileInfo = FriendSearchResult["profile_info"];
 
 export type DirectMessage = z.output<typeof direct_msg_schema>;
+
+export const message_delete_payload = z.discriminatedUnion("is_local_echo",[
+    z.object({
+        is_local_echo: z.literal(false),
+        id: z.number(),
+        conc_id: z.string(),
+        type: z.literal("DM")
+    }), 
+    z.object({
+        is_local_echo: z.literal(true),
+        hash: z.string(),
+        type: z.literal("DM")
+    })
+])
+
+export type MessageDeletePayload = z.output<typeof message_delete_payload>;

@@ -21,20 +21,11 @@ import ProfileDialog from "../profile_dialog";
 import { dm_details_state } from "@/lib/store/atom/dm_details_state";
 import { fetch_dms } from "@/lib/store/selector/fetch_dms";
 import { get_new_local_id } from "../../util";
+import { MessageDeletePayload } from "@/packages/zod";
 
-type Payload = ({
-    id: number,
-    conc_id: string,
-    is_local_echo: false,
-} | {
-    hash: string,
-    is_local_echo: true,
-}) & {
-    type: 'DM'
-}
 type DeleteMsgCallbackData = {
     type: string,
-    payload: Payload,
+    payload: MessageDeletePayload,
 }
 
 
@@ -297,17 +288,17 @@ export default function Direct({params}:{params:{slug: string}}){
     }
     function delete_msg_callback(raw_data: string){
         const data:DeleteMsgCallbackData = JSON.parse(`${raw_data}`);
-
+        const payload = data.payload;
         if(dmStateDetails.state !== "hasValue")
             return;
 
-        if(data.payload.is_local_echo === false && data.payload.conc_id !== dmStateDetails.getValue()?.friendship_data?.connectionId)
+        if(payload.is_local_echo === false && payload.conc_id !== dmStateDetails.getValue()?.friendship_data?.connectionId)
             return;
 
-        if(data.payload.is_local_echo === false){
+        if(payload.is_local_echo === false){
             const messages = dmStateDetails.getValue()!.friendship_data!.messages;
 
-            const left_messages = messages.filter((msg) => msg.id !== data.payload.id);
+            const left_messages = messages.filter((msg) => msg.id !== payload.id);
             setDmStateDetails((prev_state) => {
                 assert(prev_state !== undefined);
                 assert(prev_state.is_friend === true);
@@ -323,10 +314,12 @@ export default function Direct({params}:{params:{slug: string}}){
             })
         }
         else{
-            assert(data.payload.is_local_echo === true);
-
             setInbox((inbox) => {
-                return inbox.filter((dm) => dm.hash !== data.payload.hash);
+                return inbox.filter((dm) => {
+                    assert(dm.is_local_echo === true);
+                    if(dm.hash !== payload.hash)
+                        return dm;
+                });
             })
         }
     }
