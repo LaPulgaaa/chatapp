@@ -1,25 +1,22 @@
 import { selectorFamily } from "recoil";
 import type { ChatMessageData } from "@/packages/zod";
-import { room_details_response_schema } from "@/packages/zod";
+import { fetch_user_chats } from "./fetch_chats";
+import assert from "minimalistic-assert";
 
 export const fetch_chat_msgs = selectorFamily<ChatMessageData["messages"] | undefined, { chat_id: string }>({
     key: "fetch_chat_msgs",
     get: ({chat_id}:{chat_id: string}) => 
-        async() => {
+        async({get}) => {
+            
             try{
-                const resp=await fetch(`/api/message/chat/${chat_id}`,{
-                    credentials:"include",
-                    next:{
-                        revalidate: 30
-                    }
-                });
-                const { raw_data }=await resp.json();
+                const all_chats = get(fetch_user_chats);
+                const search_chat = all_chats.find((chat) => chat.id === chat_id);
 
-                const data = room_details_response_schema.parse(raw_data);
-                return data.messages;
+                assert(search_chat !== undefined)
+
+                return search_chat.messages;
             }catch(err)
             {
-                alert(err);
                 console.log(err);
 
                 return undefined;

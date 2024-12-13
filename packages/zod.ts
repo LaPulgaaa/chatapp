@@ -55,9 +55,11 @@ export const user_chat_schema = z.object({
     name:z.string(),
     conn_id: z.number(),
     messages: z.array(z.object({
+        id: z.number(),
         content: z.string(),
         sender: z.object({
             username: z.string(),
+            name: z.string().nullish(),
         }),
         createdAt: z.string(),
     })),
@@ -68,12 +70,9 @@ export const user_chats_response_schema=z.array(
 )
 
 export const unit_message_schema= z.object({
-    chatId:z.string(),
     content:z.string(),
     createdAt:z.string(),
-    deleted:z.boolean(),
     id:z.number(),
-    memberId:z.string(),
     sender:z.object({
         username:z.string(),
         name: z.string().nullish(),
@@ -145,7 +144,7 @@ export type RoomMemberDetails = z.output<typeof room_member_details_schema>;
 
 export const user_details_edit_form_schema = z.object({
     username: z.string(),
-    name: z.string().optional(),
+    name: z.string().nullish(),
     avatarurl: z.string().optional(),
     about: z.string().optional(),
     status: z.string().optional(),
@@ -159,12 +158,18 @@ export const private_chat_schema = z.object({
         username: z.string(),
         avatarurl: z.string().nullable(),
         about: z.string().nullable(),
+        favorite: z.array(z.string()),
+        name: z.string().nullish(),
+        status: z.string().nullable(),
     }),
     messages: z.array(z.object({
         content: z.string(),
         sendBy: z.object({
             username: z.string(),
-        })
+            name: z.string().nullish(),
+        }),
+        createdAt: z.string(),
+        id: z.number(),
     })),
     connectionId: z.string(),
 });
@@ -181,8 +186,18 @@ export const direct_msg_schema = z.object({
     createdAt: z.string(),
     sendBy: z.object({
         username: z.string(),
+        name: z.string().nullish(),
     })
 });
+
+export type DirectMsg = {
+    id: number,
+    content: string,
+    createdAt: Date,
+    sendBy: {
+        username: string,
+    }
+}
 
 export const friend_search_result_schema = z.discriminatedUnion("is_friend", [
     z.object({
@@ -194,7 +209,7 @@ export const friend_search_result_schema = z.discriminatedUnion("is_friend", [
         friendship_data: z.object({
             id: z.string(),
             connectionId: z.string(),
-            messageFrom: z.string(),
+            messageFrom: z.string().optional(),
             blocked: z.boolean(),
             messages: z.array(direct_msg_schema),
             is_active: z.boolean(),
@@ -206,7 +221,7 @@ export const friend_search_result_schema = z.discriminatedUnion("is_friend", [
                 status: z.string().nullable(),
                 about: z.string().nullable(),
                 favorite: z.array(z.string()),
-                name: z.string().nullable(),
+                name: z.string().nullish(),
                 avatarurl: z.string().nullable(),
             })
     })
