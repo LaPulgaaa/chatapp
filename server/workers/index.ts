@@ -59,6 +59,7 @@ async function process_msg(message:WorkerPayload){
                     content: message.content,
                     createdAt: message.createdAt,
                     senderId: message.sender,
+                    hash: message.hash
                 },
                 select: {
                     friendship: {

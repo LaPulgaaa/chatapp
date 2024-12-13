@@ -65,6 +65,8 @@ model Message {
 
   deleted Boolean @default(false)
 
+  hash String? @unique
+
 }
 
 model Chat {
@@ -114,4 +116,6 @@ model DirectMessage {
 
   senderId String
   sendBy Member @relation(fields: [senderId], references: [username])
+
+  hash String? @unique
 }

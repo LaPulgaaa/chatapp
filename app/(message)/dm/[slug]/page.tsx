@@ -22,6 +22,22 @@ import { dm_details_state } from "@/lib/store/atom/dm_details_state";
 import { fetch_dms } from "@/lib/store/selector/fetch_dms";
 import { get_new_local_id } from "../../util";
 
+type Payload = ({
+    id: number,
+    conc_id: string,
+    is_local_echo: false,
+} | {
+    hash: string,
+    is_local_echo: true,
+}) & {
+    type: 'DM'
+}
+type DeleteMsgCallbackData = {
+    type: string,
+    payload: Payload,
+}
+
+
 export default function Direct({params}:{params:{slug: string}}){
     const dm_ref = useRef<HTMLDivElement>(null);
     const [compose,setCompose] = useState<string>("");
@@ -74,7 +90,7 @@ export default function Direct({params}:{params:{slug: string}}){
                 inline: "center"
             })
         }
-        if(inbox.length >= 10){
+        if(inbox.length >= 5){
             const friendship_data = dmStateDetails.getValue()!.friendship_data;
             const conc_id = friendship_data?.connectionId;
             const last_msg = friendship_data?.messages.slice(-1);
@@ -199,6 +215,7 @@ export default function Direct({params}:{params:{slug: string}}){
         Signal.get_instance().REGISTER_CALLBACK("MSG_CALLBACK",pm_recieve_callback);
         Signal.get_instance().REGISTER_CALLBACK("ONLINE_CALLBACK",update_member_online_status);
         Signal.get_instance().REGISTER_CALLBACK("TYPING_CALLBACK",typing_notif_callback);
+        Signal.get_instance().REGISTER_CALLBACK('DELETE_DM',delete_msg_callback);
 
         return () => {
             if(
@@ -245,16 +262,53 @@ export default function Direct({params}:{params:{slug: string}}){
                 let last_local_msg = inbox.slice(-1);
                 const local_id = get_new_local_id(last_msg.id,last_local_msg[0]?.id);
                 console.log(local_id)
-                const new_dm = {
+                const new_dm:UnitDM = {
                     id: local_id,
                     content: data.payload.message.content,
                     createdAt: data.payload.createdAt,
                     sendBy: {
                         username: data.payload.message.user,
-                    }
+                    },
+                    is_local_echo: true,
+                    hash: data.payload.hash,
                 }
                 return [...inbox,new_dm]
             });
+        }
+    }
+    function delete_msg_callback(raw_data: string){
+        const data:DeleteMsgCallbackData = JSON.parse(`${raw_data}`);
+
+        if(dmStateDetails.state !== "hasValue")
+            return;
+
+        if(data.payload.is_local_echo === false && data.payload.conc_id !== dmStateDetails.getValue()?.friendship_data?.connectionId)
+            return;
+
+        if(data.payload.is_local_echo === false){
+            const messages = dmStateDetails.getValue()!.friendship_data!.messages;
+
+            const left_messages = messages.filter((msg) => msg.id !== data.payload.id);
+            setDmStateDetails((prev_state) => {
+                assert(prev_state !== undefined);
+                assert(prev_state.is_friend === true);
+
+                return {
+                    is_friend: prev_state.is_friend,
+                    profile_info: prev_state.profile_info,
+                    friendship_data: {
+                        ...prev_state.friendship_data!,
+                        messages: [...left_messages],
+                    }
+                }
+            })
+        }
+        else{
+            assert(data.payload.is_local_echo === true);
+
+            setInbox((inbox) => {
+                return inbox.filter((dm) => dm.hash !== data.payload.hash);
+            })
         }
     }
 

@@ -3,6 +3,8 @@ import { RedisSubscriptionManager } from './redisClient';
 import { createClient } from 'redis';
 import { prisma } from '../../packages/prisma/prisma_client';
 import { createId } from '@paralleldrive/cuid2';
+import sha256 from "crypto-js/sha256";
+import Base64 from "crypto-js/enc-base64";
 
 const client=createClient();
 
@@ -217,12 +219,15 @@ export async function ws(wss:WebSocketServer){
                 const msg_type: "chat" | "dm" = data.payload.msg_type;
                 const {id, ...content} = message;
                 const createdAt = new Date().toISOString();
+                const hash = sha256(message.content+createdAt+message.user);
+                const hash_str = Base64.stringify(hash);
                 const msg_data = JSON.stringify({
                     type:"message",
                     payload:{
                         roomId,
                         message: content,
                         createdAt,
+                        hash: hash_str,
                     }
                 });
                 RedisSubscriptionManager.get_instance().addChatMessage(roomId,"MSG_CALLBACK",msg_data);
@@ -244,9 +249,11 @@ export async function ws(wss:WebSocketServer){
                         createdAt,
                         friendshipId: data.payload.friendshipId,
                         sender: message.user,
+                        hash: hash_str
                     }))
                 }
             }
+
             if(data.type === "typing"){
                 const { chat_id, user_id } = data.payload;
 
@@ -260,6 +267,62 @@ export async function ws(wss:WebSocketServer){
 
                 RedisSubscriptionManager.get_instance().addChatMessage(chat_id,"TYPING_CALLBACK",msg_data)
             }
+
+            if(data.type === "delete"){
+                const {type,is_local_echo} = data.payload;
+
+                try{
+                    if(type === "DM" && is_local_echo === false){
+                        const id = data.payload;
+                        const resp = await prisma.directMessage.update({
+                            where: {
+                                id
+                            },
+                            data: {
+                                deleted: true,
+                            }
+                        })
+                        const msg = JSON.stringify({
+                            type: "delete",
+                            payload: {
+                                type: "DM",
+                                is_local_echo: false,
+                                conc_id: resp.connectionId,
+                                id: resp.id,
+                            }
+                        })
+                        RedisSubscriptionManager.get_instance().addChatMessage(resp.connectionId,"DELETE_DM",msg);
+                    }
+                    else if(type === "DM" && is_local_echo === true){
+                        const { content, createdAt, username} = data.payload;
+                        const hash = sha256(content+createdAt+username);
+                        const hash_str = Base64.stringify(hash);
+                        const resp = await prisma.directMessage.update({
+                            where: {
+                                hash: hash_str
+                            },
+                            data: {
+                                deleted: true,
+                            }
+                        })
+                        const msg = JSON.stringify({
+                            type: "delete",
+                            payload: {
+                                type: "DM",
+                                is_local_echo: true,
+                                conc_id: resp.connectionId,
+                                hash: hash_str
+                            }
+                        })
+                        RedisSubscriptionManager.get_instance().addChatMessage(resp.connectionId,"DELETE_DM",msg);
+                    }
+
+                    
+                }catch(err){
+                    console.log(err);
+                }
+            }
+
             if(data.type === "leave"){
                 const msg_data = JSON.stringify(
                     {
