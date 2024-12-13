@@ -1,10 +1,11 @@
 import { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { prisma } from "@/packages/prisma/prisma_client";
-import type { PrivateChat } from "@/packages/zod";
+import type { DirectMsg, PrivateChat } from "@/packages/zod";
 
-type DirectMessagesServer = (Omit<PrivateChat, "lastmsgAt"> & {
+type DirectMessagesServer = (Omit<PrivateChat, "lastmsgAt" | "messages"> & {
     lastmsgAt: Date,
+    messages: DirectMsg[]
 })[];
 
 type Friend = {
@@ -13,6 +14,9 @@ type Friend = {
         about: string | null;
         username: string;
         avatarurl: string | null;
+        status: string | null;
+        name: string | null;
+        favorite: string[]
     };
     blocked: boolean;
     lastmsgAt: Date;
@@ -43,6 +47,9 @@ export async function GET(req: NextRequest){
                         username: true,
                         avatarurl: true,
                         about: true,
+                        status: true,
+                        name: true,
+                        favorite: true,
                     },
                 },
                 connectionId: true,
@@ -55,7 +62,7 @@ export async function GET(req: NextRequest){
 
         let friendships_with_last_dm:DirectMessagesServer = [];
 
-        await Promise.all(resp.map(async(frnd:Friend) => {
+        await Promise.all(resp.map(async(frnd) => {
             try{
                 const message = await prisma.directMessage.findMany({
                     where: {
@@ -66,6 +73,8 @@ export async function GET(req: NextRequest){
                         deleted: false,
                     },
                     select: {
+                        id: true,
+                        createdAt: true,
                         content: true,
                         sendBy: {
                             select: {

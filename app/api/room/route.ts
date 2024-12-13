@@ -25,10 +25,12 @@ export async function GET(req:NextRequest){
                                 deleted: false,
                             },
                             select: {
+                                id: true,
                                 content: true,
                                 sender: {
                                     select: {
                                         username: true,
+                                        name: true,
                                     }
                                 },
                                 createdAt: true,

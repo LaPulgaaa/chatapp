@@ -42,13 +42,16 @@ export async function GET(req:NextRequest,
                         },
                         deleted: false
                     },
-                    include:{
+                    select:{
+                        id: true,
                         sender:{
                             select:{
                                 username: true,
                                 name: true,
                             }
-                        }
+                        },
+                        content: true,
+                        createdAt: true,
                     }
                 },
             }
