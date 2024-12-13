@@ -125,12 +125,15 @@ export default function Chat({params}:{params:{slug:string}}){
 
             if(chat.length > 0)
             {
+                
                 const last_recent_msg = chat.slice(-1)[0];
                 new_last_msg = {
+                    id: Math.random(),
                     createdAt: last_recent_msg.payload.createdAt,
                     content: last_recent_msg.payload.message.content,
                     sender: {
                         username: last_recent_msg.payload.message.user,
+                        name: last_recent_msg.payload.message.name,
                     }
                 }
             }
@@ -153,10 +156,12 @@ export default function Chat({params}:{params:{slug:string}}){
                 ...narrowed_room,
                 lastmsgAt: new_last_msg.createdAt,
                 messages: [{
+                    id: Math.random(),
                     content: new_last_msg.content,
                     createdAt: new_last_msg.createdAt,
                     sender: {
                         username: new_last_msg.sender.username,
+                        name: new_last_msg.sender.name,
                     }
                 }]
             }
