@@ -120,17 +120,47 @@ export default function Chat({params}:{params:{slug:string}}){
             assert(narrowed_room !== undefined);
             const other_rooms = all_rooms_data.filter((room) => room.id !== narrowed_room.id);
 
-            if(sweeped.length === 0)
+            let new_last_msg;
+
+            if(chat.length > 0)
+            {
+                
+                const last_recent_msg = chat.slice(-1)[0];
+                new_last_msg = {
+                    id: Math.random(),
+                    createdAt: last_recent_msg.payload.createdAt,
+                    content: last_recent_msg.payload.message.content,
+                    sender: {
+                        username: last_recent_msg.payload.message.user,
+                        name: last_recent_msg.payload.message.name,
+                    }
+                }
+            }
+            else if(sweeped.length > 0)
+            {
+                const last_sweeped_msg = sweeped.slice(-1)[0];
+                new_last_msg = {
+                    createdAt: last_sweeped_msg.createdAt,
+                    content: last_sweeped_msg.content,
+                    sender: {
+                        username: last_sweeped_msg.sender.username,
+                    }
+                }
+            }
+
+            if(new_last_msg === undefined)
                 return;
 
             const new_last_msg = sweeped.slice(-1)[0];
             const room_details_with_updated_last_msg = {
                 ...narrowed_room,
                 messages: [{
+                    id: Math.random(),
                     content: new_last_msg.content,
                     createdAt: new_last_msg.createdAt,
                     sender: {
                         username: new_last_msg.sender.username,
+                        name: new_last_msg.sender.name,
                     }
                 }]
             }
