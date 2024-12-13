@@ -8,6 +8,7 @@ import type { ChatReponse, PrivateChats } from "@/packages/zod";
 import { useSession } from "next-auth/react";
 import { fetch_dms } from "@/lib/store/selector/fetch_dms";
 import { subscribed_chats_state } from "@/lib/store/atom/subscribed_chats_state";
+import { direct_msg_state } from "@/lib/store/atom/dm";
 
 function get_last_msg_time(lastmsgAt: string | undefined): string {
 
@@ -50,7 +51,7 @@ function get_last_msg_time(lastmsgAt: string | undefined): string {
 export default function Home(){
     const session = useSession();
     const roomsStateData = useRecoilValueLoadable(subscribed_chats_state);
-    const dmStateData = useRecoilValueLoadable(fetch_dms);
+    const dmStateData = useRecoilValueLoadable(direct_msg_state);
     //@ts-ignore
     const id: string | undefined = session.data?.id;
 
