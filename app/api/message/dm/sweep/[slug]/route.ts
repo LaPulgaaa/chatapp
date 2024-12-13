@@ -26,6 +26,7 @@ export async function POST(req: NextRequest,{ params }:{ params: { slug: string 
                 id: true,
                 createdAt: true,
                 content: true,
+                hash: true,
                 sendBy:{
                     select: {
                         username: true,

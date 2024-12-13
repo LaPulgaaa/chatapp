@@ -233,18 +233,11 @@ export type DmProfileInfo = FriendSearchResult["profile_info"];
 
 export type DirectMessage = z.output<typeof direct_msg_schema>;
 
-export const message_delete_payload = z.discriminatedUnion("is_local_echo",[
-    z.object({
-        is_local_echo: z.literal(false),
-        id: z.number(),
-        conc_id: z.string(),
-        type: z.literal("DM")
-    }), 
-    z.object({
-        is_local_echo: z.literal(true),
-        hash: z.string(),
-        type: z.literal("DM")
-    })
-])
+export const message_delete_payload = z.object({
+    hash: z.string(),
+    conc_id: z.string(),
+    type: z.literal("DM"),
+    id: z.number(),
+})
 
 export type MessageDeletePayload = z.output<typeof message_delete_payload>;

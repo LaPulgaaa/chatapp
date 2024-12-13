@@ -4,10 +4,8 @@ import assert from "minimalistic-assert";
 
 import { useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { useRecoilRefresher_UNSTABLE, useRecoilStateLoadable } from "recoil";
-import { useToast } from "@/hooks/use-toast";
-import { Signal } from "./signal";
-import { fetch_dms } from "@/lib/store/selector/fetch_dms";
+import { useRecoilStateLoadable } from "recoil";
+import { Signal } from "../home/signal";
 import { MessageDeletePayload } from "@/packages/zod";
 import { direct_msg_state } from "@/lib/store/atom/dm";
 
@@ -18,18 +16,7 @@ type DeleteMsgCallbackData = {
 
 export default function Connect(){
     const session = useSession();
-    const { toast } = useToast();
-    const refresh_dms = useRecoilRefresher_UNSTABLE(fetch_dms);
     const [dms,setDms] = useRecoilStateLoadable(direct_msg_state);
-
-    function recieve_invite_callback(raw_data: string){
-        const data = JSON.parse(raw_data);
-        toast({
-            title: data.payload.requestBy,
-            description: data.payload.content,
-        });
-        refresh_dms();
-    }
 
     function delete_msg_callback(raw_string: string){
         const data:DeleteMsgCallbackData = JSON.parse(`${raw_string}`);
@@ -59,7 +46,6 @@ export default function Connect(){
     useEffect(()=>{
         if(session.status === "authenticated"){
             //@ts-ignore
-            Signal.get_instance(session.data.username).REGISTER_CALLBACK("INVITE",recieve_invite_callback);
             Signal.get_instance().REGISTER_CALLBACK("DELETE_NON_ECHO",delete_msg_callback);
         }
 
@@ -67,8 +53,7 @@ export default function Connect(){
             if(session.status === "authenticated")
             {
                 //@ts-ignore
-                Signal.get_instance(session.data.username).DEREGISTER("INVITE");
-                Signal.get_instance().DEREGISTER("DELETE_NON_ECHO");
+                Signal.get_instance(session.data.username).DEREGISTER("DELETE_NON_ECHO");
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
