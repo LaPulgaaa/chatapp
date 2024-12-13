@@ -117,6 +117,7 @@ export const worker_payload = z.discriminatedUnion("type",[
         createdAt: z.string(),
         friendshipId: z.string(),
         sender: z.string(),
+        hash: z.string(),
     })
 ])
 

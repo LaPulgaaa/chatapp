@@ -45,7 +45,7 @@ export type RecievedMessage={
             name?: string,
         },
         createdAt: string,
-    
+        hash: string,
     }
 }
 
