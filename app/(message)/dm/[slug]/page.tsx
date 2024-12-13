@@ -21,20 +21,12 @@ import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import ProfileDialog from "../profile_dialog";
 import { dm_details_state } from "@/lib/store/atom/dm_details_state";
 import { fetch_dms } from "@/lib/store/selector/fetch_dms";
+import { get_new_local_id } from "../../util";
+import { MessageDeletePayload } from "@/packages/zod";
 
-type Payload = ({
-    id: number,
-    conc_id: string,
-    is_local_echo: false,
-} | {
-    hash: string,
-    is_local_echo: true,
-}) & {
-    type: 'DM'
-}
 type DeleteMsgCallbackData = {
     type: string,
-    payload: Payload,
+    payload: MessageDeletePayload,
 }
 
 
@@ -283,8 +275,46 @@ export default function Direct({params}:{params:{slug: string}}){
                 },
                     is_local_echo: true,
                     hash: data.payload.hash,
-            }
-            setInbox((inbox) => [...inbox,new_dm]);
+                }
+                return [...inbox,new_dm]
+            });
+        }
+    }
+    function delete_msg_callback(raw_data: string){
+        const data:DeleteMsgCallbackData = JSON.parse(`${raw_data}`);
+        const payload = data.payload;
+        if(dmStateDetails.state !== "hasValue")
+            return;
+
+        if(payload.is_local_echo === false && payload.conc_id !== dmStateDetails.getValue()?.friendship_data?.connectionId)
+            return;
+
+        if(payload.is_local_echo === false){
+            const messages = dmStateDetails.getValue()!.friendship_data!.messages;
+
+            const left_messages = messages.filter((msg) => msg.id !== payload.id);
+            setDmStateDetails((prev_state) => {
+                assert(prev_state !== undefined);
+                assert(prev_state.is_friend === true);
+
+                return {
+                    is_friend: prev_state.is_friend,
+                    profile_info: prev_state.profile_info,
+                    friendship_data: {
+                        ...prev_state.friendship_data!,
+                        messages: [...left_messages],
+                    }
+                }
+            })
+        }
+        else{
+            setInbox((inbox) => {
+                return inbox.filter((dm) => {
+                    assert(dm.is_local_echo === true);
+                    if(dm.hash !== payload.hash)
+                        return dm;
+                });
+            })
         }
     }
 
