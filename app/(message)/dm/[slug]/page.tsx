@@ -50,8 +50,9 @@ export default function Direct({params}:{params:{slug: string}}){
     const [history,setHistory] = useState<UnitDM[]>([]);
     const [sweeped,setSweeped] = useState<UnitDM[]>([]);
     const [active, setActive] = useState<boolean>(false);
-    const [typing,setTyping] = useState<boolean>(false);
+    const [typing,setTyping] = useState<number>(0);
     const [send,setSend] = useState(false);
+    const type_ref = useRef<HTMLDivElement>(null);
 
     useEffect(()=>{
         if(compose.trim().length === 0){
@@ -76,6 +77,19 @@ export default function Direct({params}:{params:{slug: string}}){
             })
         }
     },[history])
+
+    useEffect(() => {
+        const type_node = type_ref.current;
+        if(typing > 0 && type_node !== null){
+            const type_comp = type_node.querySelector("#typing");
+            if(type_comp !== null){
+                type_comp.scrollIntoView({
+                    behavior: "smooth",
+                    inline: "end",
+                })
+            }
+        }
+    },[typing])
 
     useEffect(()=>{
         const chat_node = dm_ref.current;
@@ -242,11 +256,16 @@ export default function Direct({params}:{params:{slug: string}}){
         if(dmStateDetails.getValue()?.friendship_data?.connectionId !== data.payload.chat_id)
             return;
 
-        setTyping(true);
+        setTyping((typing) => typing+1);
 
-        setTimeout(() => {
-            setTyping(false);
-        }, 4000);
+        setInterval(() => {
+            setTyping((typing) => {
+                if(typing > 0)
+                    return typing-1;
+
+                return 0;
+            });
+        }, 3000);
     }
 
     function pm_recieve_callback(raw_data: string){
@@ -397,10 +416,10 @@ export default function Direct({params}:{params:{slug: string}}){
                             })
                         }
                     </div>
-                    <div className="absolute bottom-0 mb-10">
+                    <div ref={type_ref} className="absolute bottom-0 mb-10">
                         {
-                            typing === true && 
-                            <div className="flex m-4 space-x-1 mb-6">
+                            typing > 0 && 
+                            <div id="typing" className="flex m-4 space-x-1 mb-6">
                                 <Avatar className="w-[35px] h-[35px] mt-2">
                                     <AvatarImage src={`https://avatar.varuncodes.com/${params.slug}`}/>
                                     <AvatarFallback>{params.slug.substring(0,2)}</AvatarFallback>
