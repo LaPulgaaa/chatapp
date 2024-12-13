@@ -94,7 +94,7 @@ const RoomTabs = memo(
             {
                 sorted_acc_to_time?.map((convo)=>{
                     if(convo.type === "chat"){
-                        const last_sent_msg = convo.messages[0];
+                        const last_sent_msg = convo.messages.slice(-1)[0];
                         return <div key={convo.id} 
                         className="p-3 rounded-md m-1 cursor-pointer hover:bg-gray-300 hover:dark:bg-slate-800 border-2 ease-out duration-300 transition-all"
                         onClick={()=>{
@@ -129,7 +129,7 @@ const RoomTabs = memo(
                                 <p className="hidden md:block">{get_last_msg_time(convo.lastmsgAt)}</p>
                                 </div>
 
-                                <p className="border-l-2 pl-6 italic text-muted-foreground truncate">{convo.messages[0]?.content}</p>
+                                <p className="border-l-2 pl-6 italic text-muted-foreground truncate">{convo.messages.slice(-1)[0]?.content}</p>
                             </div>
                         )
                     }

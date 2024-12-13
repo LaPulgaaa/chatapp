@@ -33,10 +33,6 @@ export async function GET(req:NextRequest){
                                 },
                                 createdAt: true,
                             },
-                            take: 1,
-                            orderBy: {
-                                createdAt: "desc"
-                            }
                         }
                     }
                 },
