@@ -91,6 +91,8 @@ export async function ws(wss:WebSocketServer){
                 const inviteeId = data.payload.inviteeId;
                 const content = data.payload.content;
                 const createdAt = new Date().toISOString();
+                const hash = sha256(content+createdAt+userId);
+                const hash_str = Base64.stringify(hash);
                 let conc_id = createId();
                 try{
                     
@@ -118,6 +120,7 @@ export async function ws(wss:WebSocketServer){
                                 content: content,
                                 senderId: userId,
                                 connectionId: conc_id,
+                                hash: hash_str,
                             }
                         });
 
@@ -270,53 +273,58 @@ export async function ws(wss:WebSocketServer){
 
             if(data.type === "delete"){
                 const {type,is_local_echo} = data.payload;
-
+                let msg;
+                let conc_id;
                 try{
-                    if(type === "DM" && is_local_echo === false){
-                        const id = data.payload;
-                        const resp = await prisma.directMessage.update({
-                            where: {
-                                id
-                            },
-                            data: {
-                                deleted: true,
-                            }
-                        })
-                        const msg = JSON.stringify({
-                            type: "delete",
-                            payload: {
-                                type: "DM",
-                                is_local_echo: false,
-                                conc_id: resp.connectionId,
-                                id: resp.id,
-                            }
-                        })
-                        RedisSubscriptionManager.get_instance().addChatMessage(resp.connectionId,"DELETE_DM",msg);
-                    }
-                    else if(type === "DM" && is_local_echo === true){
-                        const { content, createdAt, username} = data.payload;
-                        const hash = sha256(content+createdAt+username);
-                        const hash_str = Base64.stringify(hash);
-                        const resp = await prisma.directMessage.update({
-                            where: {
-                                hash: hash_str
-                            },
-                            data: {
-                                deleted: true,
-                            }
-                        })
-                        const msg = JSON.stringify({
-                            type: "delete",
-                            payload: {
-                                type: "DM",
-                                is_local_echo: true,
-                                conc_id: resp.connectionId,
-                                hash: hash_str
-                            }
-                        })
-                        RedisSubscriptionManager.get_instance().addChatMessage(resp.connectionId,"DELETE_DM",msg);
-                    }
+                    if( type === "DM"){
+                        if(is_local_echo === false){
+                            const id = data.payload.id;
+                            const resp = await prisma.directMessage.update({
+                                where: {
+                                    id
+                                },
+                                data: {
+                                    deleted: true,
+                                }
+                            })
+                            msg = JSON.stringify({
+                                type: "delete",
+                                payload: {
+                                    type: "DM",
+                                    conc_id: resp.connectionId,
+                                    id: resp.id,
+                                    hash: resp.hash
+                                }
+                            })
+                            conc_id = resp.connectionId;
+                            
+                        }
+                        else{
+                            const { hash } = data.payload;
 
+                            const resp = await prisma.directMessage.update({
+                                where: {
+                                    hash: hash
+                                },
+                                data: {
+                                    deleted: true,
+                                }
+                            })
+                            msg = JSON.stringify({
+                                type: "delete",
+                                payload: {
+                                    type: "DM",
+                                    conc_id: resp.connectionId,
+                                    id: resp.id,
+                                    hash: resp.hash,
+                                }
+                            })
+                            conc_id = resp.connectionId;
+                        }
+                        RedisSubscriptionManager.get_instance().addChatMessage(conc_id,"DELETE_ECHO",msg);
+                        RedisSubscriptionManager.get_instance().addChatMessage(conc_id,"DELETE_NON_ECHO",msg);
+    
+                    }
                     
                 }catch(err){
                     console.log(err);

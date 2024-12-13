@@ -5,7 +5,7 @@ import Link from "next/link";
 import React,{ useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { SendHorizonal } from "lucide-react";
-import { useRecoilRefresher_UNSTABLE, useRecoilStateLoadable } from "recoil";
+import { useRecoilRefresher_UNSTABLE, useRecoilStateLoadable, useRecoilValueLoadable } from "recoil";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -22,7 +22,8 @@ import ProfileDialog from "../profile_dialog";
 import { dm_details_state } from "@/lib/store/atom/dm_details_state";
 import { fetch_dms } from "@/lib/store/selector/fetch_dms";
 import { get_new_local_id } from "../../util";
-import { MessageDeletePayload } from "@/packages/zod";
+import { FriendSearchResult, MessageDeletePayload, friend_search_result_schema } from "@/packages/zod";
+import { direct_msg_state } from "@/lib/store/atom/dm";
 
 type DeleteMsgCallbackData = {
     type: string,
@@ -35,7 +36,8 @@ export default function Direct({params}:{params:{slug: string}}){
     const [compose,setCompose] = useState<string>("");
     const [disable,setDisable] = useState<boolean>(true);
     const session = useSession();
-    const [dmStateDetails,setDmStateDetails] = useRecoilStateLoadable(dm_details_state({username: params.slug}));
+    const [dmStateDetails,setDmStateDetails] = useState<FriendSearchResult | undefined>();
+    const [dms,setDms] = useRecoilStateLoadable(direct_msg_state);
     const refresh_dm_state = useRecoilRefresher_UNSTABLE(dm_details_state({username: params.slug}));
     const refresh_dms = useRecoilRefresher_UNSTABLE(fetch_dms);
     const [inbox,setInbox] = useState<UnitDM[]>([]);
@@ -45,6 +47,52 @@ export default function Direct({params}:{params:{slug: string}}){
     const [typing,setTyping] = useState<number>(0);
     const [send,setSend] = useState(false);
     const type_ref = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if(dms.state === "hasValue" && dms.getValue()){
+            const friend = dms.getValue().find((dm) => {
+                if(dm.to.username === params.slug)
+                    return dm;
+            });
+
+            if(friend !== undefined)
+            {
+                const {to, ...cond_details} = friend
+                const data = {
+                    is_friend: true as const,
+                    friendship_data: {
+                        ...cond_details,
+                        is_active: false,
+                    },
+                    profile_info: {
+                        avatarurl: to.avatarurl,
+                        about: to.about,
+                        name: to.name,
+                        favorite: to.favorite,
+                        status: to.status
+                    }
+                }
+
+                setDmStateDetails(data);
+            }
+            else {
+                fetch_user_details();
+            }
+        }
+    },[dms])
+
+    async function fetch_user_details(){
+        try{
+            const resp = await fetch(`/api/dm/${params.slug}`);
+            const { raw_data } = await resp.json();
+            const data = friend_search_result_schema.parse(raw_data);
+            assert(data.is_friend === false)
+            setDmStateDetails(data);
+        }catch(err){
+            console.log(err);
+            return undefined;
+        }
+    }
 
     useEffect(()=>{
         if(compose.trim().length === 0){
@@ -97,7 +145,7 @@ export default function Direct({params}:{params:{slug: string}}){
             })
         }
         if(inbox.length >= 5){
-            const friendship_data = dmStateDetails.getValue()!.friendship_data;
+            const friendship_data = dmStateDetails!.friendship_data;
             const conc_id = friendship_data?.connectionId;
             const last_msg = friendship_data?.messages.slice(-1);
             
@@ -111,7 +159,7 @@ export default function Direct({params}:{params:{slug: string}}){
 
     function send_typing_notification(){
         
-        if(dmStateDetails.state !== "hasValue" || dmStateDetails.getValue()?.is_friend === false)
+        if(dmStateDetails === undefined || dmStateDetails?.is_friend === false)
             return;
         //@ts-ignore
         const username = session.data.username;
@@ -119,7 +167,7 @@ export default function Direct({params}:{params:{slug: string}}){
             type:"typing",
             payload: {
                 user_id: username,
-                chat_id: dmStateDetails.getValue()?.friendship_data!.connectionId,
+                chat_id: dmStateDetails?.friendship_data!.connectionId,
             }
         })
         if(send === true)
@@ -152,11 +200,10 @@ export default function Direct({params}:{params:{slug: string}}){
     useEffect(()=>{
         async function sweep_lastest_dms(){
             if(
-                dmStateDetails.state === "hasValue" && 
-                dmStateDetails.getValue() !== undefined
+                dmStateDetails !== undefined
             )
             {
-                const friendship_data = dmStateDetails.getValue()!.friendship_data;
+                const friendship_data = dmStateDetails.friendship_data;
                 const conc_id = friendship_data?.connectionId;
                 const last_msg = friendship_data?.messages.slice(-1);
                 
@@ -169,23 +216,24 @@ export default function Direct({params}:{params:{slug: string}}){
 
         sweep_lastest_dms();
         //eslint-disable-next-line react-hooks/exhaustive-deps
-    },[dmStateDetails.state])
+    },[dmStateDetails])
 
     useEffect(()=>{
         if(sweeped.length > 0){
-            setDmStateDetails((prev_state) => {
-                assert(prev_state !== undefined);
-                assert(prev_state.is_friend === true);
-
-                return {
-                    is_friend: prev_state.is_friend,
-                    profile_info: prev_state.profile_info,
-                    friendship_data: {
-                        ...prev_state.friendship_data!,
-                        messages: [...prev_state.friendship_data.messages, ...sweeped],
-
+            setDms((dms) => {
+                const updated_dms = dms.map((dm) => {
+                    if(dm.to.username === params.slug){
+                        const prev_state = dm;
+                        return {
+                            ...prev_state,
+                            messages: [...prev_state.messages, ...sweeped]
+                        }
                     }
-                }
+                    else
+                    return dm;
+                });
+
+                return updated_dms;
             })
             setInbox([]);
         }
@@ -195,24 +243,23 @@ export default function Direct({params}:{params:{slug: string}}){
     useEffect(()=>{
         if(
         session.status === "authenticated" && 
-        dmStateDetails.state === "hasValue" && 
-        dmStateDetails.getValue() !== undefined && 
-        dmStateDetails.getValue()!.is_friend === true
+        dmStateDetails !== undefined && 
+        dmStateDetails.is_friend === true
         ){
             //@ts-ignore
             const username = session.data.username;
             //@ts-ignore
             const user_id = session.data.id;
-            const conc_id = dmStateDetails.getValue()!.friendship_data!.connectionId;
-            setActive(dmStateDetails.getValue()!.friendship_data!.is_active);
-            setHistory(dmStateDetails.getValue()!.friendship_data!.messages);
+            const conc_id = dmStateDetails.friendship_data!.connectionId;
+            setActive(dmStateDetails.friendship_data!.is_active);
+            setHistory(dmStateDetails.friendship_data!.messages);
             Signal.get_instance(username).SUBSCRIBE(conc_id,user_id,username);
             
         }
         else if(
             session.status === "authenticated" && 
-            dmStateDetails.state === "hasValue" &&
-            dmStateDetails.getValue()!.is_friend === false
+            dmStateDetails !== undefined &&
+            dmStateDetails.is_friend === false
         ){
             //@ts-ignore
             const username = session.data.username;
@@ -221,17 +268,17 @@ export default function Direct({params}:{params:{slug: string}}){
         Signal.get_instance().REGISTER_CALLBACK("MSG_CALLBACK",pm_recieve_callback);
         Signal.get_instance().REGISTER_CALLBACK("ONLINE_CALLBACK",update_member_online_status);
         Signal.get_instance().REGISTER_CALLBACK("TYPING_CALLBACK",typing_notif_callback);
+        Signal.get_instance().REGISTER_CALLBACK('DELETE_ECHO',delete_msg_callback);
 
         return () => {
             if(
                 session.status === "authenticated" &&
-                dmStateDetails.state === "hasValue" &&
-                dmStateDetails.getValue() !== undefined &&
-                dmStateDetails.getValue()!.is_friend === true
+                dmStateDetails !== undefined &&
+                dmStateDetails.is_friend === true
             ){
                 //@ts-ignore
                 const username = session.data.username;
-                Signal.get_instance(username).UNSUBSCRIBE(dmStateDetails.getValue()!.friendship_data!.connectionId,username);
+                Signal.get_instance(username).UNSUBSCRIBE(dmStateDetails.friendship_data!.connectionId,username);
             }
             Signal.get_instance().DEREGISTER("MSG_CALLBACK");
             Signal.get_instance().DEREGISTER("ONLINE_CALLBACK");
@@ -244,7 +291,7 @@ export default function Direct({params}:{params:{slug: string}}){
 
         if(params.slug !== data.payload.user_id)
             return;
-        if(dmStateDetails.getValue()?.friendship_data?.connectionId !== data.payload.chat_id)
+        if(dmStateDetails?.friendship_data?.connectionId !== data.payload.chat_id)
             return;
 
         setTyping((typing) => typing+6);
@@ -261,18 +308,24 @@ export default function Direct({params}:{params:{slug: string}}){
 
     function pm_recieve_callback(raw_data: string){
         const data:RecievedMessage = JSON.parse(raw_data);
-        if(dmStateDetails.state !== "hasValue" || (dmStateDetails.state === "hasValue" && !dmStateDetails.getValue()?.is_friend))
+        if(dmStateDetails === undefined || (dmStateDetails !== undefined && !dmStateDetails.is_friend))
             return;
-        if(data.payload.roomId !== dmStateDetails.getValue()!.friendship_data!.connectionId)
+        if(data.payload.roomId !== dmStateDetails.friendship_data.connectionId)
         return;
         else{
-            const new_dm:UnitDM = {
-                id: Math.random()*1000,
-                content: data.payload.message.content,
-                createdAt: data.payload.createdAt,
-                sendBy: {
-                    username: data.payload.message.user,
-                },
+            const last_msg = dmStateDetails.friendship_data.messages.slice(-1)[0];
+            
+            setInbox((inbox) => {
+                let last_local_msg = inbox.slice(-1);
+                const local_id = get_new_local_id(last_msg.id,last_local_msg[0]?.id);
+                console.log(local_id)
+                const new_dm:UnitDM = {
+                    id: local_id,
+                    content: data.payload.message.content,
+                    createdAt: data.payload.createdAt,
+                    sendBy: {
+                        username: data.payload.message.user,
+                    },
                     is_local_echo: true,
                     hash: data.payload.hash,
                 }
@@ -283,31 +336,10 @@ export default function Direct({params}:{params:{slug: string}}){
     function delete_msg_callback(raw_data: string){
         const data:DeleteMsgCallbackData = JSON.parse(`${raw_data}`);
         const payload = data.payload;
-        if(dmStateDetails.state !== "hasValue")
+        if(dmStateDetails === undefined)
             return;
 
-        if(payload.is_local_echo === false && payload.conc_id !== dmStateDetails.getValue()?.friendship_data?.connectionId)
-            return;
-
-        if(payload.is_local_echo === false){
-            const messages = dmStateDetails.getValue()!.friendship_data!.messages;
-
-            const left_messages = messages.filter((msg) => msg.id !== payload.id);
-            setDmStateDetails((prev_state) => {
-                assert(prev_state !== undefined);
-                assert(prev_state.is_friend === true);
-
-                return {
-                    is_friend: prev_state.is_friend,
-                    profile_info: prev_state.profile_info,
-                    friendship_data: {
-                        ...prev_state.friendship_data!,
-                        messages: [...left_messages],
-                    }
-                }
-            })
-        }
-        else{
+        else if(payload.conc_id === dmStateDetails.friendship_data?.connectionId){
             setInbox((inbox) => {
                 return inbox.filter((dm) => {
                     assert(dm.is_local_echo === true);
@@ -332,33 +364,33 @@ export default function Direct({params}:{params:{slug: string}}){
         }
     }
     
-    if(dmStateDetails.state !== "hasValue" || dmStateDetails.getValue() === undefined || session.status !== "authenticated")
+    if(dmStateDetails === undefined || session.status !== "authenticated")
         return <div>Loading...</div>;
 
     //@ts-ignore
     const username = session.data.username;
 
     function sendMessage(){
-        const data = dmStateDetails.getValue();
+        const data = dmStateDetails;
         assert(data !== undefined);
 
-        if(data!.is_friend === false){
+        if(data.is_friend === false){
             Signal.get_instance().INVITE(username,params.slug,compose);
         }
         else{
             const broadcast_data={
                 type:"message",
                 payload:{
-                    roomId:data!.friendship_data.connectionId,
+                    roomId:data.friendship_data.connectionId,
                     msg_type: "dm",
                     message:{
                         content:compose,
                         user:username,
                         name: session.data?.user?.name,
                         //@ts-ignore
-                        id:session.data!.id,
+                        id:session.data.id,
                     },
-                    friendshipId: data!.friendship_data.id,
+                    friendshipId: data.friendship_data.id,
                 }
             }
             Signal.get_instance().SEND(JSON.stringify(broadcast_data));
@@ -369,7 +401,7 @@ export default function Direct({params}:{params:{slug: string}}){
     return (
         <div className="w-full h-svh">
             {
-                dmStateDetails.state === "hasValue" && dmStateDetails.getValue() && session.status === "authenticated" ? 
+                dmStateDetails !== undefined && session.status === "authenticated" ? 
                 <div className="flex flex-col w-full h-svh">
                 <div className={`flex rounded-md h-[72px] mx-2 mt-2 mb-1 border-2`}>
                         <Dialog>
@@ -385,16 +417,16 @@ export default function Direct({params}:{params:{slug: string}}){
                                 </div>
                                 </div>
                             </DialogTrigger>
-                            <ProfileDialog profile_info={{...dmStateDetails.getValue()!.profile_info, username: params.slug }} />
+                            <ProfileDialog profile_info={{...dmStateDetails.profile_info, username: params.slug }} />
                         </Dialog>
                 </div>
                 <ScrollArea id="chatbox"
                     className="flex flex-col h-full rounded-md border m-2">
                     <div className="mb-2" ref={dm_ref}>
                         {
-                            dmStateDetails.getValue()!.is_friend && 
+                            dmStateDetails.is_friend && 
                             <DirectMessageHistory 
-                            dms={ dmStateDetails.getValue()!.friendship_data!.messages } 
+                            dms={ dmStateDetails.friendship_data.messages } 
                             username={username}/>
                         }
                         {
