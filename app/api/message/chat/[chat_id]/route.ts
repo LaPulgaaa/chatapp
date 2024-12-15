@@ -77,38 +77,3 @@ export async function GET(req:NextRequest,
         },{status: 400})
     }
 }
-
-export async function PUT(req: NextRequest,{params}:{ params: { chat_id: string }}){
-    const { name, discription }:{ name: string, discription: string} = await req.json();
-    const chat_id = params.chat_id;
-
-    const token = getToken({ req });
-
-    if(token === null)
-        return Response.json({
-            message: "Unauthorized"
-    },{ status: 401 });
-
-    try{
-        //@ts-ignore
-        const resp = await prisma.chat.update({
-            where:{
-                id: chat_id
-            },
-            data: {
-                name,
-                discription
-            }
-        })
-
-        return Response.json({
-            message: "Chat cleared successfully",
-            data: resp
-        },{ status: 200 });
-    }catch(err){
-        console.log(err);
-        return Response.json({
-            message: "Could not delete chat"
-        },{ status:500})
-    }
-}

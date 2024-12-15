@@ -8,15 +8,28 @@ import { useRecoilStateLoadable } from "recoil";
 import { Signal } from "../home/signal";
 import { MessageDeletePayload } from "@/packages/zod";
 import { direct_msg_state } from "@/lib/store/atom/dm";
+import { subscribed_chats_state } from "@/lib/store/atom/subscribed_chats_state";
 
 type DeleteMsgCallbackData = {
     type: string,
     payload: MessageDeletePayload,
 }
 
+export type UpdateDetailsData = {
+    type: "chat_details_update",
+    payload: {
+        chat_id: string,
+        updated_details: {
+            name: string,
+            discription: string,
+        }
+    }
+}
+
 export default function Connect(){
     const session = useSession();
     const [dms,setDms] = useRecoilStateLoadable(direct_msg_state);
+    const [roomsStateData,setRoomsStateData] = useRecoilStateLoadable(subscribed_chats_state);
 
     function delete_msg_callback(raw_string: string){
         const data:DeleteMsgCallbackData = JSON.parse(`${raw_string}`);
@@ -33,7 +46,7 @@ export default function Connect(){
                 ...narrowed_dm,
                 messages: left_msgs
             }
-            console.log("deleted msg")
+
             setDms((dms) => {
                 const other_dms = dms.filter((dm) => dm.connectionId !== payload.conc_id);
 
@@ -43,10 +56,27 @@ export default function Connect(){
 
     }
 
+    function details_update_callback(raw_string: string){
+        const data:UpdateDetailsData = JSON.parse(`${raw_string}`);
+        if(data.type === "chat_details_update"){
+            const all_rooms_data = roomsStateData.getValue();
+            const narrowed_room = all_rooms_data.find((room) => room.id === data.payload.chat_id);
+            assert(narrowed_room !== undefined);
+            const other_rooms = all_rooms_data.filter((room) => room.id !== narrowed_room.id);
+            const updated_narrowed_room = {
+                ...narrowed_room,
+                name: data.payload.updated_details.name,
+                discription: data.payload.updated_details.discription,
+            }
+            setRoomsStateData([...other_rooms,updated_narrowed_room]);
+        }
+    }
+
     useEffect(()=>{
         if(session.status === "authenticated"){
             //@ts-ignore
             Signal.get_instance().REGISTER_CALLBACK("DELETE_NON_ECHO",delete_msg_callback);
+            Signal.get_instance().REGISTER_CALLBACK("UPDATE_DETAILS_CALLBACK",details_update_callback)
         }
 
         return () => {
@@ -54,6 +84,7 @@ export default function Connect(){
             {
                 //@ts-ignore
                 Signal.get_instance(session.data.username).DEREGISTER("DELETE_NON_ECHO");
+                Signal.get_instance().DEREGISTER("UPDATE_DETAILS_CALLBACK");
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -1,23 +1,27 @@
 'use client'
 import {z} from "zod";
-import assert from "minimalistic-assert";
 
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Form } from "@/components/ui/form"
+import { 
+    DialogClose,
+    DialogContent,
+    DialogDescription, 
+    DialogFooter, 
+    DialogHeader, 
+    DialogTitle
+} from "@/components/ui/dialog";
+import { Form } from "@/components/ui/form";
 import { room_details_schema } from "@/packages/zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { useRecoilStateLoadable } from "recoil";
-import { subscribed_chats_state } from "@/lib/store/atom/subscribed_chats_state";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Signal } from "@/app/home/signal";
 
 type FormValue = z.output<typeof room_details_schema>;
 
 export default function EditRoomDetails({room_details,chat_id}:{room_details: FormValue,chat_id: string}){
-    const [roomsStateData,setRoomsStateData] = useRecoilStateLoadable(subscribed_chats_state);
     const form_details = useForm<FormValue>({
         resolver: zodResolver(room_details_schema),
         defaultValues: {
@@ -30,26 +34,16 @@ export default function EditRoomDetails({room_details,chat_id}:{room_details: Fo
 
     async function edit_chat_details(values: FormValue){
         try{
-            const resp = await fetch(`/api/message/chat/${chat_id}`,{
-                method: "PUT",
-                credentials: "include",
-                body: JSON.stringify({
-                    ...values
-                })
-            });
-
-            if(resp.status === 200){
-                const all_rooms_data = roomsStateData.getValue();
-                const narrowed_room = all_rooms_data.find((room) => room.id === chat_id);
-                assert(narrowed_room !== undefined);
-                const other_rooms = all_rooms_data.filter((room) => room.id !== narrowed_room.id);
-                const updated_narrowed_room = {
-                    ...narrowed_room,
-                    name: values.name,
-                    discription: values.discription,
+            const message = {
+                type: "update_details",
+                payload: {
+                    id: chat_id,
+                    updated_details: {
+                        ...values
+                    }
                 }
-                setRoomsStateData([...other_rooms,updated_narrowed_room]);
             }
+            Signal.get_instance().SEND(JSON.stringify(message));
         }catch(err){
             console.log(err);
         }
