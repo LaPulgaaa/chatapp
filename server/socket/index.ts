@@ -271,6 +271,39 @@ export async function ws(wss:WebSocketServer){
                 RedisSubscriptionManager.get_instance().addChatMessage(chat_id,"TYPING_CALLBACK",msg_data)
             }
 
+            if(data.type === "update_details"){
+                const chat_id = data.payload.id;
+                const updated_details = data.payload.updated_details; 
+
+                try{
+                    const resp = await prisma.chat.update({
+                        where: {
+                            id: chat_id
+                        },
+                        data: {
+                            name: updated_details.name,
+                            discription: updated_details.discription
+                        }
+                    })
+                    const msg = JSON.stringify({
+                        type: "chat_details_update",
+                        payload: {
+                            chat_id,
+                            updated_details:{
+                                name: resp.name,
+                                discription: resp.discription,
+                            },
+                        }
+                    });
+    
+                    RedisSubscriptionManager.get_instance().addChatMessage(chat_id,"UPDATE_DETAILS_CALLBACK",msg);
+                }catch(err){
+                    console.log(err);
+                 }
+
+                
+            }
+
             if(data.type === "delete"){
                 const {type,is_local_echo} = data.payload;
                 let msg;
