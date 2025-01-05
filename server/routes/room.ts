@@ -6,12 +6,6 @@ import { RedisSubscriptionManager } from '../socket/redisClient';
 
 const router=express.Router();
 
-type CreateRoomSchema={
-    name:string,
-    discription:string,
-    memberId:string
-}
-
 router.post("/joinChat",authenticate,async(req,res)=>{
     const {roomId,memberId}=req.body;
     try{

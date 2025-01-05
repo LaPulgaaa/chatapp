@@ -11,7 +11,6 @@ export async function GET(req:NextRequest){
     try{
         //@ts-ignore
         const memberId = token.id;
-        let joined_rooms=[];
         const message_subscribed_rooms=await prisma.message.findMany({
             where:{
                 content:`chat_${memberId}`,

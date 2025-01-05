@@ -8,22 +8,6 @@ type DirectMessagesServer = (Omit<PrivateChat, "lastmsgAt" | "messages"> & {
     messages: DirectMsg[]
 })[];
 
-type Friend = {
-    id: string;
-    to: {
-        about: string | null;
-        username: string;
-        avatarurl: string | null;
-        status: string | null;
-        name: string | null;
-        favorite: string[]
-    };
-    blocked: boolean;
-    lastmsgAt: Date;
-    connectionId: string;
-    messageFrom: Date;
-}
-
 
 export async function GET(req: NextRequest){
     const token = await getToken({ req });

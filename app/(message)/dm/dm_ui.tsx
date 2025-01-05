@@ -1,6 +1,5 @@
 import { Signal } from "@/app/home/signal";
-import { DropdownMenuIcon } from "@radix-ui/react-icons";
-import { ChevronDownSquare, MoreVertical, MoreVerticalIcon, Trash2Icon } from "lucide-react";
+import { Trash2Icon } from "lucide-react";
 import { useState } from "react";
 
 export type UnitDM = ({

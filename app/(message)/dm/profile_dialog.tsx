@@ -1,5 +1,5 @@
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { DialogContent, DialogDescription, DialogHeader } from "@/components/ui/dialog";
+import { DialogContent, DialogHeader } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { DmProfileInfo } from "@/packages/zod";
 

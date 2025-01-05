@@ -7,7 +7,6 @@ import { search_by_username } from "./actions";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MessageCircleIcon, SearchIcon, UserIcon } from "lucide-react";
-import Link from "next/link";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
@@ -71,7 +70,7 @@ export default function Search(){
                                         <AvatarImage src={member.avatarurl ?? ""}/>
                                         <AvatarFallback>{initials}</AvatarFallback>
                                     </Avatar>
-                                    <div className="mx-1 px-1 mx-1">
+                                    <div className="mx-1 px-1">
                                         <div>{member.username}</div>
                                         <div className="italic text-muted-foreground truncate w-[124px] text-[15px]">
                                             { member.about }
