@@ -13,7 +13,7 @@ import Inbox from "@/components/Inbox";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useRecoilValue, useRecoilState, useRecoilValueLoadable, useRecoilStateLoadable} from "recoil";
+import { useRecoilValue, useRecoilState, useRecoilStateLoadable} from "recoil";
 import { useRouter } from "next/navigation";
 import { ChevronLeftIcon, ChevronRightIcon, Edit, ListEndIcon, SendHorizonal } from "lucide-react";
 import { DarkLight } from "@/components/DarkLight";
@@ -61,7 +61,7 @@ export default function Chat({params}:{params:{slug:string}}){
     const [compose,setCompose]=useState<string>("");
     const [chat,setChat]=useState<RecievedMessage[]>([]);
     const session = useSession();
-    const [did,setDid]=useState<number>();
+    const [did,_setDid]=useState<number>();
     const [rooms,setRooms]=useRecoilState(UserStateChats);
     const [ishidden,setIshidden] = useRecoilState(isSidebarHidden) 
     const [disable,setDisable] = useState(true);
@@ -486,7 +486,7 @@ export default function Chat({params}:{params:{slug:string}}){
                     <div className="mb-16">
                         {
                             typing.length > 0 && 
-                            <div className="flex mb-4 m-3 space-x-1 mb-6">
+                            <div className="flex m-3 space-x-1 mb-6">
                                 {
                                     typing.map((member) => {
                                         return(
@@ -576,7 +576,7 @@ function Members({room_id,username}:{room_id: string,username: string}){
                                         <AvatarImage src={member.avatarurl ?? ""}/>
                                         <AvatarFallback>{initials}</AvatarFallback>
                                     </Avatar>
-                                    <div className="mx-1 px-1 mx-1">
+                                    <div className="px-1 mx-1">
                                         <div>{member.username}</div>
                                         <div className="italic text-muted-foreground truncate w-[124px] text-[15px]">{member.status ?? "NA"}</div>
                                     </div>

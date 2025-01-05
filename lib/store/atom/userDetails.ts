@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 import { atom, selector } from "recoil";
-import { user_details_edit_form_schema } from "@/packages/zod";
 
 const fetch_user_details = z.object({
     username: z.string(),

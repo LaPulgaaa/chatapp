@@ -4,7 +4,7 @@ import assert from "minimalistic-assert";
 import React,{ useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { SendHorizonal } from "lucide-react";
-import { useRecoilRefresher_UNSTABLE, useRecoilStateLoadable, useRecoilValueLoadable } from "recoil";
+import { useRecoilRefresher_UNSTABLE, useRecoilStateLoadable } from "recoil";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,7 @@ import ProfileDialog from "../profile_dialog";
 import { dm_details_state } from "@/lib/store/atom/dm_details_state";
 import { fetch_dms } from "@/lib/store/selector/fetch_dms";
 import { get_new_local_id } from "../../util";
-import { FriendSearchResult, MessageDeletePayload, friend_search_result_schema } from "@/packages/zod";
+import { FriendSearchResult, MessageDeletePayload, PrivateChats, friend_search_result_schema } from "@/packages/zod";
 import { direct_msg_state } from "@/lib/store/atom/dm";
 
 type DeleteMsgCallbackData = {
@@ -410,7 +410,7 @@ export default function Direct({params}:{params:{slug: string}}){
                                     <AvatarImage src={`https://avatar.varuncodes.com/${params.slug}`}/>
                                     <AvatarFallback>{params.slug.substring(0,2)}</AvatarFallback>
                                 </Avatar>
-                                <div className="mx-1 px-1 mx-1">
+                                <div className="mx-1 px-1">
                                     <h3 className="scroll-m-20 text-xl font-semibold">{params.slug}</h3>
                                     <p className={`italic text-muted-foreground truncate w-[124px] text-[15px] ${active ? "text-rose-800" : "text-green-400"}`}>{active ? "Active" : "Offline"}</p>
                                 </div>

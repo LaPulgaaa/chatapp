@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 
 import { Inter as FontSans } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
 import RecoilContextProvider from "@/components/providers/RecoilContextProvider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import {AuthProvider} from "@/components/Provider";

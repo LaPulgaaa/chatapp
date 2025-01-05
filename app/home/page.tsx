@@ -6,7 +6,6 @@ import { useRecoilValueLoadable} from "recoil";
 import { useRouter } from "next/navigation";
 import type { ChatReponse, PrivateChats } from "@/packages/zod";
 import { useSession } from "next-auth/react";
-import { fetch_dms } from "@/lib/store/selector/fetch_dms";
 import { subscribed_chats_state } from "@/lib/store/atom/subscribed_chats_state";
 import { direct_msg_state } from "@/lib/store/atom/dm";
 
