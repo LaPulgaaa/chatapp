@@ -8,7 +8,6 @@
     "build": "next build",
     "start": "NODE_ENV=production ts-node server.ts",
     "lint": "next lint",
-    "test": "vitest",
     "dev:combined": "npm run dev & npx next dev",
     "prisma:migrate": "npx prisma migrate dev --schema=./packages/prisma/schema.prisma",
     "prisma:generate": "npx prisma generate --schema=./packages/prisma/schema.prisma",
@@ -64,7 +63,7 @@
     "@types/express": "^4.17.21",
     "@types/jsonwebtoken": "^9.0.5",
     "@types/minimalistic-assert": "^1.0.3",
-    "@types/node": "^20",
+    "@types/node": "^18",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/supertest": "^6.0.2",
@@ -77,8 +76,9 @@
     "prisma": "^5.12.1",
     "supertest": "^7.0.0",
     "tailwindcss": "^3.3.0",
-    "typescript": "^5",
-    "vitest": "^1.6.0",
-    "vitest-mock-extended": "^1.3.1"
+    "typescript": "^5"
+  },
+  "engines": {
+    "node": "18.x"
   }
 }
