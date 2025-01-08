@@ -32,6 +32,7 @@ type DeleteMsgCallbackData = {
 
 export default function Direct({params}:{params:{slug: string}}){
     const dm_ref = useRef<HTMLDivElement>(null);
+    const compose_ref = useRef<string>("");
     const [compose,setCompose] = useState<string>("");
     const [disable,setDisable] = useState<boolean>(true);
     const session = useSession();
@@ -73,12 +74,32 @@ export default function Direct({params}:{params:{slug: string}}){
                 }
 
                 setDmStateDetails(data);
+                setCompose(friend.draft ?? "");
             }
             else {
                 fetch_user_details();
             }
         }
+        //eslint-disable-next-line react-hooks/exhaustive-deps
     },[dms])
+
+    function update_draft(){
+        const draft = compose_ref.current;
+        if(draft.length > 0 && dms.state === "hasValue" && dms.getValue() !== undefined){
+            const dms_with_draft:PrivateChats = dms.getValue().map((dm) => {
+                if(dm.to.username !== params.slug)
+                    return dm;
+                else {
+                    const updated_dm = {
+                        ...dm,
+                        draft
+                    }
+                    return updated_dm
+                }
+            })
+            setDms([...dms_with_draft])
+        }
+    }
 
     async function fetch_user_details(){
         try{
@@ -281,6 +302,7 @@ export default function Direct({params}:{params:{slug: string}}){
             }
             Signal.get_instance().DEREGISTER("MSG_CALLBACK");
             Signal.get_instance().DEREGISTER("ONLINE_CALLBACK");
+            update_draft();
         }
         //eslint-disable-next-line react-hooks/exhaustive-deps
     },[session.status,dmStateDetails]);
@@ -452,6 +474,7 @@ export default function Direct({params}:{params:{slug: string}}){
                     value={compose}
                     onChange={(e)=>{
                         setCompose(e.target.value);
+                        compose_ref.current = e.target.value;
                         send_typing_notification();
                     }}
                     onKeyDown={(e)=>{
