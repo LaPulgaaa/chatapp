@@ -63,7 +63,10 @@ export const user_chat_schema = z.object({
         }),
         createdAt: z.string(),
     })),
+    draft: z.string().optional(),
 })
+
+export type UserChat = z.output<typeof user_chat_schema>;
 
 export const user_chats_response_schema=z.array(
     user_chat_schema, 
