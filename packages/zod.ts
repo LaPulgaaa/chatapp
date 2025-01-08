@@ -172,6 +172,7 @@ export const private_chat_schema = z.object({
         id: z.number(),
     })),
     connectionId: z.string(),
+    draft: z.string().optional(),
 });
 
 export const private_chats_schema = z.array(private_chat_schema);
