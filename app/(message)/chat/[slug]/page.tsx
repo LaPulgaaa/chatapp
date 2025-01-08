@@ -136,7 +136,6 @@ export default function Chat({params}:{params:{slug:string}}){
 
     function update_last_sent_message(){
         if(roomsStateData.state === "hasValue") {
-            console.log("is this being updated")
             const all_rooms_data = roomsStateData.getValue();
             const narrowed_room = all_rooms_data.find((room) => room.id === params.slug);
             assert(narrowed_room !== undefined);
@@ -223,6 +222,7 @@ export default function Chat({params}:{params:{slug:string}}){
         if(sweeped.length > 0){
             setRoomDetailState((prev_state) => [...prev_state ?? [],...sweeped]);
             setRealtimechat([]);
+            update_last_sent_message();
         }
         //eslint-disable-next-line react-hooks/exhaustive-deps
     },[sweeped])
@@ -341,6 +341,7 @@ export default function Chat({params}:{params:{slug:string}}){
             const last_msg = roomDetailState.getValue()!.slice(-1);
             sweep_latest_messages(last_msg[0]?.id);
         }
+        //eslint-disable-next-line react-hooks/exhaustive-deps
     },[chat])
 
     useEffect(()=>{

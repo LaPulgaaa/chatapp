@@ -1,5 +1,3 @@
-const PORT = 3001;
-
 type BufferedMessage = {
     id: number,
     message: string
