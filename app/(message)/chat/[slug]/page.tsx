@@ -23,7 +23,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 
 import Message from "@/components/Message";
-import { ChatMessageData } from "@/packages/zod";
+import { ChatMessageData, UserChat } from "@/packages/zod";
 import { leave_room } from "@/app/home/util";
 import { UserStateChats } from "@/lib/store/atom/chats";
 import { RoomHeaderDetails, chat_messages_schema } from "@/packages/zod";
@@ -54,6 +54,7 @@ export type RecievedMessage={
 export default function Chat({params}:{params:{slug:string}}){
     const { toast } = useToast();
 
+    const compose_ref = useRef<string | null>(null);
     const chat_ref = useRef<HTMLDivElement>(null);
     const type_ref = useRef<HTMLDivElement>(null);
     const [sweeped,setSweeped] = useState<ChatMessageData['messages']>([]);
@@ -87,6 +88,7 @@ export default function Chat({params}:{params:{slug:string}}){
                 discription: narrowed_room.discription,
                 createdAt: narrowed_room.createdAt,
             });
+            setCompose(narrowed_room.draft ?? "")
         }
     //eslint-disable-next-line react-hooks/exhaustive-deps
     },[roomsStateData])
@@ -110,6 +112,24 @@ export default function Chat({params}:{params:{slug:string}}){
         else{
             Signal.get_instance().SEND(message);
             setSend(true);
+        }
+    }
+
+    function update_draft(){
+        const draft = compose_ref.current;
+        if(draft !== null && draft.length > 0 && roomsStateData.state === "hasValue"){
+            const rooms_with_draft_msg = roomsStateData.getValue().map((room) => {
+                if(room.id !== params.slug)
+                    return room;
+                else{
+                    const room_with_draft:UserChat = {
+                        ...room,
+                        draft,
+                    }
+                    return room_with_draft;
+                }
+            })
+            setRoomsStateData([...rooms_with_draft_msg])
         }
     }
 
@@ -228,6 +248,7 @@ export default function Chat({params}:{params:{slug:string}}){
                 Signal.get_instance().DEREGISTER("ONLINE_CALLBACK");
                 Signal.get_instance().DEREGISTER("TYPING_CALLBACK");
             }
+            update_draft();
         }
         //eslint-disable-next-line react-hooks/exhaustive-deps
     },[room_id,user_id,session.status])
@@ -507,6 +528,7 @@ export default function Chat({params}:{params:{slug:string}}){
                     value={compose}
                     onChange={(e)=>{
                         setCompose(e.target.value);
+                        compose_ref.current = e.target.value;
                         send_typing_notification();
                     }}
                     onKeyDown={(e)=>{

@@ -106,14 +106,20 @@ const RoomTabs = memo(
                             <p className="hidden md:block">{get_last_msg_time(convo.lastmsgAt)}</p>
                             </div>
 
-                            {
-                                last_sent_msg ? <div className="border-l-2 pl-6 italic text-muted-foreground flex truncate">
+                            <div className="border-l-2 pl-6 italic text-muted-foreground truncate">
                                 {
-                                    last_sent_msg.sender.username !== username && <p>{last_sent_msg.sender.username}: </p>
+                                convo.draft ? 
+                                <p><span className="text-red-500">Draft: </span>{convo.draft}</p> :
+                                (
+                                    last_sent_msg ? <div className="border-l-2 pl-6 italic text-muted-foreground flex truncate">
+                                    {
+                                        last_sent_msg.sender.username !== username && <p>{last_sent_msg.sender.username}: </p>
+                                    }
+                                    <p>{last_sent_msg.content}</p>
+                                    </div> : <div className="pl-6 border-l-2">No messages yet.</div>
+                                )
                                 }
-                                <p>{last_sent_msg.content}</p>
-                                </div> : <div className="pl-6 border-l-2">No messages yet.</div>
-                            }
+                            </div>
                         </div>
                     }
                     else {
