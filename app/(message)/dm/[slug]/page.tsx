@@ -101,6 +101,30 @@ export default function Direct({params}:{params:{slug: string}}){
         }
     }
 
+    function maybe_clear_draft_cache(){
+        let has_draft_cache = false;
+        dms.getValue().forEach((dm) => {
+            if(dm.to.username === params.slug && dm.draft && dm.draft.length > 0){
+                has_draft_cache = true;
+            }
+        })
+        //@ts-ignore
+        if(has_draft_cache === true){
+            const dms_with_draft:PrivateChats = dms.getValue().map((dm) => {
+                if(dm.to.username !== params.slug)
+                    return dm;
+                else {
+                    const updated_dm = {
+                        ...dm,
+                        draft: undefined
+                    }
+                    return updated_dm
+                }
+            })
+            setDms([...dms_with_draft])
+        }
+    }
+
     async function fetch_user_details(){
         try{
             const resp = await fetch(`/api/dm/${params.slug}`);
@@ -417,6 +441,7 @@ export default function Direct({params}:{params:{slug: string}}){
             Signal.get_instance().SEND(JSON.stringify(broadcast_data));
         }
         setCompose("");
+        maybe_clear_draft_cache();
     }
     
     return (
