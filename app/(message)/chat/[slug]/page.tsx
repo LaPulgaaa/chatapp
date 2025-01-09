@@ -117,7 +117,7 @@ export default function Chat({params}:{params:{slug:string}}){
 
     function update_draft(){
         const draft = compose_ref.current;
-        if(draft !== null && draft.length > 0 && roomsStateData.state === "hasValue"){
+        if(draft !== null && roomsStateData.state === "hasValue"){
             const rooms_with_draft_msg = roomsStateData.getValue().map((room) => {
                 if(room.id !== params.slug)
                     return room;
@@ -367,7 +367,8 @@ export default function Chat({params}:{params:{slug:string}}){
                 }
             }
         }
-        setCompose("")
+        setCompose("");
+        compose_ref.current = "";
         Signal.get_instance().SEND(JSON.stringify(data));
     }
     async function deleteChat(){
