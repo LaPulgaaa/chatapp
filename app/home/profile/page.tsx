@@ -52,7 +52,7 @@ export default function Profile(){
         }
     });
 
-    const { control, handleSubmit, formState:{isDirty, isLoading, isSubmitting}, setValue, getFieldState} = form_details;
+    const { control, handleSubmit, formState:{isDirty, isLoading, isSubmitting}, setValue} = form_details;
     
     useEffect(()=>{
         if(user_state.state === "hasValue"){

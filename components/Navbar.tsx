@@ -3,8 +3,6 @@
 import Link from "next/link";
 import * as React from "react";
 
-import { redirect } from "next/navigation";
-
 import { Button } from "./ui/button";
 import { DarkLight } from "./DarkLight";
 
