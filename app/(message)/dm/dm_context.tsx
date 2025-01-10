@@ -9,6 +9,7 @@ import { Copy, PinIcon, StarIcon, Trash, Trash2Icon} from "lucide-react";
 import { UnitDM } from "./dm_ui";
 import { Signal } from "@/app/home/signal";
 import { useMemo } from "react";
+import { toast } from "@/hooks/use-toast";
 
 export function DmContextMenu({children, dm, username}:{children: React.ReactNode, dm:UnitDM,username: string}){
 
@@ -28,6 +29,24 @@ export function DmContextMenu({children, dm, username}:{children: React.ReactNod
         return true;
     //eslint-disable-next-line react-hooks/exhaustive-deps
     },[dm])
+
+    function copy_to_clipboard(){
+        navigator.clipboard.writeText(dm.content).then(
+            () => {
+                toast({
+                    title: "Copied message to clipboard",
+                    duration: 3000
+                })
+            },
+            () => {
+                toast({
+                    title: "Error copying text to clipboard",
+                    variant: "destructive",
+                    duration: 4000
+                })
+            }
+        )
+    }
 
     function delete_msg(delete_for_me?: undefined | boolean){
         let msg;
@@ -87,7 +106,9 @@ export function DmContextMenu({children, dm, username}:{children: React.ReactNod
                     <StarIcon/><span className="ml-2">Star</span>
                 </ContextMenuItem>
                 <ContextMenuSeparator/>
-                <ContextMenuItem inset>
+                <ContextMenuItem 
+                onSelect={copy_to_clipboard}
+                inset>
                     <Copy/><span className="ml-2">Copy</span>
                 </ContextMenuItem>
             </ContextMenuContent>
