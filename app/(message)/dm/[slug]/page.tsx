@@ -21,7 +21,7 @@ import ProfileDialog from "../profile_dialog";
 import { dm_details_state } from "@/lib/store/atom/dm_details_state";
 import { fetch_dms } from "@/lib/store/selector/fetch_dms";
 import { get_new_local_id } from "../../util";
-import { FriendSearchResult, MessageDeletePayload, PrivateChats, friend_search_result_schema } from "@/packages/zod";
+import { FriendSearchResult, MessageDeletePayload, friend_search_result_schema } from "@/packages/zod";
 import { direct_msg_state } from "@/lib/store/atom/dm";
 
 type DeleteMsgCallbackData = {
@@ -83,47 +83,47 @@ export default function Direct({params}:{params:{slug: string}}){
         //eslint-disable-next-line react-hooks/exhaustive-deps
     },[dms])
 
-    function update_draft(){
-        const draft = compose_ref.current;
-        if(draft.length > 0 && dms.state === "hasValue" && dms.getValue() !== undefined){
-            const dms_with_draft:PrivateChats = dms.getValue().map((dm) => {
-                if(dm.to.username !== params.slug)
-                    return dm;
-                else {
-                    const updated_dm = {
-                        ...dm,
-                        draft
-                    }
-                    return updated_dm
-                }
-            })
-            setDms([...dms_with_draft])
-        }
-    }
+    // function update_draft(){
+    //     const draft = compose_ref.current;
+    //     if(draft.length > 0 && dms.state === "hasValue" && dms.getValue() !== undefined){
+    //         const dms_with_draft:PrivateChats = dms.getValue().map((dm) => {
+    //             if(dm.to.username !== params.slug)
+    //                 return dm;
+    //             else {
+    //                 const updated_dm = {
+    //                     ...dm,
+    //                     draft
+    //                 }
+    //                 return updated_dm
+    //             }
+    //         })
+    //         setDms([...dms_with_draft])
+    //     }
+    // }
 
-    function maybe_clear_draft_cache(){
-        let has_draft_cache = false;
-        dms.getValue().forEach((dm) => {
-            if(dm.to.username === params.slug && dm.draft && dm.draft.length > 0){
-                has_draft_cache = true;
-            }
-        })
-        //@ts-ignore
-        if(has_draft_cache === true){
-            const dms_with_draft:PrivateChats = dms.getValue().map((dm) => {
-                if(dm.to.username !== params.slug)
-                    return dm;
-                else {
-                    const updated_dm = {
-                        ...dm,
-                        draft: undefined
-                    }
-                    return updated_dm
-                }
-            })
-            setDms([...dms_with_draft])
-        }
-    }
+    // function maybe_clear_draft_cache(){
+    //     let has_draft_cache = false;
+    //     dms.getValue().forEach((dm) => {
+    //         if(dm.to.username === params.slug && dm.draft !== undefined && dm.draft.length > 0){
+    //             has_draft_cache = true;
+    //         }
+    //     })
+    //     //@ts-ignore
+    //     if(has_draft_cache === true){
+    //         const dms_with_draft:PrivateChats = dms.getValue().map((dm) => {
+    //             if(dm.to.username !== params.slug)
+    //                 return dm;
+    //             else {
+    //                 const updated_dm = {
+    //                     ...dm,
+    //                     draft: undefined
+    //                 }
+    //                 return updated_dm
+    //             }
+    //         })
+    //         setDms([...dms_with_draft])
+    //     }
+    // }
 
     async function fetch_user_details(){
         try{
@@ -326,7 +326,8 @@ export default function Direct({params}:{params:{slug: string}}){
             }
             Signal.get_instance().DEREGISTER("MSG_CALLBACK");
             Signal.get_instance().DEREGISTER("ONLINE_CALLBACK");
-            update_draft();
+            // update_draft();
+            // maybe_clear_draft_cache();
         }
         //eslint-disable-next-line react-hooks/exhaustive-deps
     },[session.status,dmStateDetails]);
@@ -441,7 +442,6 @@ export default function Direct({params}:{params:{slug: string}}){
             Signal.get_instance().SEND(JSON.stringify(broadcast_data));
         }
         setCompose("");
-        maybe_clear_draft_cache();
     }
     
     return (
