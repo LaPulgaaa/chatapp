@@ -29,7 +29,7 @@ export function DmContextMenu({children, dm, username}:{children: React.ReactNod
     //eslint-disable-next-line react-hooks/exhaustive-deps
     },[dm])
 
-    function delete_msg(){
+    function delete_msg(delete_for_me?: undefined | boolean){
         let msg;
         if(dm.is_local_echo === true){
             msg = JSON.stringify({
@@ -38,6 +38,8 @@ export function DmContextMenu({children, dm, username}:{children: React.ReactNod
                     type: 'DM',
                     is_local_echo: true,
                     hash: dm.hash,
+                    delete_for_me,
+                    sender_id: username
                 }
             })
         }
@@ -48,6 +50,8 @@ export function DmContextMenu({children, dm, username}:{children: React.ReactNod
                     type: 'DM',
                     is_local_echo: false,
                     id: dm.id,
+                    delete_for_me,
+                    sender_id: username
                 }
             })
         }
@@ -68,6 +72,9 @@ export function DmContextMenu({children, dm, username}:{children: React.ReactNod
                     <Trash2Icon/><span className="ml-2">Delete for everyone</span>
                 </ContextMenuItem>
                 <ContextMenuItem 
+                onSelect={() => {
+                    delete_msg(true)
+                }}
                 disabled={delete_for_me_disabled}
                 inset>
                     <Trash/><span className="ml-2">Delete for me</span>
