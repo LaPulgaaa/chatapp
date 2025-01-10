@@ -109,6 +109,8 @@ model DirectMessage {
 
   deleted Boolean @default(false)
 
+  deleteFor String? @default("")
+
   connectionId String
 
   friendshipId String

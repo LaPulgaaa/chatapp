@@ -50,11 +50,26 @@ export async function GET(req: NextRequest){
             try{
                 const message = await prisma.directMessage.findMany({
                     where: {
-                        connectionId: frnd.connectionId,
-                        createdAt: {
-                            gte: frnd.messageFrom
-                        },
-                        deleted: false,
+                        OR:[
+                            {
+                                connectionId: frnd.connectionId,
+                                createdAt: {
+                                    gte: frnd.messageFrom
+                                },
+                                deleted: false,
+                                NOT: {
+                                    deleteFor: username
+                                }
+                            },
+                            {
+                                connectionId: frnd.connectionId,
+                                createdAt: {
+                                    gte: frnd.messageFrom
+                                },
+                                deleted: false,
+                                deleteFor: null
+                            }
+                        ]
                     },
                     select: {
                         id: true,
@@ -64,7 +79,8 @@ export async function GET(req: NextRequest){
                             select: {
                                 username: true,
                             }
-                        }
+                        },
+                        deleteFor: true
                     }
                 });
 

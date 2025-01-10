@@ -66,8 +66,20 @@ router.get("/search/:username",async(req,res)=>{
 
         const messages = await prisma.directMessage.findMany({
             where: {
-                connectionId: friendship_status.connectionId,
-                deleted: false,
+                OR: [
+                    {
+                        connectionId: friendship_status.connectionId,
+                        deleted: false,
+                        NOT: {
+                            deleteFor: username,
+                        }
+                    },
+                    {
+                        connectionId: friendship_status.connectionId,
+                        deleted: false,
+                        deleteFor: null
+                    }
+                ]
             },
             select: {
                 id: true,
@@ -77,7 +89,8 @@ router.get("/search/:username",async(req,res)=>{
                     select: {
                         username: true,
                     }
-                }
+                },
+                deleteFor: true,
             }
         })
         let is_recipient_online = false; 

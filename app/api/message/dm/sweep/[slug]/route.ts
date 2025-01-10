@@ -14,13 +14,31 @@ export async function POST(req: NextRequest,{ params }:{ params: { slug: string 
     }
 
     try{
+        //@ts-ignore
+        const username: string = token.username;
+
         const dms = await prisma.directMessage.findMany({
             where: {
-                connectionId: conc_id,
-                id: {
-                    gt: last_msg_id
-                },
-                deleted: false,
+                OR:[
+                    {
+                        connectionId: conc_id,
+                        id: {
+                            gt: last_msg_id
+                        },
+                        deleted: false,
+                        NOT: {
+                            deleteFor: username
+                        }
+                    },
+                    {
+                        connectionId: conc_id,
+                        id: {
+                            gt: last_msg_id
+                        },
+                        deleted: false,
+                        deleteFor: null
+                    }
+                ]
             },
             select: {
                 id: true,
@@ -31,7 +49,8 @@ export async function POST(req: NextRequest,{ params }:{ params: { slug: string 
                     select: {
                         username: true,
                     }
-                }
+                },
+                deleteFor: true
             }
             
         });
