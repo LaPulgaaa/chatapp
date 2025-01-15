@@ -61,7 +61,7 @@ export async function GET(req:NextRequest){
 
 export async function POST(req: NextRequest){
     const token = await getToken({req});
-    const {name,discription} = await req.json();
+    const {name,description} = await req.json();
     if(token === null){
         return Response.json({
             msg: "Unauthorized"
@@ -75,7 +75,7 @@ export async function POST(req: NextRequest){
             const new_room=await tx.chat.create({
                 data:{
                     name,
-                    discription,
+                    description,
                 }
             });
             await tx.directory.create({

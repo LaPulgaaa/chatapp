@@ -21,7 +21,7 @@ export type UpdateDetailsData = {
         chat_id: string,
         updated_details: {
             name: string,
-            discription: string,
+            description: string,
         }
     }
 }
@@ -66,7 +66,7 @@ export default function Connect(){
             const updated_narrowed_room = {
                 ...narrowed_room,
                 name: data.payload.updated_details.name,
-                discription: data.payload.updated_details.discription,
+                description: data.payload.updated_details.description,
             }
             setRoomsStateData([...other_rooms,updated_narrowed_room]);
         }
