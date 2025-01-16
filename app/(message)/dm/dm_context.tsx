@@ -14,14 +14,6 @@ import { toast } from "@/hooks/use-toast";
 
 export function DmContextMenu({children, dm, username}:{children: React.ReactNode, dm:UnitDM,username: string}){
 
-    const delete_for_me_disabled = useMemo(() => {
-        if(dm.sendBy.username !== username)
-            return true;
-        else 
-            return false;
-        //eslint-disable-next-line react-hooks/exhaustive-deps
-    },[dm])
-
     const delete_for_ev_disabled = useMemo(() => {
         const timestamp = new Date(dm.createdAt).getTime();
         if(((Date.now() - timestamp)/60) <= 43200 && dm.sendBy.username === username)
@@ -123,7 +115,6 @@ export function DmContextMenu({children, dm, username}:{children: React.ReactNod
                 onSelect={() => {
                     delete_msg(true)
                 }}
-                disabled={delete_for_me_disabled}
                 inset>
                     <Trash/><span className="ml-2">Delete for me</span>
                 </ContextMenuItem>
