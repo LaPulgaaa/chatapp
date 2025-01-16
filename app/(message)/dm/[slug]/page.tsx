@@ -374,6 +374,8 @@ export default function Direct({params}:{params:{slug: string}}){
                     },
                     is_local_echo: true,
                     hash: data.payload.hash,
+                    pinned: false,
+                    starred: [],
                 }
                 return [...inbox,new_dm]
             });

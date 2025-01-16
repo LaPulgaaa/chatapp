@@ -422,6 +422,87 @@ export async function ws(wss:WebSocketServer){
                 }
             }
 
+            if(data.type === "pin_msg"){
+                const { pinned, sender_id, type, is_local_echo } = data.payload;
+
+                if(type === "DM"){
+                    let msg;
+                    let conc_id;
+                    if(is_local_echo === true){
+                        const hash: string = data.payload.hash;
+                        try{
+                            const resp = await prisma.directMessage.update({
+                                where: {
+                                    hash
+                                },
+                                data: {
+                                    pinned: pinned,
+                                },
+                                select: {
+                                    id: true,
+                                    hash: true,
+                                    pinned: true,
+                                    connectionId: true,
+                                }
+                            })
+                            conc_id = resp.connectionId;
+                            msg = JSON.stringify({
+                                type: "pin",
+                                payload: {
+                                    type: "DM",
+                                    pinned: resp.pinned,
+                                    hash: resp.hash,
+                                    id: resp.id,
+                                    sender_id,
+                                    conc_id:resp.connectionId
+                                }
+                            })
+
+                        }catch(err){
+                            console.log(err);
+                        }
+                        
+                    }else{
+                        const msg_id = data.payload.id;
+
+                        try{
+                            const resp = await prisma.directMessage.update({
+                                where: {
+                                    id: msg_id
+                                },
+                                data: {
+                                    pinned: pinned
+                                },
+                                select:{
+                                    id: true,
+                                    hash: true,
+                                    pinned: true,
+                                    connectionId: true,
+                                }
+                            })
+
+                            conc_id = resp.connectionId;
+
+                            msg = JSON.stringify({
+                                type: "pin",
+                                payload: {
+                                    type: "DM",
+                                    pinned: resp.pinned,
+                                    hash: resp.hash,
+                                    id: resp.id,
+                                    sender_id,
+                                    conc_id: resp.connectionId
+                                }
+                            })
+                        }catch(err){
+                            console.log(err);
+                        }
+                        if(conc_id !== undefined && msg !== undefined)
+                        RedisSubscriptionManager.get_instance().addChatMessage(conc_id,"PIN_MSG_CALLBACK",msg);
+                    }
+                }
+            }
+
             if(data.type === "leave"){
                 const msg_data = JSON.stringify(
                     {

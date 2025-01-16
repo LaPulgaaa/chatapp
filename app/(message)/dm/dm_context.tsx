@@ -5,7 +5,8 @@ import {
     ContextMenuSeparator,
     ContextMenuTrigger
 } from "@/components/ui/context-menu";
-import { Copy, PinIcon, StarIcon, Trash, Trash2Icon} from "lucide-react";
+import { StarFilledIcon } from "@radix-ui/react-icons";
+import { Copy, PinIcon, PinOff, StarIcon, Trash, Trash2Icon} from "lucide-react";
 import { UnitDM } from "./dm_ui";
 import { Signal } from "@/app/home/signal";
 import { useMemo } from "react";
@@ -46,6 +47,34 @@ export function DmContextMenu({children, dm, username}:{children: React.ReactNod
                 })
             }
         )
+    }
+
+    function pin_msg({ pinned }:{ pinned: boolean }){
+        let msg;
+        if(dm.is_local_echo === true){
+            msg = JSON.stringify({
+                type: "pin_msg",
+                payload: {
+                    type: "DM",
+                    is_local_echo: true,
+                    hash: dm.hash,
+                    sender_id: username,
+                    pinned,
+                }
+            })
+        }
+        else{
+            msg = JSON.stringify({
+                type: "pin_msg",
+                payload: {
+                    type: "DM",
+                    is_local_echo: false,
+                    id: dm.id,
+                    pinned,
+                }
+            })
+        }
+        Signal.get_instance().SEND(msg);
     }
 
     function delete_msg(delete_for_me?: undefined | boolean){
@@ -99,12 +128,44 @@ export function DmContextMenu({children, dm, username}:{children: React.ReactNod
                     <Trash/><span className="ml-2">Delete for me</span>
                 </ContextMenuItem>
                 <ContextMenuSeparator/>
-                <ContextMenuItem inset>
-                    <PinIcon/><span className="ml-2">Pin</span>
-                </ContextMenuItem>
-                <ContextMenuItem inset>
-                    <StarIcon/><span className="ml-2">Star</span>
-                </ContextMenuItem>
+                {
+                    dm.pinned ?
+                    <ContextMenuItem
+                    onSelect={() => {
+                        pin_msg({
+                            pinned: false,
+                        })
+                    }}
+                    inset>
+                        <PinOff/><span className="ml-2">Unpin</span>
+                    </ContextMenuItem> :
+                    <ContextMenuItem 
+                    onSelect={() => {
+                        pin_msg({
+                            pinned: true,
+                        })
+                    }}
+                    inset>
+                        <PinIcon/><span className="ml-2">Pin</span>
+                    </ContextMenuItem>
+                }
+                {
+                    dm.starred ?
+                    <ContextMenuItem
+                    onSelect={() => {
+                        
+                    }}
+                    className="ml-1" inset>
+                        <StarIcon/><span className="ml-2">Unstar</span>
+                    </ContextMenuItem> : 
+                    <ContextMenuItem 
+                    onSelect={() => {
+                        
+                    }}
+                    className="ml-1" inset>
+                        <StarFilledIcon/><span className="ml-2">Star</span>
+                    </ContextMenuItem>
+                }
                 <ContextMenuSeparator/>
                 <ContextMenuItem 
                 onSelect={copy_to_clipboard}
@@ -115,4 +176,3 @@ export function DmContextMenu({children, dm, username}:{children: React.ReactNod
         </ContextMenu>
     )
 }
-

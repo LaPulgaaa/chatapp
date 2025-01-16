@@ -91,6 +91,8 @@ router.get("/search/:username",async(req,res)=>{
                     }
                 },
                 deleteFor: true,
+                starred: true,
+                pinned: true,
             }
         })
         let is_recipient_online = false; 
