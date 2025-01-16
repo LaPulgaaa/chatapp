@@ -141,7 +141,7 @@ export function DmContextMenu({children, dm, username}:{children: React.ReactNod
                     </ContextMenuItem>
                 }
                 {
-                    dm.starred ?
+                    dm.starred.includes(username) ?
                     <ContextMenuItem
                     onSelect={() => {
                         
