@@ -29,12 +29,23 @@ cd chatapp
 npm install
 ```
 
-# Step 2: Run docker locally to setup database
+# Step 2: Populate `.env` -- Setup Github OAuth application to obtain related secret. 
+Note: .env.example has a template.
+```
+DATABASE_URL="postgresql://postgres:mysecretpassword@localhost/postgres"
+ACCESS_TOKEN_SECRET= //any cryptographically random string
+GITHUB_ID=
+GITHUB_SECRET=
+NEXTAUTH_SECRET= //any cryptographically random string
+NEXTAUTH_URL=http://localhost:3000
+```
+
+# Step 3: Run docker locally to setup database
 ```bash
 docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=mysecretpassword postgres
 ```
 
-# Step 3: Run Prisma migrations
+# Step 4: Run Prisma migrations
 ```bash
 npm run prisma:migrate
 ```
@@ -42,7 +53,7 @@ OR
 ```bash
 npx prisma migrate --schema=./packages/prisma/schema.prisma
 ```
-# Step 4: Generate Prisma client
+# Step 5: Generate Prisma client
 Either
 ```bash
 npm run prisma:generate 
@@ -52,12 +63,12 @@ OR
 npx prisma generate --schema=./packages/prisma/schema.prisma
 ```
 
-# Step 5: Start the express server
+# Step 6: Start the express server
 ```
 npm run server
 ```
 
-# Step 6: Run NextJS project
+# Step 7: Run NextJS project
 ```
 npm run dev
 ```
