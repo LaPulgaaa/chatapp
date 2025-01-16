@@ -327,7 +327,8 @@ export async function ws(wss:WebSocketServer){
                                         type: "DM",
                                         conc_id: resp.connectionId,
                                         id: resp.id,
-                                        hash: resp.hash
+                                        hash: resp.hash,
+                                        is_local_echo: false,
                                     }
                                 })
 
@@ -354,6 +355,7 @@ export async function ws(wss:WebSocketServer){
                                         conc_id: resp.connectionId,
                                         id: resp.id,
                                         hash: resp.hash,
+                                        is_local_echo: true,
                                     }
                                 })
 
@@ -384,7 +386,8 @@ export async function ws(wss:WebSocketServer){
                                         type: "DM",
                                         conc_id: resp.connectionId,
                                         id: resp.id,
-                                        hash: resp.hash
+                                        hash: resp.hash,
+                                        is_local_echo: false,
                                     }
                                 })
                                 conc_id = resp.connectionId;
@@ -407,6 +410,7 @@ export async function ws(wss:WebSocketServer){
                                         conc_id: resp.connectionId,
                                         id: resp.id,
                                         hash: resp.hash,
+                                        is_local_echo: true,
                                     }
                                 })
                                 conc_id = resp.connectionId;
@@ -454,7 +458,8 @@ export async function ws(wss:WebSocketServer){
                                     hash: resp.hash,
                                     id: resp.id,
                                     sender_id,
-                                    conc_id:resp.connectionId
+                                    conc_id:resp.connectionId,
+                                    is_local_echo: true,
                                 }
                             })
 
@@ -491,7 +496,8 @@ export async function ws(wss:WebSocketServer){
                                     hash: resp.hash,
                                     id: resp.id,
                                     sender_id,
-                                    conc_id: resp.connectionId
+                                    conc_id: resp.connectionId,
+                                    is_local_echo: false,
                                 }
                             })
                         }catch(err){
