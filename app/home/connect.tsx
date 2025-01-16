@@ -44,53 +44,58 @@ export default function Connect(){
         const payload = data.payload;
         
         if(payload.type === "DM" && dms.state === "hasValue"){
-            const narrowed_dm = dms.getValue().find((dm) => dm.connectionId === payload.conc_id);
-
-            assert(narrowed_dm !== undefined);
-
-            const left_msgs = narrowed_dm.messages.filter((msg) => msg.id !== payload.id);
-
-            const narrow_with_left_msgs = {
-                ...narrowed_dm,
-                messages: left_msgs
-            }
-            console.log("deleted msg")
             setDms((dms) => {
-                const other_dms = dms.filter((dm) => dm.connectionId !== payload.conc_id);
+                const updated_dms = dms.map((dm) => {
+                    if(dm.connectionId !== payload.conc_id){
+                        return dm;
+                    }
+                    else{
+                        const updated_msgs = dm.messages.filter((msg) => {
+                            if(msg.id !== payload.id)
+                                return msg;
+                        })
 
-                return [...other_dms,narrow_with_left_msgs];
+                        return {
+                            ...dm,
+                            messages: updated_msgs,
+                        }
+                    }
+                })
+                return updated_dms;
             })
         }
 
     }
+
     function pin_msg_callback(raw_string: string){
         const data:PinMsgCallbackData = JSON.parse(`${raw_string}`);
         const payload = data.payload;
         
         if(payload.type === "DM" && dms.state === "hasValue"){
-            const narrowed_dm = dms.getValue().find((dm) => dm.connectionId === payload.conc_id);
-
-            assert(narrowed_dm !== undefined);
-
-            const left_msgs = narrowed_dm.messages.map((msg) => {
-                if(msg.id === payload.id)
-                    return {
-                        ...msg,
-                        pinned: payload.pinned
-                    }
-                else
-                return msg;
-            });
-
-            const narrow_with_left_msgs = {
-                ...narrowed_dm,
-                messages: left_msgs
-            }
-            console.log("pinned this msg")
             setDms((dms) => {
-                const other_dms = dms.filter((dm) => dm.connectionId !== payload.conc_id);
+                const new_dms = dms.map((dm) => {
+                    if(dm.connectionId !== payload.conc_id)
+                        return dm;
+                    else{
+                        const updated_msgs = dm.messages.map((msg) => {
+                            if(payload.is_local_echo === false && msg.id === payload.id)
+                            {
+                                return {
+                                    ...msg,
+                                    pinned: payload.pinned,
+                                }
+                            }
+                            else
+                            return msg;
+                        })
+                        return {
+                            ...dm,
+                            messages: updated_msgs,
+                        };
+                    }
+                })
 
-                return [...other_dms,narrow_with_left_msgs];
+                return new_dms;
             })
         }
 
