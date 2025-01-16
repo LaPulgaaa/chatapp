@@ -120,4 +120,8 @@ model DirectMessage {
   sendBy Member @relation(fields: [senderId], references: [username])
 
   hash String? @unique
+
+  pinned Boolean @default(false)
+
+  starred String[]
 }

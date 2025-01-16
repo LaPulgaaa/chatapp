@@ -50,7 +50,9 @@ export async function POST(req: NextRequest,{ params }:{ params: { slug: string 
                         username: true,
                     }
                 },
-                deleteFor: true
+                deleteFor: true,
+                pinned: true,
+                starred: true,
             }
             
         });

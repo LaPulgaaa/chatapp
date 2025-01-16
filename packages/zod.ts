@@ -153,6 +153,18 @@ export const user_details_edit_form_schema = z.object({
     status: z.string().optional(),
 })
 
+export const direct_msg_schema = z.object({
+    id: z.number(),
+    content: z.string(),
+    createdAt: z.string(),
+    sendBy: z.object({
+        username: z.string(),
+        name: z.string().nullish(),
+    }),
+    pinned: z.boolean(),
+    starred: z.array(z.string()),
+});
+
 export const private_chat_schema = z.object({
     id: z.string(),
     blocked: z.boolean(),
@@ -165,15 +177,7 @@ export const private_chat_schema = z.object({
         name: z.string().nullish(),
         status: z.string().nullable(),
     }),
-    messages: z.array(z.object({
-        content: z.string(),
-        sendBy: z.object({
-            username: z.string(),
-            name: z.string().nullish(),
-        }),
-        createdAt: z.string(),
-        id: z.number(),
-    })),
+    messages: z.array(direct_msg_schema),
     connectionId: z.string(),
     draft: z.string().optional(),
 });
@@ -184,23 +188,15 @@ export type PrivateChat = z.output<typeof private_chat_schema>;
 
 export type PrivateChats = PrivateChat[];
 
-export const direct_msg_schema = z.object({
-    id: z.number(),
-    content: z.string(),
-    createdAt: z.string(),
-    sendBy: z.object({
-        username: z.string(),
-        name: z.string().nullish(),
-    })
-});
-
 export type DirectMsg = {
     id: number,
     content: string,
     createdAt: Date,
     sendBy: {
         username: string,
-    }
+    },
+    pinned: boolean,
+    starred: string[],
 }
 
 export const friend_search_result_schema = z.discriminatedUnion("is_friend", [
@@ -245,3 +241,14 @@ export const message_delete_payload = z.object({
 })
 
 export type MessageDeletePayload = z.output<typeof message_delete_payload>;
+
+export const message_pin_payload = z.object({
+    type: z.enum(["DM","CHAT"]),
+    pinned: z.boolean(),
+    hash: z.string(),
+    id: z.number(),
+    sender_id: z.string(),
+    conc_id: z.string(),
+})
+
+export type MessagePinPayload = z.output<typeof message_pin_payload>;

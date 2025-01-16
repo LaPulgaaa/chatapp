@@ -80,7 +80,9 @@ export async function GET(req: NextRequest){
                                 username: true,
                             }
                         },
-                        deleteFor: true
+                        deleteFor: true,
+                        pinned: true,
+                        starred: true,
                     }
                 });
 
