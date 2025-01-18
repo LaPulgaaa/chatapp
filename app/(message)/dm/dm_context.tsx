@@ -107,7 +107,6 @@ export function DmContextMenu({children, dm, username}:{children: React.ReactNod
                 disabled={delete_for_ev_disabled}
                 inset onSelect={() => {
                     delete_msg();
-                    console.log("Delete this shit")
                 }}>
                     <Trash2Icon/><span className="ml-2">Delete for everyone</span>
                 </ContextMenuItem>
