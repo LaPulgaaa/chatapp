@@ -25,7 +25,9 @@ export async function POST(req: NextRequest,{ params }:{ params: { slug: string 
                 },
                 deleted: false,
                 NOT: {
-                    deleteFor: username
+                    deleteFor: {
+                        contains: username,
+                    }
                 }
             },
             select: {
