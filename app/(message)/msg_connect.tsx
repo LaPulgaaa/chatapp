@@ -16,7 +16,7 @@ type DeleteMsgCallbackData = {
 }
 
 
-type PinMsgCallbackData = {
+export type PinMsgCallbackData = {
     type: "pin",
     payload: MessagePinPayload
 }
@@ -119,7 +119,7 @@ export default function Connect(){
         if(session.status === "authenticated"){
             //@ts-ignore
             Signal.get_instance().REGISTER_CALLBACK("DELETE_NON_ECHO",delete_msg_callback);
-            Signal.get_instance().REGISTER_CALLBACK("PIN_MSG_CALLBACK",pin_msg_callback);
+            Signal.get_instance().REGISTER_CALLBACK("PIN_MSG_CALLBACK_NON_ECHO",pin_msg_callback);
             Signal.get_instance().REGISTER_CALLBACK("UPDATE_DETAILS_CALLBACK",details_update_callback)
         }
 
@@ -128,7 +128,7 @@ export default function Connect(){
             {
                 //@ts-ignore
                 Signal.get_instance(session.data.username).DEREGISTER("DELETE_NON_ECHO");
-                Signal.get_instance().DEREGISTER("PIN_MSG_CALLBACK");
+                Signal.get_instance().DEREGISTER("PIN_MSG_CALLBACK_NON_ECHO");
                 Signal.get_instance().DEREGISTER("UPDATE_DETAILS_CALLBACK");
             }
         }

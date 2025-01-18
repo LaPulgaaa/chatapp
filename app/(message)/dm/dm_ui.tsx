@@ -33,7 +33,7 @@ export default function DmRender({dm, username,id }:{dm: UnitDM, username: strin
         {
             dm.sendBy.username !== username ? 
             <div 
-            id={dm.id.toString()}
+            id={dm.is_local_echo ? `dm-${dm.hash}` : `dm-${dm.id.toString()}`}
             className="flex m-2">
                 <DmContextMenu dm={dm} username={username}>
                     <div className={`w-full border-2 pb-1 mr-2 bg-slate-200 dark:bg-slate-900  max-w-prose rounded-md flex`}>
@@ -49,7 +49,7 @@ export default function DmRender({dm, username,id }:{dm: UnitDM, username: strin
                 </DmContextMenu>
             </div> : 
             <div
-            id={dm.id.toString()}
+            id={dm.is_local_echo ? `dm-${dm.hash.substring(0,4)}` : `dm-${dm.id.toString()}`}
             className="flex m-2 justify-end mr-3">
                 <DmContextMenu dm={dm} username={username}>
                     <div
