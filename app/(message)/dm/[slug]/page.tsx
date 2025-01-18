@@ -24,7 +24,7 @@ import { get_new_local_id } from "../../util";
 import { FriendSearchResult, MessageDeletePayload, friend_search_result_schema } from "@/packages/zod";
 import { direct_msg_state } from "@/lib/store/atom/dm";
 import { PinnedMessages } from "../pinned_msg_ui";
-import { PinMsgCallbackData } from "../../msg_connect";
+import { PinMsgCallbackData, StarMsgCallbackData } from "../../msg_connect";
 
 type DeleteMsgCallbackData = {
     type: string,
@@ -331,6 +331,7 @@ export default function Direct({params}:{params:{slug: string}}){
         Signal.get_instance().REGISTER_CALLBACK("TYPING_CALLBACK",typing_notif_callback);
         Signal.get_instance().REGISTER_CALLBACK('DELETE_ECHO',delete_msg_callback);
         Signal.get_instance().REGISTER_CALLBACK('PIN_MSG_CALLBACK_ECHO',pin_echo_msg_callback);
+        Signal.get_instance().REGISTER_CALLBACK('STARRED_ECHO_CALLBACK',star_echo_msg_callback);
 
         return () => {
             if(
@@ -345,6 +346,7 @@ export default function Direct({params}:{params:{slug: string}}){
             Signal.get_instance().DEREGISTER("MSG_CALLBACK");
             Signal.get_instance().DEREGISTER("ONLINE_CALLBACK");
             Signal.get_instance().DEREGISTER("PIN_MSG_CALLBACK_ECHO");
+            Signal.get_instance().DEREGISTER("STARRED_ECHO_CALLBACK");
             Signal.get_instance().DEREGISTER("DELETE_ECHO");
             Signal.get_instance().DEREGISTER("TYPING_CALLBACK");
             // update_draft();
@@ -401,6 +403,25 @@ export default function Direct({params}:{params:{slug: string}}){
                 return [...inbox,new_dm]
             });
         }
+    }
+
+    function star_echo_msg_callback(raw_data: string){
+        const data: StarMsgCallbackData = JSON.parse(`${raw_data}`);
+
+        const payload = data.payload;
+
+        setInbox((inbox) => {
+            return inbox.map((dm) => {
+                assert(dm.is_local_echo === true);
+                if(dm.hash === payload.hash)
+                return {
+                    ...dm,
+                    starred: payload.starred,
+                }
+                else
+                return dm;
+            })
+        })
     }
 
     function pin_echo_msg_callback(raw_data: string){

@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRecoilStateLoadable } from "recoil";
 import { Signal } from "../home/signal";
-import { MessageDeletePayload, MessagePinPayload } from "@/packages/zod";
+import { MessageDeletePayload, MessagePinPayload, MessageStarPayload } from "@/packages/zod";
 import { direct_msg_state } from "@/lib/store/atom/dm";
 import { subscribed_chats_state } from "@/lib/store/atom/subscribed_chats_state";
 
@@ -19,6 +19,11 @@ type DeleteMsgCallbackData = {
 export type PinMsgCallbackData = {
     type: "pin",
     payload: MessagePinPayload
+}
+
+export type StarMsgCallbackData = {
+    type: "star",
+    payload: MessageStarPayload,
 }
 
 export type UpdateDetailsData = {
@@ -60,6 +65,40 @@ export default function Connect(){
                     }
                 })
                 return updated_dms;
+            })
+        }
+
+    }
+
+    function star_msg_callback(raw_string: string){
+        const data:StarMsgCallbackData = JSON.parse(`${raw_string}`);
+        const payload = data.payload;
+        
+        if(payload.type === "DM" && dms.state === "hasValue"){
+            setDms((dms) => {
+                const new_dms = dms.map((dm) => {
+                    if(dm.connectionId !== payload.conc_id)
+                        return dm;
+                    else{
+                        const updated_msgs = dm.messages.map((msg) => {
+                            if(msg.id === payload.id)
+                            {
+                                return {
+                                    ...msg,
+                                    starred: payload.starred,
+                                }
+                            }
+                            else
+                            return msg;
+                        })
+                        return {
+                            ...dm,
+                            messages: updated_msgs,
+                        };
+                    }
+                })
+
+                return new_dms;
             })
         }
 
@@ -120,6 +159,7 @@ export default function Connect(){
             //@ts-ignore
             Signal.get_instance().REGISTER_CALLBACK("DELETE_NON_ECHO",delete_msg_callback);
             Signal.get_instance().REGISTER_CALLBACK("PIN_MSG_CALLBACK_NON_ECHO",pin_msg_callback);
+            Signal.get_instance().REGISTER_CALLBACK("STARRED_NON_ECHO_CALLBACK",star_msg_callback);
             Signal.get_instance().REGISTER_CALLBACK("UPDATE_DETAILS_CALLBACK",details_update_callback)
         }
 
@@ -129,6 +169,7 @@ export default function Connect(){
                 //@ts-ignore
                 Signal.get_instance(session.data.username).DEREGISTER("DELETE_NON_ECHO");
                 Signal.get_instance().DEREGISTER("PIN_MSG_CALLBACK_NON_ECHO");
+                Signal.get_instance().DEREGISTER("STARRED_NON_ECHO_CALLBACK");
                 Signal.get_instance().DEREGISTER("UPDATE_DETAILS_CALLBACK");
             }
         }

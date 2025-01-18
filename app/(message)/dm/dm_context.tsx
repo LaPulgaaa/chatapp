@@ -41,6 +41,33 @@ export function DmContextMenu({children, dm, username}:{children: React.ReactNod
         )
     }
 
+    function star_msg({ starred }:{ starred: string[]}){
+        let msg;
+        if(dm.is_local_echo === true){
+            msg = JSON.stringify({
+                type: "star_msg",
+                payload: {
+                    type: "DM",
+                    is_local_echo: true,
+                    hash: dm.hash,
+                    sender_id: username,
+                    starred,
+                }
+            })
+        }else{
+            msg = JSON.stringify({
+                type: "star_msg",
+                payload: {
+                    type: "DM",
+                    is_local_echo: false,
+                    id: dm.id,
+                    starred,
+                }
+            })
+        }
+        Signal.get_instance().SEND(msg);
+    }
+
     function pin_msg({ pinned }:{ pinned: boolean }){
         let msg;
         if(dm.is_local_echo === true){
@@ -143,14 +170,15 @@ export function DmContextMenu({children, dm, username}:{children: React.ReactNod
                     dm.starred.includes(username) ?
                     <ContextMenuItem
                     onSelect={() => {
-                        
+                        const left_starred = dm.starred.filter((member) => member !== username)
+                        star_msg({ starred: left_starred });
                     }}
                     className="ml-1" inset>
                         <StarIcon/><span className="ml-2">Unstar</span>
                     </ContextMenuItem> : 
                     <ContextMenuItem 
                     onSelect={() => {
-                        
+                        star_msg({ starred: [...dm.starred,username] });
                     }}
                     className="ml-1" inset>
                         <StarFilledIcon/><span className="ml-2">Star</span>
