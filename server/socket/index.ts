@@ -310,39 +310,72 @@ export async function ws(wss:WebSocketServer){
                         if(type === 'DM'){
                             if(is_local_echo === false){
                                 const id = data.payload.id;
-                                const resp = await prisma.directMessage.update({
-                                    where: {
-                                        id
-                                    },
-                                    data: {
-                                        deleteFor: sender_id
-                                    }
-                                })
-                                msg = JSON.stringify({
-                                    type: "delete",
-                                    payload: {
-                                        type: "DM",
-                                        conc_id: resp.connectionId,
-                                        id: resp.id,
-                                        hash: resp.hash,
-                                        is_local_echo: false,
-                                    }
-                                })
-
-                                ws.send(JSON.stringify({
-                                    type: "DELETE_NON_ECHO",
-                                    data: msg
-                                }))
+                                try{
+                                    const resp = await prisma.$transaction(async(tx) => {
+                                        const dm = await prisma.directMessage.findUniqueOrThrow({
+                                            where: {
+                                                id
+                                            },
+                                            select: {
+                                                deleteFor: true,
+                                                id: true,
+                                                connectionId: true,
+                                                hash: true,
+                                            }
+                                        })
+                                        await prisma.directMessage.update({
+                                            where: {
+                                                id: dm.id,
+                                            },
+                                            data: {
+                                                deleteFor: `${dm.deleteFor}:${sender_id}`
+                                            }
+                                        })
+    
+                                        return dm;
+                                    })
+                                    msg = JSON.stringify({
+                                        type: "delete",
+                                        payload: {
+                                            type: "DM",
+                                            conc_id: resp.connectionId,
+                                            id: resp.id,
+                                            hash: resp.hash,
+                                            is_local_echo: false,
+                                        }
+                                    })
+    
+                                    ws.send(JSON.stringify({
+                                        type: "DELETE_NON_ECHO",
+                                        data: msg
+                                    }))
+                                }catch(err){
+                                    console.log(err);
+                                }
                             }else{
                                 const { hash } = data.payload;
     
-                                const resp = await prisma.directMessage.update({
-                                    where: {
-                                        hash: hash
-                                    },
-                                    data: {
-                                        deleteFor: sender_id
-                                    }
+                                const resp = await prisma.$transaction(async(tx) => {
+                                    const dm = await prisma.directMessage.findUniqueOrThrow({
+                                        where: {
+                                            hash: hash
+                                        },
+                                        select: {
+                                            deleteFor: true,
+                                            id: true,
+                                            hash: true,
+                                            connectionId: true,
+                                        }
+                                    })
+                                    await prisma.directMessage.update({
+                                        where: {
+                                            hash: hash
+                                        },
+                                        data: {
+                                            deleteFor: `${dm.deleteFor}:${sender_id}`
+                                        }
+                                    })
+                                    return dm;
                                 })
 
                                 msg = JSON.stringify({

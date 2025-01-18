@@ -56,7 +56,9 @@ export async function GET(req: NextRequest){
                         },
                         deleted: false,
                         NOT: {
-                            deleteFor: username
+                            deleteFor: {
+                                contains: username,
+                            }
                         }
                     },
                     select: {

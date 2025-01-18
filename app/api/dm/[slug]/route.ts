@@ -63,7 +63,9 @@ export async function GET(req: NextRequest, { params }: { params: {slug: string}
                 connectionId: friendship_status.connectionId,
                 deleted: false,
                 NOT: {
-                    deleteFor: username
+                    deleteFor: {
+                        contains: username,
+                    }
                 }
             },
             select: {
