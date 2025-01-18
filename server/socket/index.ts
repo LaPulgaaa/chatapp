@@ -489,16 +489,13 @@ export async function ws(wss:WebSocketServer){
                                     id: resp.id,
                                     sender_id,
                                     conc_id:resp.connectionId,
-                                    is_local_echo: true,
                                 }
                             })
 
                         }catch(err){
                             console.log(err);
-                        }
-                        if(conc_id !== undefined && msg !== undefined)
-                        RedisSubscriptionManager.get_instance().addChatMessage(conc_id,"PIN_MSG_CALLBACK_ECHO",msg);
-                        
+                        }     
+
                     }else{
                         const msg_id = data.payload.id;
 
@@ -529,14 +526,17 @@ export async function ws(wss:WebSocketServer){
                                     id: resp.id,
                                     sender_id,
                                     conc_id: resp.connectionId,
-                                    is_local_echo: false,
                                 }
                             })
                         }catch(err){
                             console.log(err);
                         }
-                        if(conc_id !== undefined && msg !== undefined)
+
+                    }
+                    if(conc_id !== undefined && msg !== undefined)
+                    {
                         RedisSubscriptionManager.get_instance().addChatMessage(conc_id,"PIN_MSG_CALLBACK_NON_ECHO",msg);
+                        RedisSubscriptionManager.get_instance().addChatMessage(conc_id,"PIN_MSG_CALLBACK_ECHO",msg);
                     }
                 }
             }

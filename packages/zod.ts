@@ -238,7 +238,6 @@ export const message_delete_payload = z.object({
     conc_id: z.string(),
     type: z.literal("DM"),
     id: z.number(),
-    is_local_echo: z.boolean(),
 })
 
 export type MessageDeletePayload = z.output<typeof message_delete_payload>;
@@ -250,7 +249,6 @@ export const message_pin_payload = z.object({
     id: z.number(),
     sender_id: z.string(),
     conc_id: z.string(),
-    is_local_echo: z.boolean(),
 })
 
 export type MessagePinPayload = z.output<typeof message_pin_payload>;
