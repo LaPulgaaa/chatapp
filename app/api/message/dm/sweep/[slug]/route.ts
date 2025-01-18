@@ -19,26 +19,14 @@ export async function POST(req: NextRequest,{ params }:{ params: { slug: string 
 
         const dms = await prisma.directMessage.findMany({
             where: {
-                OR:[
-                    {
-                        connectionId: conc_id,
-                        id: {
-                            gt: last_msg_id
-                        },
-                        deleted: false,
-                        NOT: {
-                            deleteFor: username
-                        }
-                    },
-                    {
-                        connectionId: conc_id,
-                        id: {
-                            gt: last_msg_id
-                        },
-                        deleted: false,
-                        deleteFor: null
-                    }
-                ]
+                connectionId: conc_id,
+                id: {
+                    gt: last_msg_id
+                },
+                deleted: false,
+                NOT: {
+                    deleteFor: username
+                }
             },
             select: {
                 id: true,
