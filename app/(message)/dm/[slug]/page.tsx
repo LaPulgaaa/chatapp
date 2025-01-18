@@ -1,7 +1,7 @@
 'use client'
 
 import assert from "minimalistic-assert";
-import React,{ useState, useEffect, useRef } from "react";
+import React,{ useState, useEffect, useRef, useMemo } from "react";
 import { useSession } from "next-auth/react";
 import { SendHorizonal } from "lucide-react";
 import { useRecoilRefresher_UNSTABLE, useRecoilStateLoadable } from "recoil";
@@ -23,6 +23,8 @@ import { fetch_dms } from "@/lib/store/selector/fetch_dms";
 import { get_new_local_id } from "../../util";
 import { FriendSearchResult, MessageDeletePayload, friend_search_result_schema } from "@/packages/zod";
 import { direct_msg_state } from "@/lib/store/atom/dm";
+import { PinnedMessages } from "../pinned_msg_ui";
+import { PinMsgCallbackData } from "../../msg_connect";
 
 type DeleteMsgCallbackData = {
     type: string,
@@ -47,6 +49,20 @@ export default function Direct({params}:{params:{slug: string}}){
     const [typing,setTyping] = useState<number>(0);
     const [send,setSend] = useState(false);
     const type_ref = useRef<HTMLDivElement>(null);
+
+    const pinned_msg = useMemo(() => {
+        if(dmStateDetails !== undefined && dmStateDetails.is_friend === true){
+            const pinned_history_msgs = dmStateDetails.friendship_data.messages.filter((msg) => {
+                if(msg.pinned === true)
+                    return msg;
+            })
+            const pinned_live_msg = inbox.filter((msg) => {
+                if(msg.pinned === true)
+                    return msg;
+            })
+            return [...pinned_history_msgs,...pinned_live_msg];
+        }
+    },[dmStateDetails,inbox])
 
     useEffect(() => {
         if(dms.state === "hasValue" && dms.getValue()){
@@ -313,6 +329,7 @@ export default function Direct({params}:{params:{slug: string}}){
         Signal.get_instance().REGISTER_CALLBACK("ONLINE_CALLBACK",update_member_online_status);
         Signal.get_instance().REGISTER_CALLBACK("TYPING_CALLBACK",typing_notif_callback);
         Signal.get_instance().REGISTER_CALLBACK('DELETE_ECHO',delete_msg_callback);
+        Signal.get_instance().REGISTER_CALLBACK('PIN_MSG_CALLBACK_ECHO',pin_echo_msg_callback);
 
         return () => {
             if(
@@ -326,6 +343,9 @@ export default function Direct({params}:{params:{slug: string}}){
             }
             Signal.get_instance().DEREGISTER("MSG_CALLBACK");
             Signal.get_instance().DEREGISTER("ONLINE_CALLBACK");
+            Signal.get_instance().DEREGISTER("PIN_MSG_CALLBACK_ECHO");
+            Signal.get_instance().DEREGISTER("DELETE_ECHO");
+            Signal.get_instance().DEREGISTER("TYPING_CALLBACK");
             // update_draft();
             // maybe_clear_draft_cache();
         }
@@ -363,7 +383,7 @@ export default function Direct({params}:{params:{slug: string}}){
             
             setInbox((inbox) => {
                 let last_local_msg = inbox.slice(-1);
-                const local_id = get_new_local_id(last_msg.id,last_local_msg[0]?.id);
+                const local_id = get_new_local_id(last_msg?.id,last_local_msg[0]?.id);
                 console.log(local_id)
                 const new_dm:UnitDM = {
                     id: local_id,
@@ -381,6 +401,26 @@ export default function Direct({params}:{params:{slug: string}}){
             });
         }
     }
+
+    function pin_echo_msg_callback(raw_data: string){
+        const data: PinMsgCallbackData = JSON.parse(`${raw_data}`);
+
+        const payload = data.payload;
+
+        setInbox((inbox) => {
+            return inbox.map((dm) => {
+                assert(dm.is_local_echo === true);
+                if(payload.is_local_echo === true && dm.hash === payload.hash)
+                return {
+                    ...dm,
+                    pinned: payload.pinned,
+                }
+                else
+                return dm;
+            })
+        })
+    }
+
     function delete_msg_callback(raw_data: string){
         const data:DeleteMsgCallbackData = JSON.parse(`${raw_data}`);
         const payload = data.payload;
@@ -470,7 +510,8 @@ export default function Direct({params}:{params:{slug: string}}){
                 </div>
                 <ScrollArea id="chatbox"
                     className="flex flex-col h-full rounded-md border m-2">
-                    <div className="mb-16" ref={dm_ref}>
+                    <PinnedMessages dm_ref={dm_ref} msgs={pinned_msg ?? []}/>
+                    <div className="my-16" ref={dm_ref}>
                         {
                             dmStateDetails.is_friend && 
                             <DirectMessageHistory 

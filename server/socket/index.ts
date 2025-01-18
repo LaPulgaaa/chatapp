@@ -463,6 +463,8 @@ export async function ws(wss:WebSocketServer){
                         }catch(err){
                             console.log(err);
                         }
+                        if(conc_id !== undefined && msg !== undefined)
+                        RedisSubscriptionManager.get_instance().addChatMessage(conc_id,"PIN_MSG_CALLBACK_ECHO",msg);
                         
                     }else{
                         const msg_id = data.payload.id;
@@ -501,7 +503,7 @@ export async function ws(wss:WebSocketServer){
                             console.log(err);
                         }
                         if(conc_id !== undefined && msg !== undefined)
-                        RedisSubscriptionManager.get_instance().addChatMessage(conc_id,"PIN_MSG_CALLBACK",msg);
+                        RedisSubscriptionManager.get_instance().addChatMessage(conc_id,"PIN_MSG_CALLBACK_NON_ECHO",msg);
                     }
                 }
             }
