@@ -62,7 +62,8 @@ export default function Direct({params}:{params:{slug: string}}){
             })
             return [...pinned_history_msgs,...pinned_live_msg];
         }
-    },[dmStateDetails,inbox])
+        //eslint-disable-next-line react-hooks/exhaustive-deps
+    },[dms,dmStateDetails,inbox])
 
     useEffect(() => {
         if(dms.state === "hasValue" && dms.getValue()){
