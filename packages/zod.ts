@@ -39,8 +39,8 @@ export const room_details_schema=z.object({
     name:z.string({
         required_error:"enter a valid name"
     }).min(1),
-    discription:z.string({
-        required_error:"discription should be atleast 1 character."
+    description:z.string({
+        required_error:"description should be atleast 1 character."
     }).min(6).max(50)
 })
 
@@ -50,7 +50,7 @@ export const user_chat_schema = z.object({
     createdAt:z.string(),
     lastmsgAt: z.string(),
     deleted:z.boolean(),
-    discription:z.string(),
+    description:z.string(),
     id:z.string(),
     name:z.string(),
     conn_id: z.number(),
@@ -129,7 +129,7 @@ export type WorkerPayload=z.output<typeof worker_payload>;
 
 export const room_header_details = z.object({
     name: z.string(),
-    discription: z.string(),
+    description: z.string(),
     createdAt: z.string()
 });
 

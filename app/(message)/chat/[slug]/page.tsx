@@ -85,7 +85,7 @@ export default function Chat({params}:{params:{slug:string}}){
 
             setRoomDetails({
                 name: narrowed_room.name,
-                discription: narrowed_room.discription,
+                description: narrowed_room.description,
                 createdAt: narrowed_room.createdAt,
             });
             setCompose(narrowed_room.draft ?? "")
@@ -437,7 +437,7 @@ export default function Chat({params}:{params:{slug:string}}){
                                 {room_details.name}
                                 </h4>
                                 <h5 className="truncate border-l-2 pl-4 italic my-1">
-                                {room_details.discription}
+                                {room_details.description}
                                 </h5>
                             </div>
                             <div className="flex space-x-2">
@@ -462,7 +462,7 @@ export default function Chat({params}:{params:{slug:string}}){
                                         </DialogTrigger>
                                         <EditRoomDetails room_details={{
                                             name: room_details!.name,
-                                            discription: room_details!.discription
+                                            description: room_details!.description
                                         }} chat_id={params.slug}/>
                                     </Dialog>
                                 </Button>

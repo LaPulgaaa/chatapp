@@ -12,7 +12,7 @@ export async function PUT(req: NextRequest, {params}:{params: {chat_id: string}}
             },
             data: {
                 name: updated_form_data.name,
-                discription: updated_form_data.discription,
+                description: updated_form_data.description,
             }
         });
 

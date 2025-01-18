@@ -30,7 +30,7 @@ export default function CreateRoom(){
         resolver:zodResolver(room_details_schema),
         defaultValues:{
             name:"",
-            discription:""
+            description:""
         }
     });
 
@@ -43,7 +43,7 @@ export default function CreateRoom(){
                     method:"POST",
                     body:JSON.stringify({
                         name:values.name,
-                        discription:values.discription
+                        description:values.description
                     }),
                     headers:{
                         'Content-Type':"application/json"
@@ -95,12 +95,12 @@ export default function CreateRoom(){
                                 />
                                 <FormField
                                 control={form.control}
-                                name="discription"
+                                name="description"
                                 render={({field})=>(
                                 <FormItem>
-                                    <FormLabel>Discription</FormLabel>
+                                    <FormLabel>description</FormLabel>
                                     <FormControl>
-                                    <Textarea placeholder='Discription' {...field}/>
+                                    <Textarea placeholder='description' {...field}/>
                                     </FormControl>
                                     <FormMessage/>
                                 </FormItem>
