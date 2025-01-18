@@ -410,7 +410,7 @@ export default function Direct({params}:{params:{slug: string}}){
         setInbox((inbox) => {
             return inbox.map((dm) => {
                 assert(dm.is_local_echo === true);
-                if(payload.is_local_echo === true && dm.hash === payload.hash)
+                if(dm.hash === payload.hash)
                 return {
                     ...dm,
                     pinned: payload.pinned,

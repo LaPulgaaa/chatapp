@@ -49,7 +49,7 @@ export default function Connect(){
                     }
                     else{
                         const updated_msgs = dm.messages.filter((msg) => {
-                            if(payload.is_local_echo === false && msg.id !== payload.id)
+                            if(msg.id !== payload.id)
                                 return msg;
                         })
 
@@ -76,7 +76,7 @@ export default function Connect(){
                         return dm;
                     else{
                         const updated_msgs = dm.messages.map((msg) => {
-                            if(payload.is_local_echo === false && msg.id === payload.id)
+                            if(msg.id === payload.id)
                             {
                                 return {
                                     ...msg,
