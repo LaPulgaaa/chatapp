@@ -456,6 +456,91 @@ export async function ws(wss:WebSocketServer){
                 }
             }
 
+            if(data.type === "star_msg"){
+                const { 
+                    sender_id,
+                    type,
+                    is_local_echo 
+                }: {sender_id: string, type: "DM" | "CHAT", is_local_echo: boolean,} = data.payload;
+                switch(type){
+                    case "DM": 
+                    let msg;
+                    const starred = data.payload.starred;
+                    if(is_local_echo === true){
+                        const hash = data.payload.hash;
+                        try{
+                            const resp = await prisma.directMessage.update({
+                                where: {
+                                    hash
+                                },
+                                data: {
+                                    starred: starred,
+                                },
+                                select: {
+                                    hash: true,
+                                    id: true,
+                                    connectionId: true,
+                                    starred: true,
+                                }
+                            })
+                            msg = JSON.stringify({
+                                type: "star",
+                                payload: {
+                                    type: "DM",
+                                    starred: resp.starred,
+                                    hash: resp.hash,
+                                    id: resp.id,
+                                    sender_id,
+                                    conc_id:resp.connectionId,
+                                }
+                            })
+                            ws.send(JSON.stringify({
+                                type: "STARRED_ECHO_CALLBACK",
+                                data: msg,
+                            }))
+                        }catch(err){
+                            console.log(err);
+                        }
+                    }else{
+                        const id = data.payload.id;
+                        try{
+                            const resp = await prisma.directMessage.update({
+                                where: {
+                                    id,
+                                },
+                                data: {
+                                    starred,
+                                },
+                                select: {
+                                    id: true,
+                                    hash: true,
+                                    starred: true,
+                                    connectionId: true,
+                                }
+                            })
+                            msg = JSON.stringify({
+                                type: "star",
+                                payload: {
+                                    type: "DM",
+                                    starred: resp.starred,
+                                    hash: resp.hash,
+                                    id: resp.id,
+                                    sender_id,
+                                    conc_id:resp.connectionId,
+                                }
+                            })
+                            ws.send(JSON.stringify({
+                                type: "STARRED_NON_ECHO_CALLBACK",
+                                data: msg,
+                            }))
+                        }catch(err){
+                            console.log(err);
+                        }
+                    }
+                    break;
+                }
+            }
+
             if(data.type === "pin_msg"){
                 const { pinned, sender_id, type, is_local_echo } = data.payload;
 

@@ -251,4 +251,8 @@ export const message_pin_payload = z.object({
     conc_id: z.string(),
 })
 
+export const message_star_payload = message_pin_payload.omit({pinned: true}).
+                                    and(z.object({ starred: z.array(z.string()) }));
+
 export type MessagePinPayload = z.output<typeof message_pin_payload>;
+export type MessageStarPayload = z.output<typeof message_star_payload>;
