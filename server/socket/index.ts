@@ -5,6 +5,7 @@ import { prisma } from '../../packages/prisma/prisma_client';
 import { createId } from '@paralleldrive/cuid2';
 import sha256 from "crypto-js/sha256";
 import Base64 from "crypto-js/enc-base64";
+import { typing_notification_payload } from './client_data';
 
 const client=createClient();
 
@@ -254,18 +255,38 @@ export async function ws(wss:WebSocketServer){
                 }
             }
 
-            if(data.type === "typing"){
-                const { chat_id, user_id } = data.payload;
+            if(data.type === "TYPING"){
+                const parsed_data = typing_notification_payload.parse(data.payload)
+                const { user_id, type } = parsed_data;
 
-                const msg_data = JSON.stringify({
-                    type: 'typing',
-                    payload: {
-                        chat_id,
-                        user_id
-                    }
-                })
+                if(type === "DM"){
+                    const conc_id = parsed_data.conc_id;
+                    const msg_data = JSON.stringify({
+                        type: 'TYPING',
+                        payload: {
+                            type,
+                            conc_id,
+                            op: parsed_data.operation,
+                            user_id
+                        }
+                    })
+                    RedisSubscriptionManager.get_instance().addChatMessage(conc_id,"TYPING_CALLBACK",msg_data)
+                }else{
+                    const room_id = parsed_data.room_id;
 
-                RedisSubscriptionManager.get_instance().addChatMessage(chat_id,"TYPING_CALLBACK",msg_data)
+                    const msg_data = JSON.stringify({
+                        type: 'TYPING',
+                        payload: {
+                            type,
+                            room_id,
+                            op: parsed_data.operation,
+                            user_id
+                        }
+                    })
+                    RedisSubscriptionManager.get_instance().addChatMessage(room_id,"TYPING_CALLBACK",msg_data)
+                }
+
+                
             }
 
             if(data.type === "update_details"){

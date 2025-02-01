@@ -3,13 +3,10 @@
 import assert from "minimalistic-assert";
 import React,{ useState, useEffect, useRef, useMemo } from "react";
 import { useSession } from "next-auth/react";
-import { SendHorizonal } from "lucide-react";
 import { useRecoilRefresher_UNSTABLE, useRecoilStateLoadable } from "recoil";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { ScrollArea  } from "@/components/ui/scroll-area";
-import { Input } from "@/components/ui/input";
 
 import { Signal } from "@/app/home/signal";
 import DirectMessageHistory from "../history";
@@ -25,6 +22,8 @@ import { FriendSearchResult, MessageDeletePayload, friend_search_result_schema }
 import { direct_msg_state } from "@/lib/store/atom/dm";
 import { PinnedMessages } from "../pinned_msg_ui";
 import { PinMsgCallbackData, StarMsgCallbackData } from "../../msg_connect";
+import { ComposeBox, Recipient } from "../typing_status";
+import { TypingEvent } from "../typing_event";
 
 type DeleteMsgCallbackData = {
     type: string,
@@ -34,9 +33,8 @@ type DeleteMsgCallbackData = {
 
 export default function Direct({params}:{params:{slug: string}}){
     const dm_ref = useRef<HTMLDivElement>(null);
-    const compose_ref = useRef<string>("");
+    // const compose_ref = useRef<string>("");
     const [compose,setCompose] = useState<string>("");
-    const [disable,setDisable] = useState<boolean>(true);
     const session = useSession();
     const [dmStateDetails,setDmStateDetails] = useState<FriendSearchResult | undefined>();
     const [dms,setDms] = useRecoilStateLoadable(direct_msg_state);
@@ -46,9 +44,21 @@ export default function Direct({params}:{params:{slug: string}}){
     const [history,setHistory] = useState<UnitDM[]>([]);
     const [sweeped,setSweeped] = useState<UnitDM[]>([]);
     const [active, setActive] = useState<boolean>(false);
-    const [typing,setTyping] = useState<number>(0);
-    const [send,setSend] = useState(false);
-    const type_ref = useRef<HTMLDivElement>(null);
+
+    const recipient:Recipient | null = useMemo(()=>{
+        if(dmStateDetails !== undefined && dmStateDetails.is_friend === true && session.status === "authenticated"){
+            //@ts-ignore
+            const username = session.data.username;
+            return {
+                message_type: "DM",
+                notification_type: "typing",
+                conc_id: dmStateDetails.friendship_data.connectionId,
+                user_id: username,
+            }
+        }
+
+        return null;
+    },[dmStateDetails,session])
 
     const pinned_msg = useMemo(() => {
         if(dmStateDetails !== undefined && dmStateDetails.is_friend === true){
@@ -156,15 +166,6 @@ export default function Direct({params}:{params:{slug: string}}){
     }
 
     useEffect(()=>{
-        if(compose.trim().length === 0){
-            setDisable(true);
-        }
-        else{
-            setDisable(false);
-        }
-    },[compose])
-
-    useEffect(()=>{
         const chat_node = dm_ref.current;
         if(chat_node!==null)
         {
@@ -178,19 +179,6 @@ export default function Direct({params}:{params:{slug: string}}){
             })
         }
     },[history])
-
-    useEffect(() => {
-        const type_node = type_ref.current;
-        if(typing > 0 && type_node !== null){
-            const type_comp = type_node.querySelector("#typing");
-            if(type_comp !== null){
-                type_comp.scrollIntoView({
-                    behavior: "smooth",
-                    inline: "end",
-                })
-            }
-        }
-    },[typing])
 
     useEffect(()=>{
         const chat_node = dm_ref.current;
@@ -217,31 +205,6 @@ export default function Direct({params}:{params:{slug: string}}){
         }
         //eslint-disable-next-line react-hooks/exhaustive-deps
     },[inbox])
-
-    function send_typing_notification(){
-        
-        if(dmStateDetails === undefined || dmStateDetails?.is_friend === false)
-            return;
-        //@ts-ignore
-        const username = session.data.username;
-        const message = JSON.stringify({
-            type:"typing",
-            payload: {
-                user_id: username,
-                chat_id: dmStateDetails?.friendship_data!.connectionId,
-            }
-        })
-        if(send === true)
-        {
-            setTimeout(() => {
-                setSend(false)
-            },1000)
-        }
-        else{
-            Signal.get_instance().SEND(message);
-            setSend(true);
-        }
-    }
 
     async function sweep_lastest_messages(conc_id: string, last_msg_id: number | undefined){
         try{
@@ -328,7 +291,6 @@ export default function Direct({params}:{params:{slug: string}}){
         }
         Signal.get_instance().REGISTER_CALLBACK("MSG_CALLBACK",pm_recieve_callback);
         Signal.get_instance().REGISTER_CALLBACK("ONLINE_CALLBACK",update_member_online_status);
-        Signal.get_instance().REGISTER_CALLBACK("TYPING_CALLBACK",typing_notif_callback);
         Signal.get_instance().REGISTER_CALLBACK('DELETE_ECHO',delete_msg_callback);
         Signal.get_instance().REGISTER_CALLBACK('PIN_MSG_CALLBACK_ECHO',pin_echo_msg_callback);
         Signal.get_instance().REGISTER_CALLBACK('STARRED_ECHO_CALLBACK',star_echo_msg_callback);
@@ -348,32 +310,11 @@ export default function Direct({params}:{params:{slug: string}}){
             Signal.get_instance().DEREGISTER("PIN_MSG_CALLBACK_ECHO");
             Signal.get_instance().DEREGISTER("STARRED_ECHO_CALLBACK");
             Signal.get_instance().DEREGISTER("DELETE_ECHO");
-            Signal.get_instance().DEREGISTER("TYPING_CALLBACK");
             // update_draft();
             // maybe_clear_draft_cache();
         }
         //eslint-disable-next-line react-hooks/exhaustive-deps
     },[session.status,dmStateDetails]);
-
-    function typing_notif_callback(raw_data: string){
-        const data = JSON.parse(`${raw_data}`);
-
-        if(params.slug !== data.payload.user_id)
-            return;
-        if(dmStateDetails?.friendship_data?.connectionId !== data.payload.chat_id)
-            return;
-
-        setTyping((typing) => typing+1);
-
-        setInterval(() => {
-            setTyping((typing) => {
-                if(typing > 0)
-                    return typing-1;
-
-                return 0;
-            });
-        }, 3000);
-    }
 
     function pm_recieve_callback(raw_data: string){
         const data:RecievedMessage = JSON.parse(raw_data);
@@ -532,7 +473,7 @@ export default function Direct({params}:{params:{slug: string}}){
                 </div>
                 <ScrollArea id="chatbox"
                     className="flex flex-col h-full rounded-md border m-2">
-                    <PinnedMessages dm_ref={dm_ref} msgs={pinned_msg ?? []}/>
+                    { pinned_msg && pinned_msg.length > 0 && <PinnedMessages dm_ref={dm_ref} msgs={pinned_msg ?? []}/>}
                     <div className="my-16" ref={dm_ref}>
                         {
                             dmStateDetails.is_friend && 
@@ -546,39 +487,17 @@ export default function Direct({params}:{params:{slug: string}}){
                             })
                         }
                     </div>
-                    <div ref={type_ref} className="absolute bottom-0 mb-10">
-                        {
-                            typing > 0 && 
-                            <div id="typing" className="flex m-4 space-x-1 mb-6">
-                                <Avatar className="w-[35px] h-[35px] mt-2">
-                                    <AvatarImage src={`https://avatar.varuncodes.com/${params.slug}`}/>
-                                    <AvatarFallback>{params.slug.substring(0,2)}</AvatarFallback>
-                                </Avatar>
-                                <div className="bg-slate-200 dark:bg-slate-900 rounded-md p-1 px-2 mt-2 text-center">...</div>
-                            </div>
-                        }
-                    </div>
-                    <div className="absolute bottom-0 w-full mb-3 flex">
-                    <Input 
-                    className="ml-4" 
-                    value={compose}
-                    onChange={(e)=>{
-                        setCompose(e.target.value);
-                        compose_ref.current = e.target.value;
-                        send_typing_notification();
-                    }}
-                    onKeyDown={(e)=>{
-                        if(e.key === "Enter" && compose.trim().length > 0)
-                            sendMessage();
-                    }}
-                    type="text" placeholder="Message"/>
-                    <Button
-                    disabled = {disable}
-                    onClick={()=>{
-                        if(compose.trim().length > 0)
-                            sendMessage();
-                    }} className="mx-4"><SendHorizonal/></Button>
-                    </div>
+                    {
+                        dmStateDetails.is_friend && <TypingEvent
+                        typing_details={{ type: "DM", conc_id: dmStateDetails.friendship_data.connectionId}}
+                        />
+                    }
+                    <ComposeBox
+                    recipient={recipient}
+                    sendMessage={sendMessage}
+                    compose={compose}
+                    setCompose={setCompose}
+                    />
                 </ScrollArea>
                 </div> : <div>Loading...</div>
             }

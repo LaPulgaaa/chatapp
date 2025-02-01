@@ -1,0 +1,46 @@
+import { typing_event_store } from "@/lib/store/atom/typing_event_store";
+import { useMemo } from "react";
+import { useRecoilValue } from "recoil";
+import { Avatar,AvatarImage,AvatarFallback } from "@/components/ui/avatar";
+
+type TypingDetails = {
+    type: 'CHAT',
+    room_id: string,
+} | {
+    type: 'DM',
+    conc_id: string,
+}
+
+export function TypingEvent({typing_details}:{typing_details: TypingDetails}){
+    const typingState = useRecoilValue(typing_event_store);
+
+    const typing_data = useMemo(() => {
+        return typingState.find((room_or_dm) => {
+            if(room_or_dm.type === "CHAT" && typing_details.type === "CHAT" && room_or_dm.room_id === typing_details.room_id)
+                return room_or_dm;
+            else if(room_or_dm.type === "DM" && typing_details.type === "DM" && room_or_dm.conc_id === typing_details.conc_id)
+                return room_or_dm
+        })
+    },[typingState,typing_details]);
+
+    return (
+        <div className="mb-10 absolute bottom-0">
+            {
+                typing_data && typing_data.typists.length > 0 &&
+                <div className="flex m-3 space-x-1 mb-6">
+                    {
+                        typing_data.typists.map((member) => {
+                            return(
+                                <Avatar id="typing" key={member} className="w-[35px] h-[35px] mt- 2 ">
+                                    <AvatarImage src={`https://avatar.varuncodes.com/${member}`}/>
+                                    <AvatarFallback>{member.substring(0,2)}</AvatarFallback>
+                                </Avatar>
+                            )
+                        })
+                    }
+                    <div className="bg-slate-200 dark:bg-slate-900 rounded-md p-1 px-2 text-center">...</div>
+                </div>
+            }
+        </div>
+    )
+}
