@@ -2,7 +2,7 @@
 
 import assert from "minimalistic-assert";
 
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 
 import { Signal } from "@/app/home/signal";
 
@@ -10,12 +10,11 @@ import { useEffect, useState } from "react";
 
 import { useSession } from "next-auth/react";
 import Inbox from "@/components/Inbox";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useRecoilValue, useRecoilState, useRecoilStateLoadable} from "recoil";
 import { useRouter } from "next/navigation";
-import { ChevronLeftIcon, ChevronRightIcon, Edit, ListEndIcon, SendHorizonal } from "lucide-react";
+import { ChevronLeftIcon, ChevronRightIcon, Edit, ListEndIcon} from "lucide-react";
 import { DarkLight } from "@/components/DarkLight";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
@@ -34,6 +33,8 @@ import { chat_details_state } from "@/lib/store/atom/chat_details_state";
 import { subscribed_chats_state } from "@/lib/store/atom/subscribed_chats_state";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import EditRoomDetails from "../edit_room_details";
+import { TypingEvent } from "../../dm/typing_event";
+import { ComposeBox } from "../../dm/typing_status";
 
 export type RecievedMessage={
     type:string,
@@ -56,7 +57,6 @@ export default function Chat({params}:{params:{slug:string}}){
 
     const compose_ref = useRef<string | null>(null);
     const chat_ref = useRef<HTMLDivElement>(null);
-    const type_ref = useRef<HTMLDivElement>(null);
     const [sweeped,setSweeped] = useState<ChatMessageData['messages']>([]);
     const [realtimechat, setRealtimechat] = useState<JSX.Element[]>([]);
     const [compose,setCompose]=useState<string>("");
@@ -65,17 +65,28 @@ export default function Chat({params}:{params:{slug:string}}){
     const [did,_setDid]=useState<number>();
     const [rooms,setRooms]=useRecoilState(UserStateChats);
     const [ishidden,setIshidden] = useRecoilState(isSidebarHidden) 
-    const [disable,setDisable] = useState(true);
     const router=useRouter();
-    const [room_details,setRoomDetails] = useState<RoomHeaderDetails>();
+    const [roomDetails,setRoomDetails] = useState<RoomHeaderDetails>();
     const room_id = params.slug;
     //@ts-ignore
     const user_id = session.data?.id;
     const [memberStatus,setMemberStatus] = useRecoilState(member_online_state);
     const [roomsStateData,setRoomsStateData] = useRecoilStateLoadable(subscribed_chats_state);
     const [roomDetailState,setRoomDetailState] = useRecoilStateLoadable(chat_details_state({chat_id: params.slug}));
-    const [typing,setTyping] = useState<string[]>([]);
-    const [send,setSend] = useState(false);
+
+    const recipient = useMemo(() => {
+        if(session.status === "authenticated"){
+            return {
+                //@ts-ignore
+                user_id: session.data.username,
+                message_type: "CHAT" as const,
+                notification_type: "typing" as const,
+                room_id: params.slug,
+            }
+        }
+        return null;
+    //eslint-disable-next-line react-hooks/exhaustive-deps
+    },[params.slug,session]);
 
     useEffect(()=>{
         if(roomsStateData.state === "hasValue" && roomsStateData.getValue()){
@@ -92,28 +103,6 @@ export default function Chat({params}:{params:{slug:string}}){
         }
     //eslint-disable-next-line react-hooks/exhaustive-deps
     },[roomsStateData])
-
-    function send_typing_notification(){
-        //@ts-ignore
-        const username = session.data.username;
-        const message = JSON.stringify({
-            type:"typing",
-            payload: {
-                user_id: username,
-                chat_id: params.slug,
-            }
-        })
-        if(send === true)
-        {
-            setTimeout(() => {
-                setSend(false)
-            },1000)
-        }
-        else{
-            Signal.get_instance().SEND(message);
-            setSend(true);
-        }
-    }
 
     function update_draft(){
         const draft = compose_ref.current;
@@ -234,7 +223,6 @@ export default function Chat({params}:{params:{slug:string}}){
             Signal.get_instance(session.data.username).SUBSCRIBE(room_id, session.data.id, session.data.username);
             Signal.get_instance().REGISTER_CALLBACK("MSG_CALLBACK",recieve_msg);
             Signal.get_instance().REGISTER_CALLBACK("ONLINE_CALLBACK",update_member_online_status);
-            Signal.get_instance().REGISTER_CALLBACK("TYPING_CALLBACK",typing_notif_callback);
         }
 
         
@@ -245,7 +233,6 @@ export default function Chat({params}:{params:{slug:string}}){
                 Signal.get_instance().UNSUBSCRIBE(params.slug,session.data.username);
                 Signal.get_instance().DEREGISTER("MSG_CALLBACK");
                 Signal.get_instance().DEREGISTER("ONLINE_CALLBACK");
-                Signal.get_instance().DEREGISTER("TYPING_CALLBACK");
             }
             update_draft();
         }
@@ -260,29 +247,6 @@ export default function Chat({params}:{params:{slug:string}}){
             setRealtimechat((realtimechat)=>[...realtimechat, <Message  key={(session.data?.user?.email?.substring(5) || "")+Date.now()} data={data}/>])
         }
         
-    }
-
-    function typing_notif_callback(raw_data: string){
-        const data = JSON.parse(`${raw_data}`);
-        //@ts-ignore
-        const username = session.data.username;
-        if(data.payload.user_id === username || data.payload.chat_id !== params.slug)
-            return;
-
-        setTyping((members) => {
-            if(members.find((member) => member === data.payload.user_id))
-            return [...members];
-
-            return [...members,data.payload.user_id]
-        });
-
-        setTimeout(()=>{
-            setTyping((typing) => {
-                const left_members = typing.filter((member) => member !== data.payload.user_id);
-                return left_members;
-            });
-        },6000)
-
     }
 
     function update_member_online_status(raw_data: string){
@@ -310,19 +274,6 @@ export default function Chat({params}:{params:{slug:string}}){
             }
     },[roomDetailState])
 
-    useEffect(() => {
-        const type_node = type_ref.current;
-        if(typing.length > 0 && type_node !== null){
-            const type_comp = type_node.querySelectorAll("#typing");
-            if(type_comp.length !== 0){
-                type_comp[type_comp.length-1].scrollIntoView({
-                    behavior: "smooth",
-                    inline: "center"
-                })
-            }
-        }
-    },[typing])
-
     useEffect(()=>{
         const chat_node = chat_ref.current;
         if(chat_node!==null)
@@ -343,13 +294,6 @@ export default function Chat({params}:{params:{slug:string}}){
         }
         //eslint-disable-next-line react-hooks/exhaustive-deps
     },[chat])
-
-    useEffect(()=>{
-        if(compose.trim().length>0)
-            setDisable(false);
-        else
-            setDisable(true);
-    },[compose])
 
     function sendMessage(){
         const data={
@@ -427,16 +371,16 @@ export default function Chat({params}:{params:{slug:string}}){
     return <div className="h-svh w-full pb-24">
             <div className="flex justify-between mt-2 mx-1">
                 {
-                    room_details && (
+                    roomDetails && (
                         <>
                         <div
                         className="w-full flex justify-between mx-2 mr-4 border-[1.5px] border-slate-800 rounded">
                             <div className="w-full flex px-3 pt-1 mx-2 ">
                                 <h4 className="scroll-m-20 text-xl pb-1 font-semibold tracking-tight mr-3">
-                                {room_details.name}
+                                {roomDetails.name}
                                 </h4>
                                 <h5 className="truncate border-l-2 pl-4 italic my-1">
-                                {room_details.discription}
+                                {roomDetails.discription}
                                 </h5>
                             </div>
                             <div className="flex space-x-2">
@@ -460,8 +404,8 @@ export default function Chat({params}:{params:{slug:string}}){
                                             <Edit/>
                                         </DialogTrigger>
                                         <EditRoomDetails room_details={{
-                                            name: room_details!.name,
-                                            discription: room_details!.discription
+                                            name: roomDetails!.name,
+                                            discription: roomDetails!.discription
                                         }} chat_id={params.slug}/>
                                     </Dialog>
                                 </Button>
@@ -504,45 +448,21 @@ export default function Chat({params}:{params:{slug:string}}){
                         </div>
                         <div>{realtimechat}</div>
                     </div>
-                    <div className="mb-16">
-                        {
-                            typing.length > 0 && 
-                            <div className="flex m-3 space-x-1 mb-6">
-                                {
-                                    typing.map((member) => {
-                                        return(
-                                            <Avatar id="typing" key={member} className="w-[35px] h-[35px] mt-2">
-                                                <AvatarImage src={`https://avatar.varuncodes.com/${member}`}/>
-                                                <AvatarFallback>{member.substring(0,2)}</AvatarFallback>
-                                            </Avatar>
-                                        )
-                                    })
-                                }
-                                <div className="bg-slate-200 dark:bg-slate-900 rounded-md p-1 px-2 mt-2 text-center">...</div>
-                            </div>
-                        }
-                    </div>
-                    <div className="absolute bottom-0 w-full mb-3 flex">
-                    <Input 
-                    className="ml-4" 
-                    value={compose}
-                    onChange={(e)=>{
-                        setCompose(e.target.value);
-                        compose_ref.current = e.target.value;
-                        send_typing_notification();
-                    }}
-                    onKeyDown={(e)=>{
-                        if(e.key === "Enter" && compose.trim().length > 0)
-                            sendMessage();
-                    }}
-                    type="text" placeholder="Message"/>
-                    <Button
-                    disabled = {disable}
-                    onClick={()=>{
-                        if(compose.trim().length > 0)
-                            sendMessage();
-                    }} className="mx-4"><SendHorizonal/></Button>
-                    </div>
+                    {
+                        session.status === "authenticated" && 
+                            <TypingEvent
+                            typing_details={{
+                                type: "CHAT",
+                                room_id: params.slug
+                            }}
+                            />
+                    }
+                    <ComposeBox
+                    recipient={recipient}
+                    sendMessage={sendMessage}
+                    compose={compose}
+                    setCompose={setCompose}
+                    />
                 </ScrollArea>
                 {/* @ts-ignore */}
                 { session.status === "authenticated" && <Members room_id={params.slug} username={session.data.username}/>}

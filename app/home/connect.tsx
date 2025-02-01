@@ -2,9 +2,10 @@
 
 import assert from "minimalistic-assert";
 
+import { z } from "zod";
 import { useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { useRecoilRefresher_UNSTABLE, useRecoilStateLoadable } from "recoil";
+import { useRecoilRefresher_UNSTABLE, useRecoilStateLoadable, useSetRecoilState } from "recoil";
 import { useToast } from "@/hooks/use-toast";
 import { Signal } from "./signal";
 import { fetch_dms } from "@/lib/store/selector/fetch_dms";
@@ -12,6 +13,7 @@ import { MessageDeletePayload, MessagePinPayload } from "@/packages/zod";
 import { direct_msg_state } from "@/lib/store/atom/dm";
 import type { UpdateDetailsData } from "../(message)/msg_connect";
 import { subscribed_chats_state } from "@/lib/store/atom/subscribed_chats_state";
+import { typing_event_store } from "@/lib/store/atom/typing_event_store";
 
 type DeleteMsgCallbackData = {
     type: string,
@@ -23,12 +25,32 @@ type PinMsgCallbackData = {
     payload: MessagePinPayload
 }
 
+
+const inbound_typing_event = z.object({
+    type: z.literal('TYPING'),
+    payload: z.discriminatedUnion("type",[
+        z.object({
+            type: z.literal("CHAT"),
+            room_id: z.string(),
+            user_id: z.string(),
+            op: z.enum(["start","stop"]),
+        }),
+        z.object({
+            type: z.literal("DM"),
+            conc_id: z.string(),
+            user_id: z.string(),
+            op: z.enum(["start","stop"]),
+        })
+    ])
+})
+
 export default function Connect(){
     const session = useSession();
     const { toast } = useToast();
     const refresh_dms = useRecoilRefresher_UNSTABLE(fetch_dms);
     const [dms,setDms] = useRecoilStateLoadable(direct_msg_state);
     const [roomsStateData,setRoomsStateData] = useRecoilStateLoadable(subscribed_chats_state);
+    const setTypingState = useSetRecoilState(typing_event_store);
 
     function recieve_invite_callback(raw_data: string){
         const data = JSON.parse(raw_data);
@@ -116,6 +138,54 @@ export default function Connect(){
             setRoomsStateData([...other_rooms,updated_narrowed_room]);
         }
     }
+    
+    function handle_inbound_typing_event(raw_data: string){
+        //@ts-ignore
+        const username = session.data.username
+        const data = inbound_typing_event.parse(JSON.parse(raw_data));
+        const payload = data.payload;
+            setTypingState((curr_state) => {
+                return curr_state.map((s) => {
+                    if(payload.user_id === username)
+                        return s;
+
+                    if(payload.type === "CHAT" && s.type === "CHAT" && payload.room_id === s.room_id){
+                        let already_typists = s.typists;
+
+                        if(payload.op === "start" && !already_typists.includes(payload.user_id)){
+                            already_typists = [...already_typists,payload.user_id];
+                        }
+                        else if(payload.op === "stop" && already_typists.includes(payload.user_id)){
+                            already_typists = already_typists.filter((typist) => typist !== payload.user_id);
+                        }
+
+                        return {
+                            type: 'CHAT',
+                            room_id: s.room_id,
+                            typists: already_typists
+                        }
+                    }
+                    else if(payload.type === "DM" && s.type === "DM" && payload.conc_id === s.conc_id){
+                        let already_typists = s.typists;
+
+                        if(payload.op === "start" && !already_typists.includes(payload.user_id)){
+                            already_typists = [...already_typists,payload.user_id];
+                        }
+                        else if(payload.op === "stop" && already_typists.includes(payload.user_id)){
+                            already_typists = already_typists.filter((typist) => typist !== payload.user_id);
+                        }
+
+                        return {
+                            type: "DM",
+                            conc_id: s.conc_id,
+                            typists: already_typists
+                        }
+                    }
+
+                    return s;
+                })
+            })
+    }
 
     useEffect(()=>{
         if(session.status === "authenticated"){
@@ -123,6 +193,7 @@ export default function Connect(){
             Signal.get_instance(session.data.username).REGISTER_CALLBACK("INVITE",recieve_invite_callback);
             Signal.get_instance().REGISTER_CALLBACK("DELETE_NON_ECHO",delete_msg_callback);
             Signal.get_instance().REGISTER_CALLBACK("PIN_MSG_CALLBACK",pin_msg_callback);
+            Signal.get_instance().REGISTER_CALLBACK("TYPING_CALLBACK",handle_inbound_typing_event);
             Signal.get_instance().REGISTER_CALLBACK("UPDATE_DETAILS_CALLBACK",details_update_callback)
         }
 
