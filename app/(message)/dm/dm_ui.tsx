@@ -37,12 +37,12 @@ export default function DmRender({dm, username,id }:{dm: UnitDM, username: strin
             className="flex m-2">
                 <DmContextMenu dm={dm} username={username}>
                     <div className={`w-full border-2 pb-1 mr-2 bg-slate-200 dark:bg-slate-900  max-w-prose rounded-md flex`}>
-                        <p className="w-7/8 italic text-wrap mx-2 my-2">{dm.content}</p>
+                        <p className="w-7/8 italic text-wrap break-all mx-2 my-2">{dm.content}</p>
                         <div className="flex flex-col gap-2 mt-1 mr-1">
                             <div className="justify-end flex-1 ml-4">{dm.starred.includes(username) && <StarFilledIcon/>}</div>
                             <div className="w-full flex flex-row gap-1 justify-end text-[10px] ml-2 mr-1">
                                 <div>{dm.pinned && <DrawingPinFilledIcon/>}</div>
-                                <p>{dm_created_at}</p>
+                                <p className="mx-2">{dm_created_at}</p>
                             </div>
                         </div>
                     </div>
@@ -54,12 +54,12 @@ export default function DmRender({dm, username,id }:{dm: UnitDM, username: strin
                 <DmContextMenu dm={dm} username={username}>
                     <div
                     className={`w-full border-2 pb-1 mr-2 bg-slate-200 dark:bg-slate-900  max-w-prose rounded-md flex`}>
-                        <p className="w-7/8 italic text-wrap mx-2 my-2">{dm.content}</p>
+                        <p className="w-7/8 italic text-wrap break-all mx-2 my-2">{dm.content}</p>
                         <div className="flex flex-col gap-2 mt-1 mr-1">
                             <div className="w-full flex-1 flex justify-end ml-4 ">{dm.starred.includes(username) && <StarFilledIcon className="justify-end mr-2"/>}</div>
                             <div className="w-full flex flex-row gap-1 justify-end text-[10px] ml-2">
                                 <div>{dm.pinned && <DrawingPinFilledIcon/>}</div>
-                                <p>{dm_created_at}</p>
+                                <p className="mx-2">{dm_created_at}</p>
                             </div>
                         </div>
                     </div>
