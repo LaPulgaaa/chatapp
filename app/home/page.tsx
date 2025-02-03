@@ -2,12 +2,13 @@
 
 import { memo } from "react";
 
-import { useRecoilValueLoadable} from "recoil";
+import { useRecoilValue, useRecoilValueLoadable} from "recoil";
 import { useRouter } from "next/navigation";
 import type { ChatReponse, PrivateChats } from "@/packages/zod";
 import { useSession } from "next-auth/react";
 import { subscribed_chats_state } from "@/lib/store/atom/subscribed_chats_state";
 import { direct_msg_state } from "@/lib/store/atom/dm";
+import { typing_event_store } from "@/lib/store/atom/typing_event_store";
 
 function get_last_msg_time(lastmsgAt: string): string {
 
@@ -75,6 +76,7 @@ export default function Home(){
 const RoomTabs = memo(
     function({rooms, dms, username}:{rooms:ChatReponse, dms:PrivateChats, username: string}){
     const router = useRouter();
+    let typingState = useRecoilValue(typing_event_store);
 
     // `rooms` is a state variable so we can not mutate it
     // instead copy it over and sort accordingly
@@ -88,6 +90,7 @@ const RoomTabs = memo(
         <div>
             {
                 sorted_acc_to_time?.map((convo)=>{
+                    const maybe_typing = typingState.find((state) => state.type === "CHAT" && state.room_id === convo.id);
                     if(convo.type === "chat"){
                         const last_sent_msg = convo.messages.slice(-1)[0];
                         return <div key={convo.id} 
@@ -103,21 +106,28 @@ const RoomTabs = memo(
 
                             <div className="border-l-2 pl-6 italic text-muted-foreground truncate">
                                 {
+                                maybe_typing !== undefined && maybe_typing.typists.length > 0  ? 
+                                <div>
+                                    {
+                                        <p className="font-semibold">{maybe_typing.typists.join(", ")} are typing...</p>
+                                    }
+                                </div> :
                                 convo.draft ? 
                                 <p><span className="text-red-500">Draft: </span>{convo.draft}</p> :
                                 (
-                                    last_sent_msg ? <div>
+                                    last_sent_msg ? <div className="flex flex-row gap-1">
                                     {
                                         last_sent_msg.sender.username !== username && <p>{last_sent_msg.sender.username}: </p>
                                     }
-                                    <p>{last_sent_msg.content}</p>
-                                    </div> : <div className="pl-6 border-l-2">No messages yet.</div>
+                                    <p className="truncate">{last_sent_msg.content}</p>
+                                    </div> : <div>No messages yet.</div>
                                 )
                                 }
                             </div>
                         </div>
                     }
                     else {
+                        const maybe_typing = typingState.find((state) => state.type === "DM" && state.conc_id === convo.connectionId);
                         return (
                             <div key={convo.id} 
                             className="p-3 rounded-md m-1 cursor-pointer hover:bg-gray-300 hover:dark:bg-slate-800 border-2 ease-out duration-300 transition-all"
@@ -132,9 +142,17 @@ const RoomTabs = memo(
 
                                 <div className="border-l-2 pl-6 italic text-muted-foreground truncate">
                                     {
+                                        maybe_typing !== undefined && maybe_typing.typists.length > 0 ? 
+                                        <div>
+                                            {
+                                                <p className="font-semibold">{maybe_typing.typists.join(", ")} is typing...</p>
+                                            }
+                                        </div> : 
                                         convo.draft ? 
-                                        <p><span className="text-red-500">Draft: </span>{convo.draft}</p> :
-                                        <p>{convo.messages.slice(-1)[0]?.content}</p>
+                                        <p>
+                                            <span className="text-red-500">Draft: </span>{convo.draft}
+                                        </p> :
+                                        <p className="truncate">{convo.messages.slice(-1)[0]?.content}</p>
                                     }
                                 </div>
                             </div>

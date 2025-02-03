@@ -26,7 +26,7 @@ type PinMsgCallbackData = {
 }
 
 
-const inbound_typing_event = z.object({
+export const inbound_typing_event = z.object({
     type: z.literal('TYPING'),
     payload: z.discriminatedUnion("type",[
         z.object({
