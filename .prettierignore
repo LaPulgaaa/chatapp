@@ -1,0 +1,10 @@
+# Ignore artifacts:
+build
+coverage
+package-lock.json
+app
+components
+hooks
+lib
+packages
+public
