@@ -1,9 +1,8 @@
-'use client';
+"use client";
 import { RecoilRoot } from "recoil";
 
-
-export default function RecoilContextProvider({children}:Readonly<{children:JSX.Element}>){
-    return <RecoilRoot>
-        {children}
-    </RecoilRoot>
+export default function RecoilContextProvider({
+  children,
+}: Readonly<{ children: JSX.Element }>) {
+  return <RecoilRoot>{children}</RecoilRoot>;
 }
