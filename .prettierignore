@@ -2,8 +2,4 @@
 build
 coverage
 package-lock.json
-app
-components
-hooks
-lib
 

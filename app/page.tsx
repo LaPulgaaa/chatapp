@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { ArrowUpRight } from "lucide-react";
@@ -11,13 +11,12 @@ export default function Home() {
   const session = useSession();
   const router = useRouter();
 
-  useEffect(()=>{
-    if(session.status === "authenticated")
-      router.push("/home");
-  },[session.status,router])
+  useEffect(() => {
+    if (session.status === "authenticated") router.push("/home");
+  }, [session.status, router]);
   return (
     <div>
-      <Navbar/>
+      <Navbar />
       <div className="grid justify-items-center m-48">
         <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-7xl">
           chat.varuncodes.com
@@ -26,20 +25,17 @@ export default function Home() {
           Open Source Chat Application for better convos.
         </h2>
         <div className="flex px-4">
-        <Link href={"/signup"}>
-          <Button variant={"outline"} className="mx-4">
-            <ArrowUpRight className="mb-1"/>
-            <span className="ml-1">Get Started</span>
-          </Button>
-        </Link>
-        <Link href={"https://github.com/LaPulgaaa/chatapp"}>
-          <Button variant={"secondary"}>
-            Checkout code
-          </Button>
-        </Link>
+          <Link href={"/signup"}>
+            <Button variant={"outline"} className="mx-4">
+              <ArrowUpRight className="mb-1" />
+              <span className="ml-1">Get Started</span>
+            </Button>
+          </Link>
+          <Link href={"https://github.com/LaPulgaaa/chatapp"}>
+            <Button variant={"secondary"}>Checkout code</Button>
+          </Link>
         </div>
       </div>
     </div>
-    
   );
 }

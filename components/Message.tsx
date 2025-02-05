@@ -29,9 +29,7 @@ export default function Message({ data }: { data: RecievedMessage }) {
       <Avatar
         className={`w-[35px] h-[35px] mr-2 mt-1 ${
           // @ts-ignore
-          data.payload.message.user === username
-            ? "hidden"
-            : ""
+          data.payload.message.user === username ? "hidden" : ""
         }`}
       >
         <AvatarImage

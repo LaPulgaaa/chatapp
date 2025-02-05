@@ -3,4 +3,4 @@ import NextAuth from "next-auth";
 
 const provider = NextAuth(NEXTAUTH_CONFIG);
 
-export {provider as GET, provider as POST};
+export { provider as GET, provider as POST };
