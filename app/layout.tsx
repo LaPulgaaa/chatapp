@@ -4,17 +4,15 @@ import { Inter as FontSans } from "next/font/google";
 import "./globals.css";
 import RecoilContextProvider from "@/components/providers/RecoilContextProvider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
-import {AuthProvider} from "@/components/Provider";
+import { AuthProvider } from "@/components/Provider";
 // const inter = Inter({ subsets: ["latin"] });
-import { cn } from "../lib/utils"
+import { cn } from "../lib/utils";
 import { Toaster } from "@/components/ui/toaster";
- 
+
 const fontSans = FontSans({
   subsets: ["latin"],
   variable: "--font-sans",
-})
-
-
+});
 
 export const metadata: Metadata = {
   title: "chat | Open source chat application",
@@ -29,25 +27,25 @@ export default function RootLayout({
   return (
     <html lang="en">
       <RecoilContextProvider>
-        <body className={cn(
+        <body
+          className={cn(
             "min-h-screen bg-background font-sans antialiased",
-            fontSans.variable
-          )}>
-            <AuthProvider>
+            fontSans.variable,
+          )}
+        >
+          <AuthProvider>
             <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
             >
-           
-            {children}
-            <Toaster/>
+              {children}
+              <Toaster />
             </ThemeProvider>
-            </AuthProvider>
-            </body>
-        </RecoilContextProvider>
-      
+          </AuthProvider>
+        </body>
+      </RecoilContextProvider>
     </html>
   );
 }
