@@ -250,7 +250,8 @@ export default function Direct({params}:{params:{slug: string}}){
                         const prev_state = dm;
                         return {
                             ...prev_state,
-                            messages: [...prev_state.messages, ...sweeped]
+                            messages: [...prev_state.messages, ...sweeped],
+                            lastmsgAt: sweeped.slice(-1)[0]?.createdAt ?? prev_state.lastmsgAt,
                         }
                     }
                     else
