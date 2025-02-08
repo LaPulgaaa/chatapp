@@ -371,7 +371,7 @@ export default function Chat({ params }: { params: { slug: string } }) {
   }
   async function may_be_leave_room() {
     const opcode_id = rooms.find((room) => room.id === params.slug)?.conn_id;
-    if (opcode_id === undefined || session.status === "authenticated") {
+    if (opcode_id === undefined || session.status !== "authenticated") {
       alert("Could not leave the chat!");
       return;
     }
