@@ -60,7 +60,6 @@ export default function CreateRoom() {
         if (resp.status === 400) alert("Error creating chat.");
         else {
           const { created_chat } = await resp.json();
-          //@ts-ignore
           Signal.get_instance().ADD_ROOM(session.data.id!, created_chat.id);
           refresh_chats();
         }

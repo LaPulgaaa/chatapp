@@ -18,11 +18,9 @@ export default function Sidebar() {
   const session = useSession();
 
   function get_initials() {
-    //@ts-ignore
-    const names: string[] = session.data!.name?.split(" ");
-    //@ts-ignore
-    let initials = session.data.username?.substring(0, 2);
-    if (names) {
+    const names = session.data!.name?.split(" ");
+    let initials = session.data?.username?.substring(0, 2);
+    if (names !== undefined) {
       initials = names.map((name) => name.charAt(0)).join("");
     }
 
@@ -35,13 +33,11 @@ export default function Sidebar() {
         <div className="flex ml-1 pb-2 text-center cursor-pointer justify-between">
           <Link href={"/home"} className="flex w-full">
             <Avatar className="">
-              {/* @ts-ignore */}
               <AvatarImage
                 src={`https://avatar.varuncodes.com/${session.data.username}`}
               />
               <AvatarFallback>{get_initials()}</AvatarFallback>
             </Avatar>
-            {/* @ts-ignore */}
             <h6 className="pt-2 ml-2">{session.data.name ?? ""}</h6>
           </Link>
           <br />

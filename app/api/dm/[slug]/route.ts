@@ -19,7 +19,6 @@ export async function GET(
     );
 
   try {
-    //@ts-ignore
     const username: string = token.username;
     const search_result = await prisma.member.findUnique({
       where: {

@@ -57,7 +57,6 @@ export default function JoinRoomDialog() {
         const room_info = user_chat_schema.parse(raw_resp.raw_data);
         refresh_chats();
         setRooms([...rooms, room_info]);
-        //@ts-ignore
         Signal.get_instance().ADD_ROOM(session.data.id, room_info.id);
       } else {
         alert("Room not found. Make sure the id is correct!!");

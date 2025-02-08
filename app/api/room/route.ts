@@ -9,7 +9,6 @@ export async function GET(req: NextRequest) {
     return Response.json({ message: "unauthorized" }, { status: 401 });
 
   try {
-    //@ts-ignore
     const memberId = token.id;
     const message_subscribed_rooms = await prisma.message.findMany({
       where: {
@@ -76,7 +75,6 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    //@ts-ignore
     const memberId: string = token.id;
     const [new_room, chat_opcode] = await prisma.$transaction(async (tx) => {
       const new_room = await tx.chat.create({

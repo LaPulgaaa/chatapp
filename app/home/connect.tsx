@@ -141,7 +141,7 @@ export default function Connect() {
   }
 
   function handle_inbound_typing_event(raw_data: string) {
-    //@ts-ignore
+    assert(session.status === "authenticated");
     const username = session.data.username;
     const data = inbound_typing_event.parse(JSON.parse(raw_data));
     const payload = data.payload;
@@ -210,7 +210,6 @@ export default function Connect() {
 
   useEffect(() => {
     if (session.status === "authenticated") {
-      //@ts-ignore
       Signal.get_instance(session.data.username).REGISTER_CALLBACK(
         "INVITE",
         recieve_invite_callback,
@@ -235,7 +234,6 @@ export default function Connect() {
 
     return () => {
       if (session.status === "authenticated") {
-        //@ts-ignore
         Signal.get_instance(session.data.username).DEREGISTER("INVITE");
         Signal.get_instance().DEREGISTER("DELETE_NON_ECHO");
         Signal.get_instance().DEREGISTER("PIN_MSG_CALLBACK");

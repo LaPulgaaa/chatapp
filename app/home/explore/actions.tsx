@@ -5,7 +5,7 @@ import { prisma } from "../../../packages/prisma/prisma_client";
 export async function search_by_username(
   cred: string,
   host_username: string,
-  host_name: string,
+  host_name?: string | null,
 ) {
   try {
     const possible_members = await prisma.member.findMany({

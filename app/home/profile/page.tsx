@@ -124,7 +124,6 @@ export default function Profile() {
   async function upload_avatar(e: React.ChangeEvent<HTMLInputElement>) {
     if (status !== "authenticated") return;
 
-    //@ts-ignore
     const username = data.username;
 
     const uploaded_files = e.target.files;
