@@ -41,8 +41,6 @@ export default function Home() {
   const session = useSession();
   const roomsStateData = useRecoilValueLoadable(subscribed_chats_state);
   const dmStateData = useRecoilValueLoadable(direct_msg_state);
-  //@ts-ignore
-  const id: string | undefined = session.data?.id;
 
   return (
     <div className="lg:col-span-4 mr-4 ml-2 pt-2">
@@ -54,7 +52,6 @@ export default function Home() {
 
           {roomsStateData.state === "hasValue" &&
           dmStateData.state === "hasValue" ? (
-            //@ts-ignore
             <RoomTabs
               rooms={roomsStateData.getValue()!}
               dms={dmStateData.getValue()!}

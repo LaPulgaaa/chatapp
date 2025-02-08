@@ -21,11 +21,9 @@ export default function CandleSidebar() {
   const session = useSession();
 
   function get_initials() {
-    //@ts-ignore
-    const names: string[] = session.data!.name?.split(" ");
-    //@ts-ignore
-    let initials = session.data.username?.substring(0, 2);
-    if (names) {
+    const names = session.data!.user?.name?.split(" ");
+    let initials = session.data?.username?.substring(0, 2);
+    if (names !== undefined) {
       initials = names.map((name) => name.charAt(0)).join("");
     }
 
@@ -38,8 +36,7 @@ export default function CandleSidebar() {
         {session.status === "authenticated" && (
           <Link href={"/home"}>
             <Avatar>
-              {/* @ts-ignore */}
-              <AvatarImage src={session.data.avatar_url} />
+              <AvatarImage src={session.data.avatar_url ?? undefined} />
               <AvatarFallback>{get_initials()}</AvatarFallback>
             </Avatar>
           </Link>

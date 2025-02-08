@@ -58,7 +58,6 @@ export default function Direct({ params }: { params: { slug: string } }) {
       dmStateDetails.is_friend === true &&
       session.status === "authenticated"
     ) {
-      //@ts-ignore
       const username = session.data.username;
       return {
         message_type: "DM",
@@ -273,9 +272,7 @@ export default function Direct({ params }: { params: { slug: string } }) {
       dmStateDetails !== undefined &&
       dmStateDetails.is_friend === true
     ) {
-      //@ts-ignore
       const username = session.data.username;
-      //@ts-ignore
       const user_id = session.data.id;
       const conc_id = dmStateDetails.friendship_data!.connectionId;
       setActive(dmStateDetails.friendship_data!.is_active);
@@ -286,7 +283,6 @@ export default function Direct({ params }: { params: { slug: string } }) {
       dmStateDetails !== undefined &&
       dmStateDetails.is_friend === false
     ) {
-      //@ts-ignore
       const username = session.data.username;
       Signal.get_instance(username).REGISTER_CALLBACK(
         "DM_INVITE_SUCCESS",
@@ -317,7 +313,6 @@ export default function Direct({ params }: { params: { slug: string } }) {
         dmStateDetails !== undefined &&
         dmStateDetails.is_friend === true
       ) {
-        //@ts-ignore
         const username = session.data.username;
         Signal.get_instance(username).UNSUBSCRIBE(
           dmStateDetails.friendship_data!.connectionId,
@@ -435,7 +430,6 @@ export default function Direct({ params }: { params: { slug: string } }) {
   if (dmStateDetails === undefined || session.status !== "authenticated")
     return <div>Loading...</div>;
 
-  //@ts-ignore
   const username = session.data.username;
 
   function sendMessage() {
@@ -454,8 +448,7 @@ export default function Direct({ params }: { params: { slug: string } }) {
             content: compose,
             user: username,
             name: session.data?.user?.name,
-            //@ts-ignore
-            id: session.data.id,
+            id: session.data?.id,
           },
           friendshipId: data.friendship_data.id,
         },

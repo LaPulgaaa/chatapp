@@ -76,7 +76,6 @@ export default function Chat({ params }: { params: { slug: string } }) {
   const router = useRouter();
   const [roomDetails, setRoomDetails] = useState<RoomHeaderDetails>();
   const room_id = params.slug;
-  //@ts-ignore
   const user_id = session.data?.id;
   const [memberStatus, setMemberStatus] = useRecoilState(member_online_state);
   const [roomsStateData, setRoomsStateData] = useRecoilStateLoadable(
@@ -89,7 +88,6 @@ export default function Chat({ params }: { params: { slug: string } }) {
   const recipient = useMemo(() => {
     if (session.status === "authenticated") {
       return {
-        //@ts-ignore
         user_id: session.data.username,
         message_type: "CHAT" as const,
         notification_type: "typing" as const,
@@ -234,7 +232,6 @@ export default function Chat({ params }: { params: { slug: string } }) {
 
   useEffect(() => {
     if (room_id !== undefined && session.status === "authenticated") {
-      //@ts-ignore
       Signal.get_instance(session.data.username).SUBSCRIBE(
         room_id,
         session.data.id,
@@ -249,7 +246,6 @@ export default function Chat({ params }: { params: { slug: string } }) {
 
     return () => {
       if (room_id !== undefined && session.status === "authenticated") {
-        //@ts-ignore
         Signal.get_instance().UNSUBSCRIBE(params.slug, session.data.username);
         Signal.get_instance().DEREGISTER("MSG_CALLBACK");
         Signal.get_instance().DEREGISTER("ONLINE_CALLBACK");
@@ -330,10 +326,8 @@ export default function Chat({ params }: { params: { slug: string } }) {
         msg_type: "chat",
         message: {
           content: compose,
-          //@ts-ignore
           user: session.data!.username,
           name: session.data!.user?.name,
-          //@ts-ignore
           id: session.data!.id,
         },
       },
@@ -377,7 +371,6 @@ export default function Chat({ params }: { params: { slug: string } }) {
     }
 
     const is_deleted = await leave_room({
-      //@ts-ignore
       member_id: session.data?.id,
       chat_id: params.slug,
       conn_id: opcode_id,
@@ -489,7 +482,6 @@ export default function Chat({ params }: { params: { slug: string } }) {
             setCompose={setCompose}
           />
         </ScrollArea>
-        {/* @ts-ignore */}
         {session.status === "authenticated" && (
           <Members room_id={params.slug} username={session.data.username} />
         )}

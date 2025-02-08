@@ -18,7 +18,6 @@ export async function GET(
     );
 
   try {
-    //@ts-ignore
     const userId: string = token.id;
     const directory = await prisma.directory.findFirst({
       where: {

@@ -19,7 +19,6 @@ export async function GET(req: NextRequest) {
       { status: 401 },
     );
 
-  //@ts-ignore
   const username: string = token.username!;
 
   try {

@@ -27,7 +27,6 @@ export default function Search() {
   useEffect(() => {
     if (cred.length > 3 && session.status === "authenticated") {
       const search_user = async () => {
-        //@ts-ignore
         const results = await search_by_username(
           cred,
           session.data.username,
@@ -81,7 +80,6 @@ export default function Search() {
               <div className="flex justify-end w-1/5 mt-2 space-x-2 mx-2">
                 <Button
                   onClick={() => {
-                    //@ts-ignore
                     router.push(`/dm/${member.username}`);
                   }}
                   size={"icon"}

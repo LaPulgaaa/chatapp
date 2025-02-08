@@ -14,7 +14,6 @@ export default function Inbox({ data }: { data: UnitMessage }) {
     initials = names.map((name) => name.charAt(0)).join("");
   }
 
-  //@ts-ignore
   const username = session.data?.username;
 
   return (

@@ -18,7 +18,6 @@ export async function POST(req: NextRequest) {
     );
 
   try {
-    // @ts-ignore
     const memberId: string = token.id;
     const room = await prisma.chat.findUnique({
       where: {

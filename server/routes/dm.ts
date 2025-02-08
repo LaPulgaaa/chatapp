@@ -18,7 +18,6 @@ router.get("/search/:username", async (req, res) => {
   }
 
   try {
-    //@ts-ignore
     const username: string = token.username;
     const search_result = await prisma.member.findUnique({
       where: {

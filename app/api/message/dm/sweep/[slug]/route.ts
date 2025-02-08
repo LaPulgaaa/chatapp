@@ -20,7 +20,6 @@ export async function POST(
   }
 
   try {
-    //@ts-ignore
     const username: string = token.username;
 
     const dms = await prisma.directMessage.findMany({
