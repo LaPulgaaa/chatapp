@@ -108,7 +108,7 @@ export default function Chat({ params }: { params: { slug: string } }) {
 
       setRoomDetails({
         name: narrowed_room.name,
-        discription: narrowed_room.discription,
+        description: narrowed_room.description,
         createdAt: narrowed_room.createdAt,
       });
       setCompose(narrowed_room.draft ?? "");
@@ -394,7 +394,7 @@ export default function Chat({ params }: { params: { slug: string } }) {
                   {roomDetails.name}
                 </h4>
                 <h5 className="truncate border-l-2 pl-4 italic my-1">
-                  {roomDetails.discription}
+                  {roomDetails.description}
                 </h5>
               </div>
               <div className="flex space-x-2">
@@ -414,7 +414,7 @@ export default function Chat({ params }: { params: { slug: string } }) {
                     <EditRoomDetails
                       room_details={{
                         name: roomDetails!.name,
-                        discription: roomDetails!.discription,
+                        description: roomDetails!.description,
                       }}
                       chat_id={params.slug}
                     />

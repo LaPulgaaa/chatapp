@@ -38,7 +38,7 @@ export default function EditRoomDetails({
     resolver: zodResolver(room_details_schema),
     defaultValues: {
       name: room_details?.name ?? "",
-      discription: room_details?.discription ?? "",
+      description: room_details?.description ?? "",
     },
   });
 
@@ -88,7 +88,7 @@ export default function EditRoomDetails({
           />
           <FormField
             control={form_details.control}
-            name="discription"
+            name="description"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Description</FormLabel>

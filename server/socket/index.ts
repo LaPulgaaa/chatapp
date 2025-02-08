@@ -350,7 +350,7 @@ export async function ws(wss: WebSocketServer) {
             },
             data: {
               name: updated_details.name,
-              discription: updated_details.discription,
+              description: updated_details.description,
             },
           });
           const msg = JSON.stringify({
@@ -359,7 +359,7 @@ export async function ws(wss: WebSocketServer) {
               chat_id,
               updated_details: {
                 name: resp.name,
-                discription: resp.discription,
+                description: resp.description,
               },
             },
           });
