@@ -58,6 +58,7 @@
   },
   "devDependencies": {
     "@aws-sdk/types": "^3.667.0",
+    "@eslint/js": "^9.20.0",
     "@prisma/client": "^5.12.1",
     "@types/cookie-parser": "^1.4.7",
     "@types/cors": "^2.8.17",
@@ -70,14 +71,17 @@
     "@types/supertest": "^6.0.2",
     "@types/ws": "^8.5.10",
     "autoprefixer": "^10.0.1",
-    "eslint": "^8",
+    "eslint": "^8.57.1",
     "eslint-config-next": "14.1.0",
+    "eslint-plugin-react": "^7.37.4",
+    "globals": "^15.14.0",
     "minimalistic-assert": "^1.0.1",
     "postcss": "^8",
     "prettier": "3.4.2",
     "prisma": "^5.12.1",
     "supertest": "^7.0.0",
     "tailwindcss": "^3.3.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "typescript-eslint": "^8.23.0"
   }
 }
