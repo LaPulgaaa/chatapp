@@ -13,25 +13,25 @@ import { typing_event_store } from "@/lib/store/atom/typing_event_store";
 function get_last_msg_time(lastmsgAt: string | undefined): string {
   if (lastmsgAt === undefined) return "-";
 
-  let last_msg_date = new Date(lastmsgAt);
-  let now_date = new Date();
+  const last_msg_date = new Date(lastmsgAt);
+  const now_date = new Date();
 
   if (
-    last_msg_date.getFullYear() != now_date.getFullYear() ||
-    last_msg_date.getMonth() != now_date.getMonth()
+    last_msg_date.getFullYear() !== now_date.getFullYear() ||
+    last_msg_date.getMonth() !== now_date.getMonth()
   )
     return last_msg_date.toDateString();
   else if (now_date.getDate() - last_msg_date.getDate() > 7) {
-    let date_arr = last_msg_date.toDateString().split(" ");
+    const date_arr = last_msg_date.toDateString().split(" ");
     return (date_arr[1] + " " + date_arr[2]).toString();
   } else {
     if (now_date.getDate() - last_msg_date.getDate() > 1)
       return last_msg_date.toDateString().split(" ")[0];
-    else if (now_date.getDate() - last_msg_date.getDate() == 1)
+    else if (now_date.getDate() - last_msg_date.getDate() === 1)
       return "Yesterday";
     else {
-      let today_at = last_msg_date.toTimeString().split(" ")[0];
-      let hour_min = today_at.split(":").slice(0, -1);
+      const today_at = last_msg_date.toTimeString().split(" ")[0];
+      const hour_min = today_at.split(":").slice(0, -1);
       return `${hour_min[0]}:${hour_min[1]}`;
     }
   }
@@ -79,14 +79,14 @@ const RoomTabs = memo(function ({
   username: string;
 }) {
   const router = useRouter();
-  let typingState = useRecoilValue(typing_event_store);
+  const typingState = useRecoilValue(typing_event_store);
 
   // `rooms` is a state variable so we can not mutate it
   // instead copy it over and sort accordingly
-  let chats = rooms.map((room) => ({ type: "chat" as const, ...room }));
-  let direct_msgs = dms.map((dm) => ({ type: "dm" as const, ...dm }));
+  const chats = rooms.map((room) => ({ type: "chat" as const, ...room }));
+  const direct_msgs = dms.map((dm) => ({ type: "dm" as const, ...dm }));
 
-  let sorted_acc_to_time = [...chats, ...direct_msgs];
+  const sorted_acc_to_time = [...chats, ...direct_msgs];
   sorted_acc_to_time.sort(
     (a, b) => new Date(b.lastmsgAt).getTime() - new Date(a.lastmsgAt).getTime(),
   );

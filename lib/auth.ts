@@ -95,7 +95,7 @@ export const NEXTAUTH_CONFIG: NextAuthOptions = {
           const new_user = await prisma.member.create({
             data: {
               email: params.token.email,
-              //@ts-ignore
+              //@ts-expect-error to be removed soon
               username: params.profile?.login ?? "",
               avatarurl: params.token.picture,
               name: params.token.name,

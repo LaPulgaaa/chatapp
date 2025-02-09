@@ -10,7 +10,7 @@ export async function POST(
   const token = await getToken({ req });
   const { last_msg_id }: { last_msg_id: number } = await req.json();
 
-  if (token == null) {
+  if (token === null) {
     return Response.json(
       {
         message: "UNAUTHORISED_ACCESS",

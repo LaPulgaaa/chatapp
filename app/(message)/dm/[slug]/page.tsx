@@ -343,7 +343,7 @@ export default function Direct({ params }: { params: { slug: string } }) {
       const last_msg = dmStateDetails.friendship_data.messages.slice(-1)[0];
 
       setInbox((inbox) => {
-        let last_local_msg = inbox.slice(-1);
+        const last_local_msg = inbox.slice(-1);
         const local_id = get_new_local_id(last_msg?.id, last_local_msg[0]?.id);
         console.log(local_id);
         const new_dm: UnitDM = {
