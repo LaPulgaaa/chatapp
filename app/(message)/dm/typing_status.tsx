@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React,{ useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { SendHorizonal } from "lucide-react";
@@ -181,13 +181,13 @@ export function ComposeBox({
       current_recipient: recipient,
       next_send_start_time:
         worker.get_current_time() + typing_start_wait_period,
-      idle_timer: start_or_extend_idle_timer(worker, typing_stop_wait_period),
+      idle_timer: start_or_extend_idle_timer(typing_stop_wait_period),
     });
 
     notify_server_start(recipient);
   }
 
-  function stop_last_notification(worker: TypingStatusWorker) {
+  function stop_last_notification() {
     assert(typingState !== null, "Typing State shouldn't be null here");
 
     clearTimeout(typingState.idle_timer);
@@ -196,11 +196,10 @@ export function ComposeBox({
   }
 
   function start_or_extend_idle_timer(
-    worker: TypingStatusWorker,
     typing_stop_wait_period: number,
   ) {
     function on_idle_timer() {
-      stop_last_notification(worker);
+      stop_last_notification();
     }
 
     return setTimeout(on_idle_timer, typing_stop_wait_period);
@@ -232,7 +231,7 @@ export function ComposeBox({
     setTypingState({
       current_recipient: new_recipient,
       next_send_start_time: 0,
-      idle_timer: start_or_extend_idle_timer(worker, typing_stop_wait_period),
+      idle_timer: start_or_extend_idle_timer(typing_stop_wait_period),
     });
 
     notify_server_start(new_recipient);
