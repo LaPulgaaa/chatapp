@@ -50,6 +50,7 @@ export async function POST(
     return Response.json(
       {
         message: "SERVER_ERROR",
+        err,
       },
       { status: 500 },
     );

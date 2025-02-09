@@ -15,7 +15,7 @@ export function PinnedMessages({
 
   function scroll_into_view(id: string) {
     const pinned_node = dm_ref.current;
-    if (pinned_node == null) return;
+    if (pinned_node === null) return;
 
     const focused_msg_node = pinned_node.querySelector(`#dm-${id}`);
 

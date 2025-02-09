@@ -12,7 +12,7 @@ export class RedisSubscriptionManager {
     {
       [userId: string]: {
         userId: string;
-        ws: any;
+        ws: WebSocket;
         uuid: string;
       };
     }
@@ -44,7 +44,7 @@ export class RedisSubscriptionManager {
     return this.instance;
   }
 
-  bulk_subscribe(wss: any, room_ids: string[], userId: string, uuid: string) {
+  bulk_subscribe(wss: WebSocket, room_ids: string[], userId: string, uuid: string) {
     this.subscription.set(userId, [
       ...(this.subscription.get(userId) ?? []),
       ...room_ids,
@@ -60,7 +60,7 @@ export class RedisSubscriptionManager {
         },
       });
 
-      if (Object.keys(this.reverseSubscription.get(roomId) || {}).length == 1) {
+      if (Object.keys(this.reverseSubscription.get(roomId) || {}).length === 1) {
         //first one in this room
 
         this.subscriber.subscribe(roomId, (payload) => {
@@ -93,7 +93,7 @@ export class RedisSubscriptionManager {
       },
     });
 
-    if (Object.keys(this.reverseSubscription.get(roomId) || {}).length == 1) {
+    if (Object.keys(this.reverseSubscription.get(roomId) || {}).length === 1) {
       //first one in this room
 
       this.subscriber.subscribe(roomId, (payload) => {

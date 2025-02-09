@@ -314,8 +314,9 @@ export default function Profile() {
                           return (
                             <Badge
                               onDoubleClick={() => {
-                                let left_favs = favs.filter((f) => f !== fav);
-                                setFavs((f) => [...left_favs]);
+                                setFavs((old_favs) => {
+                                  return old_favs.filter((f) => f !== fav)
+                                });
                               }}
                               className="m-1 p-2"
                               key={fav}

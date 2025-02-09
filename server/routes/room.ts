@@ -14,7 +14,7 @@ router.post("/joinChat", authenticate, async (req, res) => {
         id: roomId,
       },
     });
-    if (room != null) {
+    if (room !== null) {
       const room_opcode = await prisma.message.create({
         data: {
           content: `chat_${memberId}`,

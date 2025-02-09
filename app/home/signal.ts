@@ -51,7 +51,7 @@ export class Signal {
     };
 
     this.ws.onclose = () => {
-      //@ts-ignore
+      //@ts-expect-error we are trying to delete a field ie. not optional.
       delete Signal.instance;
       this.initialised = false;
       setTimeout(() => {
@@ -175,7 +175,7 @@ export class Signal {
           stamp: Date.now(),
         },
       });
-      if (this.initialised == true) this.ws.send(message);
+      if (this.initialised === true) this.ws.send(message);
       else Signal.get_instance(this.username).handle_send(message);
     }, 10000);
   }

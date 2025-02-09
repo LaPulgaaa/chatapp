@@ -29,7 +29,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useToast } from "@/hooks/use-toast";
 
 import Message from "@/components/Message";
 import { ChatMessageData, UserChat } from "@/packages/zod";
@@ -61,8 +60,6 @@ export type RecievedMessage = {
 };
 
 export default function Chat({ params }: { params: { slug: string } }) {
-  const { toast } = useToast();
-
   const compose_ref = useRef<string | null>(null);
   const chat_ref = useRef<HTMLDivElement>(null);
   const [sweeped, setSweeped] = useState<ChatMessageData["messages"]>([]);
@@ -70,7 +67,6 @@ export default function Chat({ params }: { params: { slug: string } }) {
   const [compose, setCompose] = useState<string>("");
   const [chat, setChat] = useState<RecievedMessage[]>([]);
   const session = useSession();
-  const [did, _setDid] = useState<number>();
   const [rooms, setRooms] = useRecoilState(UserStateChats);
   const [ishidden, setIshidden] = useRecoilState(isSidebarHidden);
   const router = useRouter();
@@ -279,7 +275,8 @@ export default function Chat({ params }: { params: { slug: string } }) {
       const other_members = memberStatus.filter(
         (m) => m.username !== data.payload.username,
       );
-      setMemberStatus((memberStatus) => [
+      // TODO: Recheck this
+      setMemberStatus((_memberStatus) => [
         { ...member, active: type === "MemberJoins" ? true : false },
         ...other_members,
       ]);
@@ -336,33 +333,7 @@ export default function Chat({ params }: { params: { slug: string } }) {
     compose_ref.current = "";
     Signal.get_instance().SEND(JSON.stringify(data));
   }
-  async function deleteChat() {
-    if (did === undefined) {
-      alert("This chat does not support this feature.");
-      return;
-    } else {
-      const resp = await fetch(`/api/message/chat/${params.slug}`, {
-        method: "PUT",
-        body: JSON.stringify({
-          date: new Date(),
-          did: did,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      });
-      if (resp.status === 200) {
-        setChat([]);
-        setRealtimechat([]);
-        toast({
-          variant: "destructive",
-          title: "Chat deleted successfully!",
-          duration: 3000,
-        });
-      }
-    }
-  }
+  
   async function may_be_leave_room() {
     const opcode_id = rooms.find((room) => room.id === params.slug)?.conn_id;
     if (opcode_id === undefined || session.status !== "authenticated") {
@@ -377,7 +348,7 @@ export default function Chat({ params }: { params: { slug: string } }) {
     });
 
     if (is_deleted) {
-      const left_rooms = rooms.filter((room) => room.id != params.slug);
+      const left_rooms = rooms.filter((room) => room.id !== params.slug);
       setRooms(left_rooms);
       router.push("/home");
     }
@@ -437,9 +408,6 @@ export default function Chat({ params }: { params: { slug: string } }) {
                 className="cursor-pointer"
               >
                 Leave Room
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={deleteChat} className="cursor-pointer">
-                Delete Chat
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

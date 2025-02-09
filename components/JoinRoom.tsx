@@ -32,7 +32,7 @@ export default function JoinRoomDialog() {
   async function searchRoom() {
     if (session.status !== "authenticated") return;
 
-    const room_already_joined = rooms.find((r) => r.id == roomid);
+    const room_already_joined = rooms.find((r) => r.id === roomid);
     if (room_already_joined !== undefined) {
       router.push(`/chat/${roomid}`);
       return;
