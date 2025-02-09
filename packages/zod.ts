@@ -47,36 +47,43 @@ export const message_schema = z.object({
 
 export type Message = z.infer<typeof message_schema>;
 
-export const room_details_schema=z.object({
-    name:z.string({
-        required_error:"enter a valid name"
-    }).min(1),
-    description:z.string({
-        required_error:"description should be atleast 1 character."
-    }).min(6).max(50)
-})
+export const room_details_schema = z.object({
+  name: z
+    .string({
+      required_error: "enter a valid name",
+    })
+    .min(1),
+  description: z
+    .string({
+      required_error: "description should be atleast 1 character.",
+    })
+    .min(6)
+    .max(50),
+});
 
 export type RoomType = z.infer<typeof room_details_schema>;
 
 export const user_chat_schema = z.object({
-    createdAt:z.string(),
-    lastmsgAt: z.string(),
-    deleted:z.boolean(),
-    description:z.string(),
-    id:z.string(),
-    name:z.string(),
-    conn_id: z.number(),
-    messages: z.array(z.object({
-        id: z.number(),
-        content: z.string(),
-        sender: z.object({
-            username: z.string(),
-            name: z.string().nullish(),
-        }),
-        createdAt: z.string(),
-    })),
-    draft: z.string().optional(),
-})
+  createdAt: z.string(),
+  lastmsgAt: z.string(),
+  deleted: z.boolean(),
+  description: z.string(),
+  id: z.string(),
+  name: z.string(),
+  conn_id: z.number(),
+  messages: z.array(
+    z.object({
+      id: z.number(),
+      content: z.string(),
+      sender: z.object({
+        username: z.string(),
+        name: z.string().nullish(),
+      }),
+      createdAt: z.string(),
+    }),
+  ),
+  draft: z.string().optional(),
+});
 
 export type UserChat = z.output<typeof user_chat_schema>;
 
@@ -138,9 +145,9 @@ export const worker_payload = z.discriminatedUnion("type", [
 export type WorkerPayload = z.output<typeof worker_payload>;
 
 export const room_header_details = z.object({
-    name: z.string(),
-    description: z.string(),
-    createdAt: z.string()
+  name: z.string(),
+  description: z.string(),
+  createdAt: z.string(),
 });
 
 export type RoomHeaderDetails = z.output<typeof room_header_details>;
