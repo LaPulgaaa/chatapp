@@ -15,8 +15,8 @@ export default function Message({ data }: { data: RecievedMessage }) {
     initials = names.map((name) => name.charAt(0)).join("");
   }
 
-  let today_at = new Date().toTimeString().split(" ")[0];
-  let hour_min = today_at.split(":").slice(0, -1);
+  const today_at = new Date().toTimeString().split(" ")[0];
+  const hour_min = today_at.split(":").slice(0, -1);
 
   return (
     <div

@@ -10,9 +10,11 @@ const prisma_client_singleton=()=>{
 
 type PrismaClientSingleton=ReturnType<typeof prisma_client_singleton>;
 
-let globalPrisma=globalThis as unknown as {prisma: PrismaClientSingleton | undefined}; //this is the type dec.
+const globalPrisma = globalThis as unknown as {
+  prisma: PrismaClientSingleton | undefined;
+}; //this is the type dec.
 
-export let prisma = globalPrisma.prisma ?? prisma_client_singleton(); // checking if client is cached.
+export const prisma = globalPrisma.prisma ?? prisma_client_singleton(); // checking if client is cached.
 
 if(process.env.NODE_ENV!=="production"){
     globalPrisma.prisma=prisma; //caching the client

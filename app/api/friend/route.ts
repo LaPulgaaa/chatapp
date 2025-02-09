@@ -45,7 +45,7 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    let friendships_with_last_dm: DirectMessagesServer = [];
+    const friendships_with_last_dm: DirectMessagesServer = [];
 
     await Promise.all(
       resp.map(async (frnd) => {

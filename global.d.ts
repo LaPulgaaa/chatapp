@@ -1,4 +1,3 @@
-import type { ElementType } from "react";
 import { Session as AuthSession } from "next-auth";
 
 declare global {

@@ -115,6 +115,7 @@ router.post("/login", async (req, res) => {
       });
     } else res.status(404).send("User not found!!");
   } catch (err) {
+    console.log(err);
     res.status(404).send("Could not find user!!");
   }
 });
@@ -139,7 +140,7 @@ router.get("/getCreds/:username", authenticate, async (req, res) => {
       });
     } else res.status(200).send("user not found");
   } catch (err) {
-    console.log("error in this creds route.");
+    console.log("error in this creds route."+err);
     res.status(400).send("internal server error.");
   }
 });

@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
         id: true,
       },
     });
-    let raw_data = message_subscribed_rooms.map((room) => {
+    const raw_data = message_subscribed_rooms.map((room) => {
       return { ...room.chat, conn_id: room.id };
     });
 
@@ -55,7 +55,7 @@ export async function GET(req: NextRequest) {
     return Response.json(
       {
         msg: "Internal Server Error",
-        err: err,
+        err
       },
       {
         status: 500,

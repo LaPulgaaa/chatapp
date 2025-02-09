@@ -1,4 +1,4 @@
-import { WebSocketServer } from "ws";
+import WebSocket, { WebSocketServer } from "ws";
 import { RedisSubscriptionManager } from "./redisClient";
 import { createClient } from "redis";
 import { prisma } from "../../packages/prisma/prisma_client";
@@ -11,7 +11,7 @@ const client = createClient();
 
 const users: {
   [wsId: string]: {
-    ws: any;
+    ws: WebSocket;
     userId: string;
   };
 } = {};
@@ -19,7 +19,7 @@ const users: {
 let count = 0;
 export async function ws(wss: WebSocketServer) {
   await client.connect();
-  wss.on("connection", async (ws, req: Request) => {
+  wss.on("connection", async (ws, _req: Request) => {
     const wsId = count++;
     console.log("connection made");
 
@@ -106,7 +106,7 @@ export async function ws(wss: WebSocketServer) {
         const createdAt = new Date().toISOString();
         const hash = sha256(content + createdAt + userId);
         const hash_str = Base64.stringify(hash);
-        let conc_id = createId();
+        const conc_id = createId();
         try {
           await prisma.$transaction(async (tx) => {
             const from_link = await tx.friendShip.create({
@@ -385,7 +385,7 @@ export async function ws(wss: WebSocketServer) {
                 const id = data.payload.id;
                 try {
                   const resp = await prisma.$transaction(async (tx) => {
-                    const dm = await prisma.directMessage.findUniqueOrThrow({
+                    const dm = await tx.directMessage.findUniqueOrThrow({
                       where: {
                         id,
                       },
@@ -396,7 +396,7 @@ export async function ws(wss: WebSocketServer) {
                         hash: true,
                       },
                     });
-                    await prisma.directMessage.update({
+                    await tx.directMessage.update({
                       where: {
                         id: dm.id,
                       },
@@ -431,7 +431,7 @@ export async function ws(wss: WebSocketServer) {
                 const { hash } = data.payload;
 
                 const resp = await prisma.$transaction(async (tx) => {
-                  const dm = await prisma.directMessage.findUniqueOrThrow({
+                  const dm = await tx.directMessage.findUniqueOrThrow({
                     where: {
                       hash: hash,
                     },
@@ -442,7 +442,7 @@ export async function ws(wss: WebSocketServer) {
                       connectionId: true,
                     },
                   });
-                  await prisma.directMessage.update({
+                  await tx.directMessage.update({
                     where: {
                       hash: hash,
                     },
@@ -543,7 +543,7 @@ export async function ws(wss: WebSocketServer) {
         }: { sender_id: string; type: "DM" | "CHAT"; is_local_echo: boolean } =
           data.payload;
         switch (type) {
-          case "DM":
+          case "DM":{
             let msg;
             const starred = data.payload.starred;
             if (is_local_echo === true) {
@@ -622,6 +622,7 @@ export async function ws(wss: WebSocketServer) {
               }
             }
             break;
+          }
         }
       }
 
