@@ -1,7 +1,8 @@
-import { NextRequest } from "next/server";
-import { prisma } from "@/packages/prisma/prisma_client";
 import assert from "minimalistic-assert";
+import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
+
+import { prisma } from "@/packages/prisma/prisma_client";
 
 export async function GET(
   req: NextRequest,

@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { signOut, useSession } from "next-auth/react";
 import * as React from "react";
 
-import { Button } from "./ui/button";
 import { DarkLight } from "./DarkLight";
+import { Button } from "./ui/button";
 
-import { signOut, useSession } from "next-auth/react";
 
 export default function Navbar() {
   const session = useSession();

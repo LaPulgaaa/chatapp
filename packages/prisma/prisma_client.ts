@@ -10,7 +10,8 @@ const prisma_client_singleton=()=>{
 
 type PrismaClientSingleton=ReturnType<typeof prisma_client_singleton>;
 
-const globalPrisma = globalThis as unknown as {
+// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+const globalPrisma = globalThis as unknown as { // eslint-disable-line no-undef
   prisma: PrismaClientSingleton | undefined;
 }; //this is the type dec.
 

@@ -1,7 +1,8 @@
-import { useState } from "react";
-import { UnitDM } from "./dm_ui";
-import { useTheme } from "next-themes";
 import { PinIcon } from "lucide-react";
+import { useTheme } from "next-themes";
+import React, { useState } from "react";
+
+import type { UnitDM } from "./dm_ui";
 
 export function PinnedMessages({
   dm_ref,
@@ -41,7 +42,7 @@ export function PinnedMessages({
 
     setActive((active) => {
       if (active === msgs.length - 1) return 0;
-      else return active + 1;
+      return active + 1;
     });
   }
   return (

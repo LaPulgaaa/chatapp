@@ -1,9 +1,10 @@
 import http from "http";
+
 import { WebSocketServer } from "ws";
 
-import { start_worker } from "./server/workers";
 import { express_app } from "./bin";
 import { ws } from "./server/socket/index";
+import { start_worker } from "./server/workers";
 
 const port = 3001;
 

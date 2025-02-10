@@ -1,7 +1,8 @@
-import { prisma } from "@/packages/prisma/prisma_client";
-import { getToken } from "next-auth/jwt";
 import { revalidateTag } from "next/cache";
-import { NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
+import { getToken } from "next-auth/jwt";
+
+import { prisma } from "@/packages/prisma/prisma_client";
 
 export async function GET(req: NextRequest) {
   const token = await getToken({ req });

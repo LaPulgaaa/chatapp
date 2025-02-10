@@ -1,7 +1,8 @@
-import { typing_event_store } from "@/lib/store/atom/typing_event_store";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRecoilValue } from "recoil";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { typing_event_store } from "@/lib/store/atom/typing_event_store";
 
 type TypingDetails =
   | {

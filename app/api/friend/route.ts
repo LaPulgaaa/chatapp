@@ -1,5 +1,6 @@
-import { NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
+
 import { prisma } from "@/packages/prisma/prisma_client";
 import type { DirectMsg, PrivateChat } from "@/packages/zod";
 

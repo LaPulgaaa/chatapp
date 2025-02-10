@@ -1,8 +1,8 @@
-import assert from "minimalistic-assert";
-
 import express from "express";
-import { prisma } from "../../packages/prisma/prisma_client";
+import assert from "minimalistic-assert";
 import { getToken } from "next-auth/jwt";
+
+import { prisma } from "../../packages/prisma/prisma_client";
 import { RedisSubscriptionManager } from "../socket/redisClient";
 
 const router = express.Router();

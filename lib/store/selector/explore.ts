@@ -1,7 +1,9 @@
 import { selectorFamily } from "recoil";
+
+import { fetch_dms } from "./fetch_dms";
+
 import type { FriendSearchResult } from "@/packages/zod";
 import { friend_search_result_schema } from "@/packages/zod";
-import { fetch_dms } from "./fetch_dms";
 
 export const get_friend_by_username = selectorFamily<
   FriendSearchResult | undefined,

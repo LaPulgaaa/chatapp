@@ -1,6 +1,7 @@
+import type { NextRequest } from "next/server";
+
 import { prisma } from "@/packages/prisma/prisma_client";
-import { NextRequest } from "next/server";
-import { RoomType } from "@/packages/zod";
+import type { RoomType } from "@/packages/zod";
 
 export async function PUT(
   req: NextRequest,

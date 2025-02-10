@@ -1,18 +1,19 @@
-import { ScrollArea } from "./ui/scroll-area";
-import { Dialog, DialogTrigger } from "./ui/dialog";
-import JoinRoomDialog from "@/components/JoinRoom";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import {
   HeartPulseIcon,
+  MessageSquareDotIcon,
   PlusSquare,
   SettingsIcon,
-  UserSearchIcon,
-} from "lucide-react";
-import { MessageSquareDotIcon } from "lucide-react";
+ UserSearchIcon } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+
 import CreateRoom from "./CreateRoom";
-import Link from "next/link";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Dialog, DialogTrigger } from "./ui/dialog";
+import { ScrollArea } from "./ui/scroll-area";
+
+import JoinRoomDialog from "@/components/JoinRoom";
 export default function Sidebar() {
   const router = useRouter();
   const session = useSession();

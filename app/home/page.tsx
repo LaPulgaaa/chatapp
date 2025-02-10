@@ -1,14 +1,15 @@
 "use client";
 
-import { memo } from "react";
 
-import { useRecoilValue, useRecoilValueLoadable } from "recoil";
 import { useRouter } from "next/navigation";
-import type { ChatReponse, PrivateChats } from "@/packages/zod";
 import { useSession } from "next-auth/react";
-import { subscribed_chats_state } from "@/lib/store/atom/subscribed_chats_state";
+import { memo } from "react";
+import { useRecoilValue, useRecoilValueLoadable } from "recoil";
+
 import { direct_msg_state } from "@/lib/store/atom/dm";
+import { subscribed_chats_state } from "@/lib/store/atom/subscribed_chats_state";
 import { typing_event_store } from "@/lib/store/atom/typing_event_store";
+import type { ChatReponse, PrivateChats } from "@/packages/zod";
 
 function get_last_msg_time(lastmsgAt: string | undefined): string {
   if (lastmsgAt === undefined) return "-";
@@ -24,17 +25,17 @@ function get_last_msg_time(lastmsgAt: string | undefined): string {
   else if (now_date.getDate() - last_msg_date.getDate() > 7) {
     const date_arr = last_msg_date.toDateString().split(" ");
     return (date_arr[1] + " " + date_arr[2]).toString();
-  } else {
+  } 
     if (now_date.getDate() - last_msg_date.getDate() > 1)
       return last_msg_date.toDateString().split(" ")[0];
     else if (now_date.getDate() - last_msg_date.getDate() === 1)
       return "Yesterday";
-    else {
+    
       const today_at = last_msg_date.toTimeString().split(" ")[0];
       const hour_min = today_at.split(":").slice(0, -1);
       return `${hour_min[0]}:${hour_min[1]}`;
-    }
-  }
+    
+  
 }
 
 export default function Home() {
@@ -94,7 +95,7 @@ const RoomTabs = memo(function ({
   return (
     <div>
       {sorted_acc_to_time?.map((convo) => {
-        const maybe_typing = typingState.find(
+        let maybe_typing = typingState.find(
           (state) => state.type === "CHAT" && state.room_id === convo.id,
         );
         if (convo.type === "chat") {
@@ -144,52 +145,51 @@ const RoomTabs = memo(function ({
               </div>
             </div>
           );
-        } else {
-          const maybe_typing = typingState.find(
-            (state) =>
-              state.type === "DM" && state.conc_id === convo.connectionId,
-          );
-          return (
-            <div
-              key={convo.id}
-              className="p-3 rounded-md m-1 cursor-pointer hover:bg-gray-300 hover:dark:bg-slate-800 border-2 ease-out duration-300 transition-all"
-              onClick={() => {
-                router.push(`/dm/${convo.to.username}`);
-              }}
-            >
-              <div className="flex justify-between">
-                <h5 className="border-l-2 text-xl font-semibold scroll-m-20 tracking-light pl-2">
-                  {convo.to.username}
-                </h5>
-                <p className="hidden md:block">
-                  {get_last_msg_time(convo.lastmsgAt)}
-                </p>
-              </div>
-
-              <div className="border-l-2 pl-6 italic text-muted-foreground truncate">
-                {maybe_typing !== undefined &&
-                maybe_typing.typists.length > 0 ? (
-                  <div>
-                    {
-                      <p className="font-semibold">
-                        {maybe_typing.typists.join(", ")} is typing...
-                      </p>
-                    }
-                  </div>
-                ) : convo.draft ? (
-                  <p>
-                    <span className="text-red-500">Draft: </span>
-                    {convo.draft}
-                  </p>
-                ) : (
-                  <p className="truncate">
-                    {convo.messages.slice(-1)[0]?.content}
-                  </p>
-                )}
-              </div>
+        } 
+        maybe_typing = typingState.find(
+          (state) =>
+            state.type === "DM" && state.conc_id === convo.connectionId,
+        );
+        return (
+          <div
+            key={convo.id}
+            className="p-3 rounded-md m-1 cursor-pointer hover:bg-gray-300 hover:dark:bg-slate-800 border-2 ease-out duration-300 transition-all"
+            onClick={() => {
+              router.push(`/dm/${convo.to.username}`);
+            }}
+          >
+            <div className="flex justify-between">
+              <h5 className="border-l-2 text-xl font-semibold scroll-m-20 tracking-light pl-2">
+                {convo.to.username}
+              </h5>
+              <p className="hidden md:block">
+                {get_last_msg_time(convo.lastmsgAt)}
+              </p>
             </div>
-          );
-        }
+
+            <div className="border-l-2 pl-6 italic text-muted-foreground truncate">
+              {maybe_typing !== undefined &&
+              maybe_typing.typists.length > 0 ? (
+                <div>
+                  {
+                    <p className="font-semibold">
+                      {maybe_typing.typists.join(", ")} is typing...
+                    </p>
+                  }
+                </div>
+              ) : convo.draft ? (
+                <p>
+                  <span className="text-red-500">Draft: </span>
+                  {convo.draft}
+                </p>
+              ) : (
+                <p className="truncate">
+                  {convo.messages.slice(-1)[0]?.content}
+                </p>
+              )}
+            </div>
+          </div>
+        );
       })}
     </div>
   );

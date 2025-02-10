@@ -1,11 +1,12 @@
 "use client";
-import Navbar from "@/components/Navbar";
-import { Button } from "@/components/ui/button";
 import { ArrowUpRight } from "lucide-react";
-import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useEffect } from "react";
+
+import Navbar from "@/components/Navbar";
+import { Button } from "@/components/ui/button";
 
 export default function Home() {
   const session = useSession();

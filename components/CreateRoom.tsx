@@ -1,10 +1,24 @@
 "use client";
 
+
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useSession } from "next-auth/react";
+import { useForm } from "react-hook-form";
 import { useRecoilRefresher_UNSTABLE } from "recoil";
 
-import { useForm } from "react-hook-form";
 import { Button } from "./ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "./ui/form";
+import { Input } from "./ui/input";
+import { Textarea } from "./ui/textarea";
+
+import { Signal } from "@/app/home/signal";
 import {
   DialogClose,
   DialogContent,
@@ -13,21 +27,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormLabel,
-  FormItem,
-  FormMessage,
-} from "./ui/form";
-import { Input } from "./ui/input";
-import { Textarea } from "./ui/textarea";
-
-import { Signal } from "@/app/home/signal";
-import { RoomType, room_details_schema } from "@/packages/zod";
 import { fetch_user_chats } from "@/lib/store/selector/fetch_chats";
+import { room_details_schema } from "@/packages/zod";
+import type { RoomType} from "@/packages/zod";
 
 export default function CreateRoom() {
   const session = useSession();

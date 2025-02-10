@@ -1,5 +1,6 @@
-import { DirectMessage } from "@/packages/zod";
 import DmRender from "./dm_ui";
+
+import type { DirectMessage } from "@/packages/zod";
 
 export default function DirectMessageHistory({
   dms,

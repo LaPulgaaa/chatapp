@@ -1,15 +1,17 @@
 "use client";
 
+import { MessageCircleIcon, SearchIcon, UserIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
+
 import { search_by_username } from "./actions";
 
-import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MessageCircleIcon, SearchIcon, UserIcon } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+
 
 type ProfileSearch = {
   username: string;

@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-import {fontFamily} from "tailwindcss/defaultTheme";
+import { fontFamily } from "tailwindcss/defaultTheme";
 import animate from "tailwindcss-animate";
 module.exports = {
   darkMode: ["class"],

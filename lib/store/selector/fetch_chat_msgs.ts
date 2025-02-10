@@ -1,7 +1,9 @@
-import { selectorFamily } from "recoil";
-import type { ChatMessageData } from "@/packages/zod";
-import { fetch_user_chats } from "./fetch_chats";
 import assert from "minimalistic-assert";
+import { selectorFamily } from "recoil";
+
+import { fetch_user_chats } from "./fetch_chats";
+
+import type { ChatMessageData } from "@/packages/zod";
 
 export const fetch_chat_msgs = selectorFamily<
   ChatMessageData["messages"] | undefined,

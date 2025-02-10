@@ -1,10 +1,10 @@
-import express from "express";
-import cors from "cors";
 import cookieParser from "cookie-parser";
+import cors from "cors";
+import express from "express";
 
-import userRouter from "./server/routes/user";
-import chatRouter from "./server/routes/room";
 import dmRouter from "./server/routes/dm";
+import chatRouter from "./server/routes/room";
+import userRouter from "./server/routes/user";
 
 export const express_app = express();
 
