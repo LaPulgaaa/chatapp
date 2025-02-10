@@ -1,4 +1,5 @@
 import pluginJs from "@eslint/js";
+import eslintconfigPrettier from "eslint-config-prettier"
 import importPlugin from "eslint-plugin-import";
 import pluginReact from "eslint-plugin-react";
 import hooksPlugin from "eslint-plugin-react-hooks";
@@ -26,6 +27,7 @@ export default [
   ...tseslint.configs.recommended,
   pluginReact.configs.flat.recommended,
   importPlugin.flatConfigs.recommended,
+  eslintconfigPrettier,
   {
     rules: {
       "no-constant-condition": "off",
