@@ -1,11 +1,15 @@
-import WebSocket, { WebSocketServer } from "ws";
-import { RedisSubscriptionManager } from "./redisClient";
-import { createClient } from "redis";
-import { prisma } from "../../packages/prisma/prisma_client";
 import { createId } from "@paralleldrive/cuid2";
-import sha256 from "crypto-js/sha256";
 import Base64 from "crypto-js/enc-base64";
+import sha256 from "crypto-js/sha256";
+import { createClient } from "redis";
+import type { WebSocketServer } from "ws";
+import type WebSocket from "ws";
+
+import { prisma } from "../../packages/prisma/prisma_client";
+
+
 import { typing_notification_payload } from "./client_data";
+import { RedisSubscriptionManager } from "./redisClient";
 
 const client = createClient();
 
@@ -543,7 +547,7 @@ export async function ws(wss: WebSocketServer) {
         }: { sender_id: string; type: "DM" | "CHAT"; is_local_echo: boolean } =
           data.payload;
         switch (type) {
-          case "DM":{
+          case "DM": {
             let msg;
             const starred = data.payload.starred;
             if (is_local_echo === true) {

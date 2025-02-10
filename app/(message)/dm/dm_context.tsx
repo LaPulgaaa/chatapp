@@ -1,10 +1,3 @@
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuSeparator,
-  ContextMenuTrigger,
-} from "@/components/ui/context-menu";
 import { StarFilledIcon } from "@radix-ui/react-icons";
 import {
   Copy,
@@ -14,9 +7,18 @@ import {
   Trash,
   Trash2Icon,
 } from "lucide-react";
-import { UnitDM } from "./dm_ui";
+import React,{ useMemo } from "react";
+
+import type { UnitDM } from "./dm_ui";
+
 import { Signal } from "@/app/home/signal";
-import { useMemo } from "react";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
 import { toast } from "@/hooks/use-toast";
 
 export function DmContextMenu({
@@ -35,7 +37,7 @@ export function DmContextMenu({
       dm.sendBy.username === username
     )
       return false;
-    else return true;
+    return true;
     //eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dm]);
 

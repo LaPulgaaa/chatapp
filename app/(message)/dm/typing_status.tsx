@@ -1,10 +1,12 @@
-import React,{ useState, useEffect } from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { SendHorizonal } from "lucide-react";
-import { Signal } from "@/app/home/signal";
 import assert from "minimalistic-assert";
+import React, { useEffect, useState } from "react";
+
 import { CHATAPP } from "../util";
+
+import { Signal } from "@/app/home/signal";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export type Recipient = {
   user_id: string;
@@ -195,9 +197,7 @@ export function ComposeBox({
     setTypingState(null);
   }
 
-  function start_or_extend_idle_timer(
-    typing_stop_wait_period: number,
-  ) {
+  function start_or_extend_idle_timer(typing_stop_wait_period: number) {
     function on_idle_timer() {
       stop_last_notification();
     }

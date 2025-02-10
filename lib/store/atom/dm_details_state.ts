@@ -1,6 +1,8 @@
-import { FriendSearchResult } from "@/packages/zod";
 import { atomFamily } from "recoil";
+
 import { get_friend_by_username } from "../selector/explore";
+
+import type { FriendSearchResult } from "@/packages/zod";
 
 export const dm_details_state = atomFamily<
   FriendSearchResult | undefined,

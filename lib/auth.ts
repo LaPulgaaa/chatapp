@@ -1,6 +1,7 @@
-import GithubProvider from "next-auth/providers/github";
-import CredentialProvider from "next-auth/providers/credentials";
 import type { NextAuthOptions, SessionStrategy } from "next-auth";
+import CredentialProvider from "next-auth/providers/credentials";
+import GithubProvider from "next-auth/providers/github";
+
 import { prisma } from "@/packages/prisma/prisma_client";
 
 export const NEXTAUTH_CONFIG: NextAuthOptions = {
@@ -60,6 +61,7 @@ export const NEXTAUTH_CONFIG: NextAuthOptions = {
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   session: { strategy: "jwt" as SessionStrategy },
   callbacks: {
     async jwt(params) {

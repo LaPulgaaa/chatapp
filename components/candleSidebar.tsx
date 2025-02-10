@@ -1,21 +1,22 @@
 "use client";
 
-import { ScrollArea } from "./ui/scroll-area";
-import { Dialog, DialogTrigger } from "./ui/dialog";
-import JoinRoomDialog from "@/components/JoinRoom";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import {
   HeartPulseIcon,
+  MessageSquareDotIcon,
   PlusSquare,
   SettingsIcon,
-  UserSearchIcon,
-} from "lucide-react";
-import { MessageSquareDotIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { Button } from "./ui/button";
-import { useSession } from "next-auth/react";
-import CreateRoom from "./CreateRoom";
+ UserSearchIcon } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+
+import CreateRoom from "./CreateRoom";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Button } from "./ui/button";
+import { Dialog, DialogTrigger } from "./ui/dialog";
+import { ScrollArea } from "./ui/scroll-area";
+
+import JoinRoomDialog from "@/components/JoinRoom";
 export default function CandleSidebar() {
   const router = useRouter();
   const session = useSession();

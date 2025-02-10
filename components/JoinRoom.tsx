@@ -1,4 +1,9 @@
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+import { useRecoilRefresher_UNSTABLE, useRecoilState } from "recoil";
+
+import { Button } from "./ui/button";
 import {
   DialogContent,
   DialogDescription,
@@ -8,14 +13,11 @@ import {
 } from "./ui/dialog";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import { Button } from "./ui/button";
-import { useRecoilRefresher_UNSTABLE, useRecoilState } from "recoil";
-import { UserStateChats } from "@/lib/store/atom/chats";
-import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
+
 import { Signal } from "@/app/home/signal";
-import { user_chat_schema } from "@/packages/zod";
+import { UserStateChats } from "@/lib/store/atom/chats";
 import { fetch_user_chats } from "@/lib/store/selector/fetch_chats";
+import { user_chat_schema } from "@/packages/zod";
 
 export default function JoinRoomDialog() {
   const [roomid, setRoomId] = useState<string>("");

@@ -1,8 +1,10 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import type { RecievedMessage } from "@/app/(message)/chat/[slug]/page";
 import { useSession } from "next-auth/react";
+
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+
+import type { RecievedMessage } from "@/app/(message)/chat/[slug]/page";
 
 export default function Message({ data }: { data: RecievedMessage }) {
   const session = useSession();

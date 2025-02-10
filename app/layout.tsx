@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
-
 import { Inter as FontSans } from "next/font/google";
+import React from "react";
+
 import "./globals.css";
+import { cn } from "../lib/utils";
+
+import { AuthProvider } from "@/components/Provider";
 import RecoilContextProvider from "@/components/providers/RecoilContextProvider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
-import { AuthProvider } from "@/components/Provider";
-// const inter = Inter({ subsets: ["latin"] });
-import { cn } from "../lib/utils";
 import { Toaster } from "@/components/ui/toaster";
 
 const fontSans = FontSans({

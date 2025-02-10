@@ -1,20 +1,24 @@
 "use client";
 
-import { z } from "zod";
-
 import { zodResolver } from "@hookform/resolvers/zod";
+import { GitHubLogoIcon } from "@radix-ui/react-icons";
+import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
+import { useForm } from "react-hook-form";
+import type { z } from "zod";
+
+import { create_user } from "./actions";
+
+import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardTitle,
   CardContent,
-  CardHeader,
   CardDescription,
   CardFooter,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { useForm } from "react-hook-form";
-import { user_signup_form_schema } from "@/packages/zod";
 import {
   Form,
   FormControl,
@@ -23,12 +27,14 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useRouter } from "next/navigation";
-import Navbar from "@/components/Navbar";
-import { signIn } from "next-auth/react";
-import { GitHubLogoIcon } from "@radix-ui/react-icons";
-import { create_user } from "./actions";
+import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
+import { user_signup_form_schema } from "@/packages/zod";
+
+
+
+
+
 
 type FormValue = z.output<typeof user_signup_form_schema>;
 

@@ -1,49 +1,44 @@
 "use client";
 
-import assert from "minimalistic-assert";
-
-import { useMemo, useRef } from "react";
-
-import { Signal } from "@/app/home/signal";
-
-import { useEffect, useState } from "react";
-
-import { useSession } from "next-auth/react";
-import Inbox from "@/components/Inbox";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { useRecoilValue, useRecoilState, useRecoilStateLoadable } from "recoil";
-import { useRouter } from "next/navigation";
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
   Edit,
   ListEndIcon,
 } from "lucide-react";
+import assert from "minimalistic-assert";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import React, { useEffect, useMemo , useRef, useState } from "react";
+import { useRecoilState, useRecoilStateLoadable, useRecoilValue } from "recoil";
+
+import { TypingEvent } from "../../dm/typing_event";
+import { ComposeBox } from "../../dm/typing_status";
+import EditRoomDetails from "../edit_room_details";
+
+import { Signal } from "@/app/home/signal";
+import { leave_room } from "@/app/home/util";
 import { DarkLight } from "@/components/DarkLight";
+import Inbox from "@/components/Inbox";
+import Message from "@/components/Message";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
-import Message from "@/components/Message";
-import { ChatMessageData, UserChat } from "@/packages/zod";
-import { leave_room } from "@/app/home/util";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { chat_details_state } from "@/lib/store/atom/chat_details_state";
 import { UserStateChats } from "@/lib/store/atom/chats";
-import { RoomHeaderDetails, chat_messages_schema } from "@/packages/zod";
-import { room_member_details_schema } from "@/packages/zod";
 import { isSidebarHidden } from "@/lib/store/atom/sidebar";
 import { member_online_state } from "@/lib/store/atom/status";
-import { chat_details_state } from "@/lib/store/atom/chat_details_state";
 import { subscribed_chats_state } from "@/lib/store/atom/subscribed_chats_state";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import EditRoomDetails from "../edit_room_details";
-import { TypingEvent } from "../../dm/typing_event";
-import { ComposeBox } from "../../dm/typing_status";
+import type { ChatMessageData, RoomHeaderDetails , UserChat } from "@/packages/zod";
+import { chat_messages_schema, room_member_details_schema } from "@/packages/zod";
 
 export type RecievedMessage = {
   type: string;
@@ -63,7 +58,7 @@ export default function Chat({ params }: { params: { slug: string } }) {
   const compose_ref = useRef<string | null>(null);
   const chat_ref = useRef<HTMLDivElement>(null);
   const [sweeped, setSweeped] = useState<ChatMessageData["messages"]>([]);
-  const [realtimechat, setRealtimechat] = useState<JSX.Element[]>([]);
+  const [realtimechat, setRealtimechat] = useState<React.JSX.Element[]>([]);
   const [compose, setCompose] = useState<string>("");
   const [chat, setChat] = useState<RecievedMessage[]>([]);
   const session = useSession();
@@ -117,13 +112,13 @@ export default function Chat({ params }: { params: { slug: string } }) {
     if (draft !== null && roomsStateData.state === "hasValue") {
       const rooms_with_draft_msg = roomsStateData.getValue().map((room) => {
         if (room.id !== params.slug) return room;
-        else {
+        
           const room_with_draft: UserChat = {
             ...room,
             draft,
           };
           return room_with_draft;
-        }
+        
       });
       setRoomsStateData([...rooms_with_draft_msg]);
     }
@@ -253,7 +248,7 @@ export default function Chat({ params }: { params: { slug: string } }) {
   function recieve_msg(raw_data: string) {
     const data: RecievedMessage = JSON.parse(`${raw_data}`);
     if (data.payload.roomId !== params.slug) return;
-    else {
+    
       setChat([...chat, data]);
       setRealtimechat((realtimechat) => [
         ...realtimechat,
@@ -262,7 +257,7 @@ export default function Chat({ params }: { params: { slug: string } }) {
           data={data}
         />,
       ]);
-    }
+    
   }
 
   function update_member_online_status(raw_data: string) {
@@ -277,7 +272,7 @@ export default function Chat({ params }: { params: { slug: string } }) {
       );
       // TODO: Recheck this
       setMemberStatus((_memberStatus) => [
-        { ...member, active: type === "MemberJoins" ? true : false },
+        { ...member, active: type === "MemberJoins" },
         ...other_members,
       ]);
     }
@@ -333,7 +328,7 @@ export default function Chat({ params }: { params: { slug: string } }) {
     compose_ref.current = "";
     Signal.get_instance().SEND(JSON.stringify(data));
   }
-  
+
   async function may_be_leave_room() {
     const opcode_id = rooms.find((room) => room.id === params.slug)?.conn_id;
     if (opcode_id === undefined || session.status !== "authenticated") {

@@ -1,6 +1,8 @@
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import type { UnitMessage } from "@/packages/zod";
 import { useSession } from "next-auth/react";
+
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+
+import type { UnitMessage } from "@/packages/zod";
 export default function Inbox({ data }: { data: UnitMessage }) {
   const time = new Date(data.createdAt)
     .toTimeString()

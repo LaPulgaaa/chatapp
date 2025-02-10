@@ -1,5 +1,5 @@
-import { NextRequest } from "next/server";
 import aws from "aws-sdk";
+import type { NextRequest } from "next/server";
 
 export async function POST(req: NextRequest) {
   const { key, content_type } = await req.json();

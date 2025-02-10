@@ -1,10 +1,14 @@
 "use client";
 
+import { HomeIcon } from "lucide-react";
+import Link from "next/link";
+import { useRecoilValueLoadable } from "recoil";
+
 import { AppSidebar } from "@/components/app-sidebar";
 import {
   SidebarGroup,
-  SidebarGroupLabel,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -12,9 +16,6 @@ import {
 } from "@/components/ui/sidebar";
 import { fetch_user_chats } from "@/lib/store/selector/fetch_chats";
 import { fetch_dms } from "@/lib/store/selector/fetch_dms";
-import { HomeIcon } from "lucide-react";
-import Link from "next/link";
-import { useRecoilValueLoadable } from "recoil";
 
 export default function ChatPanel() {
   const dms = useRecoilValueLoadable(fetch_dms);

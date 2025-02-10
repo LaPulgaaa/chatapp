@@ -1,8 +1,8 @@
 import { createClient } from "redis";
 
+import { prisma } from "../../packages/prisma/prisma_client";
 import { worker_payload } from "../../packages/zod";
 import type { WorkerPayload } from "../../packages/zod";
-import { prisma } from "../../packages/prisma/prisma_client";
 
 const client = createClient();
 

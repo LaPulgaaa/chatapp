@@ -1,6 +1,10 @@
 "use client";
-import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import type { z } from "zod";
 
+import { Signal } from "@/app/home/signal";
+import { Button } from "@/components/ui/button";
 import {
   DialogClose,
   DialogContent,
@@ -9,21 +13,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Form } from "@/components/ui/form";
-import { room_details_schema } from "@/packages/zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import {
+import { Form ,
+  FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormControl,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { Signal } from "@/app/home/signal";
+import { room_details_schema } from "@/packages/zod";
 
 type FormValue = z.output<typeof room_details_schema>;
 

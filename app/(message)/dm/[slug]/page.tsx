@@ -1,33 +1,36 @@
 "use client";
 
 import assert from "minimalistic-assert";
-import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useSession } from "next-auth/react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useRecoilRefresher_UNSTABLE, useRecoilStateLoadable } from "recoil";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ScrollArea } from "@/components/ui/scroll-area";
-
-import { Signal } from "@/app/home/signal";
-import DirectMessageHistory from "../history";
-import type { RecievedMessage } from "@/app/(message)/chat/[slug]/page";
+import type { PinMsgCallbackData, StarMsgCallbackData } from "../../msg_connect";
+import { get_new_local_id } from "../../util";
 import type { UnitDM } from "../dm_ui";
 import DmRender from "../dm_ui";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import DirectMessageHistory from "../history";
+import { PinnedMessages } from "../pinned_msg_ui";
 import ProfileDialog from "../profile_dialog";
+import { TypingEvent } from "../typing_event";
+import type { Recipient } from "../typing_status";
+import { ComposeBox } from "../typing_status";
+
+import type { RecievedMessage } from "@/app/(message)/chat/[slug]/page";
+import { Signal } from "@/app/home/signal";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { direct_msg_state } from "@/lib/store/atom/dm";
 import { dm_details_state } from "@/lib/store/atom/dm_details_state";
 import { fetch_dms } from "@/lib/store/selector/fetch_dms";
-import { get_new_local_id } from "../../util";
-import {
+import type {
   FriendSearchResult,
-  MessageDeletePayload,
+  MessageDeletePayload} from "@/packages/zod";
+import {
   friend_search_result_schema,
 } from "@/packages/zod";
-import { direct_msg_state } from "@/lib/store/atom/dm";
-import { PinnedMessages } from "../pinned_msg_ui";
-import { PinMsgCallbackData, StarMsgCallbackData } from "../../msg_connect";
-import { ComposeBox, Recipient } from "../typing_status";
-import { TypingEvent } from "../typing_event";
+
 
 type DeleteMsgCallbackData = {
   type: string;
@@ -256,7 +259,7 @@ export default function Direct({ params }: { params: { slug: string } }) {
               lastmsgAt:
                 sweeped.slice(-1)[0]?.createdAt ?? prev_state.lastmsgAt,
             };
-          } else return dm;
+          } return dm;
         });
 
         return updated_dms;
@@ -339,7 +342,7 @@ export default function Direct({ params }: { params: { slug: string } }) {
       return;
     if (data.payload.roomId !== dmStateDetails.friendship_data.connectionId)
       return;
-    else {
+    
       const last_msg = dmStateDetails.friendship_data.messages.slice(-1)[0];
 
       setInbox((inbox) => {
@@ -360,7 +363,7 @@ export default function Direct({ params }: { params: { slug: string } }) {
         };
         return [...inbox, new_dm];
       });
-    }
+    
   }
 
   function star_echo_msg_callback(raw_data: string) {
@@ -376,7 +379,7 @@ export default function Direct({ params }: { params: { slug: string } }) {
             ...dm,
             starred: payload.starred,
           };
-        else return dm;
+        return dm;
       });
     });
   }
@@ -394,7 +397,7 @@ export default function Direct({ params }: { params: { slug: string } }) {
             ...dm,
             pinned: payload.pinned,
           };
-        else return dm;
+        return dm;
       });
     });
   }
@@ -423,7 +426,7 @@ export default function Direct({ params }: { params: { slug: string } }) {
     const type: "MemberJoins" | "MemberLeaves" = data.type;
     const username = data.payload.username;
     if (username === params.slug) {
-      setActive(type === "MemberJoins" ? true : false);
+      setActive(type === "MemberJoins");
     }
   }
 

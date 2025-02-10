@@ -1,7 +1,7 @@
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { DialogContent, DialogHeader } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { DmProfileInfo } from "@/packages/zod";
+import { DialogContent, DialogHeader } from "@/components/ui/dialog";
+import type { DmProfileInfo } from "@/packages/zod";
 
 export default function ProfileDialog({
   profile_info,

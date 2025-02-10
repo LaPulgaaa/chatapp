@@ -1,6 +1,7 @@
-import { private_chats_schema } from "@/packages/zod";
-import { PrivateChats } from "@/packages/zod";
 import { selector } from "recoil";
+
+import type { PrivateChats } from "@/packages/zod";
+import { private_chats_schema  } from "@/packages/zod";
 
 export const fetch_dms = selector<PrivateChats>({
   key: "fetch_dms",

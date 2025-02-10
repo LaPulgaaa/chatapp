@@ -1,6 +1,7 @@
-import { prisma } from "@/packages/prisma/prisma_client";
+import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
-import { NextRequest } from "next/server";
+
+import { prisma } from "@/packages/prisma/prisma_client";
 
 export async function GET(req: NextRequest) {
   const token = await getToken({ req });
@@ -54,7 +55,7 @@ export async function GET(req: NextRequest) {
     return Response.json(
       {
         msg: "Internal Server Error",
-        err
+        err,
       },
       {
         status: 500,

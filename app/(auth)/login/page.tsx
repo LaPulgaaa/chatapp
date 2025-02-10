@@ -1,5 +1,12 @@
 "use client";
 
+import { GitHubLogoIcon } from "@radix-ui/react-icons";
+import { useRouter } from "next/navigation";
+import { signIn, useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
+
+import Navbar from "@/components/Navbar";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -8,16 +15,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import Navbar from "@/components/Navbar";
-import { signIn, useSession } from "next-auth/react";
-import { toast } from "@/hooks/use-toast";
+import { Label } from "@/components/ui/label";
 import { ToastAction } from "@/components/ui/toast";
-import { GitHubLogoIcon } from "@radix-ui/react-icons";
+import { toast } from "@/hooks/use-toast";
+
 
 export default function Login() {
   const session = useSession();

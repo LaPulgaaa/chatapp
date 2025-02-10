@@ -1,9 +1,12 @@
 "use client";
 
+import React from "react";
+
+import Connect from "./connect";
+
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
 import CandleSidebar from "@/components/candleSidebar";
-import Connect from "./connect";
 
 export default function ChatLayout({
   children,

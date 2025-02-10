@@ -1,12 +1,11 @@
-import { z } from "zod";
 import express from "express";
+import jwt from "jsonwebtoken";
 import assert from "minimalistic-assert";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import { z } from "zod";
 
 import { prisma } from "../../packages/prisma/prisma_client";
-
-import authenticate from "../middleware/authenticate";
 import { member_profile_schema } from "../../packages/zod";
+import authenticate from "../middleware/authenticate";
 import { Cache } from "../util/jwt";
 
 const router = express.Router();
@@ -23,7 +22,7 @@ router.get("/me", (req, res) => {
     const creds = jwt.verify(
       token,
       process.env.ACCESS_TOKEN_SECRET!,
-    ) as JwtPayload;
+    ) ;
     res.json({
       msg: "user identified",
       data: creds,
@@ -140,7 +139,7 @@ router.get("/getCreds/:username", authenticate, async (req, res) => {
       });
     } else res.status(200).send("user not found");
   } catch (err) {
-    console.log("error in this creds route."+err);
+    console.log("error in this creds route." + err);
     res.status(400).send("internal server error.");
   }
 });

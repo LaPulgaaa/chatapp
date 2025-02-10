@@ -1,23 +1,25 @@
 "use client";
 
 import assert from "minimalistic-assert";
-
-import { z } from "zod";
-import { useEffect } from "react";
 import { useSession } from "next-auth/react";
+import { useEffect } from "react";
 import {
   useRecoilRefresher_UNSTABLE,
   useRecoilStateLoadable,
   useSetRecoilState,
 } from "recoil";
-import { useToast } from "@/hooks/use-toast";
-import { Signal } from "./signal";
-import { fetch_dms } from "@/lib/store/selector/fetch_dms";
-import { MessageDeletePayload, MessagePinPayload } from "@/packages/zod";
-import { direct_msg_state } from "@/lib/store/atom/dm";
+import { z } from "zod";
+
 import type { UpdateDetailsData } from "../(message)/msg_connect";
+
+import { Signal } from "./signal";
+
+import { useToast } from "@/hooks/use-toast";
+import { direct_msg_state } from "@/lib/store/atom/dm";
 import { subscribed_chats_state } from "@/lib/store/atom/subscribed_chats_state";
 import { typing_event_store } from "@/lib/store/atom/typing_event_store";
+import { fetch_dms } from "@/lib/store/selector/fetch_dms";
+import type { MessageDeletePayload, MessagePinPayload } from "@/packages/zod";
 
 type DeleteMsgCallbackData = {
   type: string;
@@ -75,7 +77,7 @@ export default function Connect() {
         const updated_dms = dms.map((dm) => {
           if (dm.connectionId !== payload.conc_id) {
             return dm;
-          } else {
+          } 
             const updated_msgs = dm.messages.filter((msg) => {
               if (msg.id !== payload.id) return msg;
             });
@@ -84,7 +86,7 @@ export default function Connect() {
               ...dm,
               messages: updated_msgs,
             };
-          }
+          
         });
         return updated_dms;
       });
@@ -99,20 +101,20 @@ export default function Connect() {
       setDms((dms) => {
         const new_dms = dms.map((dm) => {
           if (dm.connectionId !== payload.conc_id) return dm;
-          else {
+          
             const updated_msgs = dm.messages.map((msg) => {
               if (msg.id === payload.id) {
                 return {
                   ...msg,
                   pinned: payload.pinned,
                 };
-              } else return msg;
+              } return msg;
             });
             return {
               ...dm,
               messages: updated_msgs,
             };
-          }
+          
         });
 
         return new_dms;

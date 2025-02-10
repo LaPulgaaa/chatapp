@@ -1,17 +1,23 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-
-import { z } from "zod";
-
-import { useForm } from "react-hook-form";
-
 import { useSession } from "next-auth/react";
+import React,{ useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { useRecoilRefresher_UNSTABLE, useRecoilValueLoadable } from "recoil";
+import type { z } from "zod";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -21,20 +27,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-
 import { UserDetails } from "@/lib/store/atom/userDetails";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { user_details_edit_form_schema } from "@/packages/zod";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 
 type FormValue = z.output<typeof user_details_edit_form_schema>;
 
@@ -315,7 +311,7 @@ export default function Profile() {
                             <Badge
                               onDoubleClick={() => {
                                 setFavs((old_favs) => {
-                                  return old_favs.filter((f) => f !== fav)
+                                  return old_favs.filter((f) => f !== fav);
                                 });
                               }}
                               className="m-1 p-2"
