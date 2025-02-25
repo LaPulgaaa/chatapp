@@ -20,7 +20,6 @@ import { Label } from "@/components/ui/label";
 import { ToastAction } from "@/components/ui/toast";
 import { toast } from "@/hooks/use-toast";
 
-
 export default function Login() {
   const session = useSession();
   const [email, setEmail] = useState("");

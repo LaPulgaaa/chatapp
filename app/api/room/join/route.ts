@@ -4,7 +4,6 @@ import { getToken } from "next-auth/jwt";
 
 import { prisma } from "@/packages/prisma/prisma_client";
 
-
 export async function POST(req: NextRequest) {
   const { roomId } = await req.json();
   const token = await getToken({ req });
@@ -52,14 +51,13 @@ export async function POST(req: NextRequest) {
         },
         { status: 200 },
       );
-    } 
-      Response.json(
-        {
-          msg: "Room not found",
-        },
-        { status: 404 },
-      );
-    
+    }
+    Response.json(
+      {
+        msg: "Room not found",
+      },
+      { status: 404 },
+    );
   } catch (err) {
     return Response.json(
       {

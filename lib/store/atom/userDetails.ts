@@ -1,7 +1,6 @@
 import { atom, selector } from "recoil";
 import { z } from "zod";
 
-
 const fetch_user_details = z.object({
   username: z.string(),
   name: z.string().nullish(),

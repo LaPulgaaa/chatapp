@@ -7,7 +7,6 @@ import * as React from "react";
 import { DarkLight } from "./DarkLight";
 import { Button } from "./ui/button";
 
-
 export default function Navbar() {
   const session = useSession();
   return (

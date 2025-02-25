@@ -1,5 +1,5 @@
 import pluginJs from "@eslint/js";
-import eslintconfigPrettier from "eslint-config-prettier"
+import eslintconfigPrettier from "eslint-config-prettier";
 import importPlugin from "eslint-plugin-import";
 import pluginReact from "eslint-plugin-react";
 import hooksPlugin from "eslint-plugin-react-hooks";
@@ -40,10 +40,10 @@ export default [
       ],
       "no-else-return": "error",
       "no-undef-init": "error",
-      "no-unneeded-ternary": ["error",{defaultAssignment: false}],
+      "no-unneeded-ternary": ["error", { defaultAssignment: false }],
       radix: "error",
-      "sort-imports": ["error",{ignoreDeclarationSort: true}],
-      "import/no-unresolved": "off"
+      "sort-imports": ["error", { ignoreDeclarationSort: true }],
+      "import/no-unresolved": "off",
     },
   },
   {
@@ -52,10 +52,13 @@ export default [
         "error",
         { args: "all", argsIgnorePattern: "^_", ignoreRestSiblings: true },
       ],
-      "@typescript-eslint/consistent-type-assertions": ["error",{assertionStyle: "never"}],
+      "@typescript-eslint/consistent-type-assertions": [
+        "error",
+        { assertionStyle: "never" },
+      ],
       "@typescript-eslint/consistent-type-imports": "error",
-      "no-undef":"error",
-    }
+      "no-undef": "error",
+    },
   },
   {
     files: ["**/*.tsx"],

@@ -7,7 +7,7 @@ import {
   Trash,
   Trash2Icon,
 } from "lucide-react";
-import React,{ useMemo } from "react";
+import React, { useMemo } from "react";
 
 import type { UnitDM } from "./dm_ui";
 
