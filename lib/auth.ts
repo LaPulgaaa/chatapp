@@ -1,4 +1,4 @@
-import type { NextAuthOptions, SessionStrategy } from "next-auth";
+import type { NextAuthOptions } from "next-auth";
 import CredentialProvider from "next-auth/providers/credentials";
 import GithubProvider from "next-auth/providers/github";
 
@@ -61,8 +61,7 @@ export const NEXTAUTH_CONFIG: NextAuthOptions = {
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  session: { strategy: "jwt" as SessionStrategy },
+  session: { strategy: "jwt" },
   callbacks: {
     async jwt(params) {
       if (!params.token.email) {
