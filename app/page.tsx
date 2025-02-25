@@ -3,7 +3,7 @@ import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,7 @@ export default function Home() {
   const session = useSession();
   const router = useRouter();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (session.status === "authenticated") router.push("/home");
   }, [session.status, router]);
   return (

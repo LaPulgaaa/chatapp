@@ -3,7 +3,7 @@
 import { GitHubLogoIcon } from "@radix-ui/react-icons";
 import { useRouter } from "next/navigation";
 import { signIn, useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
@@ -28,7 +28,7 @@ export default function Login() {
   const router = useRouter();
 
   // a little shady
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (session.status === "authenticated") router.push("/home");
   }, [router, session.status]);
 
