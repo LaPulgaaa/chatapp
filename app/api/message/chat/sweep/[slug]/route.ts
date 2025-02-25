@@ -30,7 +30,10 @@ export async function POST(
         },
         deleted: false,
       },
-      include: {
+      select: {
+        id: true,
+        content: true,
+        createdAt: true,
         sender: {
           select: {
             username: true,
