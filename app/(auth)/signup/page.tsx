@@ -31,11 +31,6 @@ import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
 import { user_signup_form_schema } from "@/packages/zod";
 
-
-
-
-
-
 type FormValue = z.output<typeof user_signup_form_schema>;
 
 export default function Signup() {
@@ -59,32 +54,37 @@ export default function Signup() {
     try {
       const user = await create_user(values);
 
-      if (user !== undefined) {
-        const creds = {
-          email: user.email,
-          password: user.password,
-        };
-        const resp = await signIn<"credentials">("credentials", {
-          ...creds,
-          redirect: false,
-        });
-
-        if (resp?.ok) {
-          router.push("/home");
-          window.localStorage.setItem("token", "valid");
-        } else {
-          form.setError("root", { message: "Could not create user" });
-        }
-      } else {
+      if (user === undefined) {
         toast({
           title: "Could not create user",
           variant: "destructive",
           description: "Please try again!!",
         });
+
+        return;
+      }
+
+      const creds = {
+        email: user.email,
+        password: user.password,
+      };
+      const resp = await signIn<"credentials">("credentials", {
+        ...creds,
+        redirect: false,
+      });
+
+      if (resp?.ok) {
+        router.push("/home");
+        window.localStorage.setItem("token", "valid");
+      } else {
+        form.setError("root", { message: "Could not create user" });
       }
     } catch (err) {
       console.log(err);
-      alert("Signup Failed -- " + err);
+      toast({
+        title: "Signin failed!!",
+        variant: "destructive",
+      });
     }
   }
 

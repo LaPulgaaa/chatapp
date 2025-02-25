@@ -1,5 +1,5 @@
 import type { RedisClientType } from "redis";
-import { createClient  } from "redis";
+import { createClient } from "redis";
 import type WebSocket from "ws";
 
 export class RedisSubscriptionManager {

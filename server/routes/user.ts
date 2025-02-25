@@ -18,20 +18,17 @@ type UserInfo = {
 
 router.get("/me", (req, res) => {
   const token = req.cookies.token;
-  if (token !== undefined) {
-    const creds = jwt.verify(
-      token,
-      process.env.ACCESS_TOKEN_SECRET!,
-    ) ;
-    res.json({
-      msg: "user identified",
-      data: creds,
-    });
-  } else {
-    res.status(200).json({
+
+  if (token === undefined)
+    return res.status(200).json({
       msg: "token expired",
     });
-  }
+
+  const creds = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!);
+  res.json({
+    msg: "user identified",
+    data: creds,
+  });
 });
 
 router.post("/signup", async (req, res) => {

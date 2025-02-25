@@ -98,15 +98,16 @@ router.get("/getMembers/:room_id", authenticate, async (req, res) => {
     const member_info = resp.map(({ user }) => {
       const { id, ...details } = user;
       const maybe_active = activeMemberIds.has(details.username);
-      if (maybe_active !== undefined && maybe_active === true) {
+
+      if (maybe_active === undefined || maybe_active === false)
         return {
           ...details,
-          active: true,
+          active: false,
         };
-      }
+
       return {
         ...details,
-        active: false,
+        active: true,
       };
     });
 

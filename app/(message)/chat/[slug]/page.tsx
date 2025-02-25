@@ -9,7 +9,7 @@ import {
 import assert from "minimalistic-assert";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import React, { useEffect, useMemo , useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useRecoilState, useRecoilStateLoadable, useRecoilValue } from "recoil";
 
 import { TypingEvent } from "../../dm/typing_event";
@@ -38,7 +38,10 @@ import { isSidebarHidden } from "@/lib/store/atom/sidebar";
 import { member_online_state } from "@/lib/store/atom/status";
 import { subscribed_chats_state } from "@/lib/store/atom/subscribed_chats_state";
 import type { ChatMessageData, RoomHeaderDetails } from "@/packages/zod";
-import { chat_messages_schema, room_member_details_schema } from "@/packages/zod";
+import {
+  chat_messages_schema,
+  room_member_details_schema,
+} from "@/packages/zod";
 
 export type RecievedMessage = {
   type: string;
@@ -77,15 +80,14 @@ export default function Chat({ params }: { params: { slug: string } }) {
   );
 
   const recipient = useMemo(() => {
-    if (session.status === "authenticated") {
-      return {
-        user_id: session.data.username,
-        message_type: "CHAT" as const,
-        notification_type: "typing" as const,
-        room_id: params.slug,
-      };
-    }
-    return null;
+    if (session.status !== "authenticated") return null;
+
+    return {
+      user_id: session.data.username,
+      message_type: "CHAT" as const,
+      notification_type: "typing" as const,
+      room_id: params.slug,
+    };
     //eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.slug, session]);
 
@@ -112,12 +114,11 @@ export default function Chat({ params }: { params: { slug: string } }) {
     if (draft !== null && roomsStateData.state === "hasValue") {
       const rooms_with_draft_msg = roomsStateData.getValue().map((room) => {
         if (room.id !== params.slug) return room;
-        
-          return {
-            ...room,
-            draft,
-          };
-        
+
+        return {
+          ...room,
+          draft,
+        };
       });
       setRoomsStateData([...rooms_with_draft_msg]);
     }
@@ -199,13 +200,14 @@ export default function Chat({ params }: { params: { slug: string } }) {
   useEffect(() => {
     async function sweep_recent_chat_msgs() {
       if (
-        roomDetailState.state === "hasValue" &&
-        roomDetailState.getValue() !== undefined
-      ) {
-        setSweeped([]);
-        const last_msg = roomDetailState.getValue()!.slice(-1);
-        sweep_latest_messages(last_msg[0]?.id);
-      }
+        roomDetailState.state !== "hasValue" ||
+        roomDetailState.getValue() === undefined
+      )
+        return;
+
+      setSweeped([]);
+      const last_msg = roomDetailState.getValue()!.slice(-1);
+      sweep_latest_messages(last_msg[0]?.id);
     }
     sweep_recent_chat_msgs();
     //eslint-disable-next-line react-hooks/exhaustive-deps
@@ -221,25 +223,25 @@ export default function Chat({ params }: { params: { slug: string } }) {
   }, [sweeped]);
 
   useEffect(() => {
-    if (room_id !== undefined && session.status === "authenticated") {
-      Signal.get_instance(session.data.username).SUBSCRIBE(
-        room_id,
-        session.data.id,
-        session.data.username,
-      );
-      Signal.get_instance().REGISTER_CALLBACK("MSG_CALLBACK", recieve_msg);
-      Signal.get_instance().REGISTER_CALLBACK(
-        "ONLINE_CALLBACK",
-        update_member_online_status,
-      );
-    }
+    if (room_id === undefined || session.status !== "authenticated") return;
+
+    Signal.get_instance(session.data.username).SUBSCRIBE(
+      room_id,
+      session.data.id,
+      session.data.username,
+    );
+    Signal.get_instance().REGISTER_CALLBACK("MSG_CALLBACK", recieve_msg);
+    Signal.get_instance().REGISTER_CALLBACK(
+      "ONLINE_CALLBACK",
+      update_member_online_status,
+    );
 
     return () => {
-      if (room_id !== undefined && session.status === "authenticated") {
-        Signal.get_instance().UNSUBSCRIBE(params.slug, session.data.username);
-        Signal.get_instance().DEREGISTER("MSG_CALLBACK");
-        Signal.get_instance().DEREGISTER("ONLINE_CALLBACK");
-      }
+      if (room_id === undefined || session.status !== "authenticated") return;
+
+      Signal.get_instance().UNSUBSCRIBE(params.slug, session.data.username);
+      Signal.get_instance().DEREGISTER("MSG_CALLBACK");
+      Signal.get_instance().DEREGISTER("ONLINE_CALLBACK");
       update_draft();
     };
     //eslint-disable-next-line react-hooks/exhaustive-deps
@@ -247,16 +249,15 @@ export default function Chat({ params }: { params: { slug: string } }) {
   function recieve_msg(raw_data: string) {
     const data: RecievedMessage = JSON.parse(`${raw_data}`);
     if (data.payload.roomId !== params.slug) return;
-    
-      setChat([...chat, data]);
-      setRealtimechat((realtimechat) => [
-        ...realtimechat,
-        <Message
-          key={(session.data?.user?.email?.substring(5) || "") + Date.now()}
-          data={data}
-        />,
-      ]);
-    
+
+    setChat([...chat, data]);
+    setRealtimechat((realtimechat) => [
+      ...realtimechat,
+      <Message
+        key={(session.data?.user?.email?.substring(5) || "") + Date.now()}
+        data={data}
+      />,
+    ]);
   }
 
   function update_member_online_status(raw_data: string) {
@@ -265,16 +266,17 @@ export default function Chat({ params }: { params: { slug: string } }) {
     const member = memberStatus.find(
       (m) => m.username === data.payload.username,
     );
-    if (member !== undefined) {
-      const other_members = memberStatus.filter(
-        (m) => m.username !== data.payload.username,
-      );
-      // TODO: Recheck this
-      setMemberStatus((_memberStatus) => [
-        { ...member, active: type === "MemberJoins" },
-        ...other_members,
-      ]);
-    }
+
+    if (member === undefined) return;
+
+    const other_members = memberStatus.filter(
+      (m) => m.username !== data.payload.username,
+    );
+    // TODO: Recheck this
+    setMemberStatus((_memberStatus) => [
+      { ...member, active: type === "MemberJoins" },
+      ...other_members,
+    ]);
   }
 
   useEffect(() => {
@@ -282,6 +284,7 @@ export default function Chat({ params }: { params: { slug: string } }) {
     if (chat_node !== null) {
       const chat_history_comps = chat_node.querySelectorAll("#history");
       if (chat_history_comps.length < 1) return;
+
       const last_comp_idx = chat_history_comps.length - 1;
       chat_history_comps[last_comp_idx].scrollIntoView({
         behavior: "instant",
@@ -295,6 +298,7 @@ export default function Chat({ params }: { params: { slug: string } }) {
     if (chat_node !== null) {
       const recent_msg_comps = chat_node.querySelectorAll("#recent");
       if (recent_msg_comps.length < 1) return;
+
       const last_recent_idx = recent_msg_comps.length - 1;
       recent_msg_comps[last_recent_idx].scrollIntoView({
         behavior: "smooth",
@@ -464,13 +468,13 @@ function Members({ room_id, username }: { room_id: string; username: string }) {
             credentials: "include",
           },
         );
-        if (resp.status === 200) {
-          const { raw_data } = await resp.json();
-          const parsed = room_member_details_schema.safeParse(raw_data);
-          if (parsed.success) {
-            setMemberStatus(parsed.data);
-          } else console.log(parsed.error);
-        }
+        if (resp.status !== 200) return;
+
+        const { raw_data } = await resp.json();
+        const parsed = room_member_details_schema.safeParse(raw_data);
+        if (parsed.success) {
+          setMemberStatus(parsed.data);
+        } else console.log(parsed.error);
       } catch (err) {
         console.log(err);
       }
