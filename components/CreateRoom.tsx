@@ -1,6 +1,5 @@
 "use client";
 
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSession } from "next-auth/react";
 import { useForm } from "react-hook-form";
@@ -29,7 +28,7 @@ import {
 } from "@/components/ui/dialog";
 import { fetch_user_chats } from "@/lib/store/selector/fetch_chats";
 import { room_details_schema } from "@/packages/zod";
-import type { RoomType} from "@/packages/zod";
+import type { RoomType } from "@/packages/zod";
 
 export default function CreateRoom() {
   const session = useSession();

@@ -1,6 +1,5 @@
 "use client";
 
-
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { memo } from "react";
@@ -25,17 +24,15 @@ function get_last_msg_time(lastmsgAt: string | undefined): string {
   else if (now_date.getDate() - last_msg_date.getDate() > 7) {
     const date_arr = last_msg_date.toDateString().split(" ");
     return (date_arr[1] + " " + date_arr[2]).toString();
-  } 
-    if (now_date.getDate() - last_msg_date.getDate() > 1)
-      return last_msg_date.toDateString().split(" ")[0];
-    else if (now_date.getDate() - last_msg_date.getDate() === 1)
-      return "Yesterday";
-    
-      const today_at = last_msg_date.toTimeString().split(" ")[0];
-      const hour_min = today_at.split(":").slice(0, -1);
-      return `${hour_min[0]}:${hour_min[1]}`;
-    
-  
+  }
+  if (now_date.getDate() - last_msg_date.getDate() > 1)
+    return last_msg_date.toDateString().split(" ")[0];
+  else if (now_date.getDate() - last_msg_date.getDate() === 1)
+    return "Yesterday";
+
+  const today_at = last_msg_date.toTimeString().split(" ")[0];
+  const hour_min = today_at.split(":").slice(0, -1);
+  return `${hour_min[0]}:${hour_min[1]}`;
 }
 
 export default function Home() {
@@ -145,7 +142,7 @@ const RoomTabs = memo(function ({
               </div>
             </div>
           );
-        } 
+        }
         maybe_typing = typingState.find(
           (state) =>
             state.type === "DM" && state.conc_id === convo.connectionId,
@@ -168,8 +165,7 @@ const RoomTabs = memo(function ({
             </div>
 
             <div className="border-l-2 pl-6 italic text-muted-foreground truncate">
-              {maybe_typing !== undefined &&
-              maybe_typing.typists.length > 0 ? (
+              {maybe_typing !== undefined && maybe_typing.typists.length > 0 ? (
                 <div>
                   {
                     <p className="font-semibold">

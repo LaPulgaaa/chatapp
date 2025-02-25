@@ -77,16 +77,15 @@ export default function Connect() {
         const updated_dms = dms.map((dm) => {
           if (dm.connectionId !== payload.conc_id) {
             return dm;
-          } 
-            const updated_msgs = dm.messages.filter((msg) => {
-              if (msg.id !== payload.id) return msg;
-            });
+          }
+          const updated_msgs = dm.messages.filter((msg) => {
+            if (msg.id !== payload.id) return msg;
+          });
 
-            return {
-              ...dm,
-              messages: updated_msgs,
-            };
-          
+          return {
+            ...dm,
+            messages: updated_msgs,
+          };
         });
         return updated_dms;
       });
@@ -101,20 +100,20 @@ export default function Connect() {
       setDms((dms) => {
         const new_dms = dms.map((dm) => {
           if (dm.connectionId !== payload.conc_id) return dm;
-          
-            const updated_msgs = dm.messages.map((msg) => {
-              if (msg.id === payload.id) {
-                return {
-                  ...msg,
-                  starred: payload.starred,
-                };
-              } return msg;
-            });
-            return {
-              ...dm,
-              messages: updated_msgs,
-            };
-          
+
+          const updated_msgs = dm.messages.map((msg) => {
+            if (msg.id === payload.id) {
+              return {
+                ...msg,
+                starred: payload.starred,
+              };
+            }
+            return msg;
+          });
+          return {
+            ...dm,
+            messages: updated_msgs,
+          };
         });
 
         return new_dms;
@@ -130,20 +129,20 @@ export default function Connect() {
       setDms((dms) => {
         const new_dms = dms.map((dm) => {
           if (dm.connectionId !== payload.conc_id) return dm;
-          
-            const updated_msgs = dm.messages.map((msg) => {
-              if (msg.id === payload.id) {
-                return {
-                  ...msg,
-                  pinned: payload.pinned,
-                };
-              } return msg;
-            });
-            return {
-              ...dm,
-              messages: updated_msgs,
-            };
-          
+
+          const updated_msgs = dm.messages.map((msg) => {
+            if (msg.id === payload.id) {
+              return {
+                ...msg,
+                pinned: payload.pinned,
+              };
+            }
+            return msg;
+          });
+          return {
+            ...dm,
+            messages: updated_msgs,
+          };
         });
 
         return new_dms;

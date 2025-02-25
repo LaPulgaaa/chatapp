@@ -1,7 +1,7 @@
 import { selector } from "recoil";
 
 import type { ChatReponse } from "@/packages/zod";
-import { user_chats_response_schema  } from "@/packages/zod";
+import { user_chats_response_schema } from "@/packages/zod";
 
 export const fetch_user_chats = selector<ChatReponse>({
   key: "fetch_user_chats",
