@@ -47,7 +47,9 @@ export class Signal {
       const data: string = payload.data;
 
       const target_callback = this.callbacks[type];
-      if (target_callback !== undefined) target_callback(data);
+      if (target_callback === undefined) return;
+
+      target_callback(data);
     };
 
     this.ws.onclose = () => {

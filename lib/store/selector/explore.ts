@@ -18,33 +18,33 @@ export const get_friend_by_username = selectorFamily<
         if (dm.to.username === username) return dm;
       });
 
-      if (friend !== undefined) {
-        const { to, ...cond_details } = friend;
-        const data = {
-          is_friend: true as const,
-          friendship_data: {
-            ...cond_details,
-            is_active: false,
-          },
-          profile_info: {
-            avatarurl: to.avatarurl,
-            about: to.about,
-            name: to.name,
-            favorite: to.favorite,
-            status: to.status,
-          },
-        };
+      if (friend === undefined) {
+        try {
+          const resp = await fetch(`/api/dm/${username}`);
+          const { raw_data } = await resp.json();
+          const data = friend_search_result_schema.parse(raw_data);
+          return data;
+        } catch (err) {
+          console.log(err);
+          return undefined;
+        }
+      }
 
-        return data;
-      }
-      try {
-        const resp = await fetch(`/api/dm/${username}`);
-        const { raw_data } = await resp.json();
-        const data = friend_search_result_schema.parse(raw_data);
-        return data;
-      } catch (err) {
-        console.log(err);
-        return undefined;
-      }
+      const { to, ...cond_details } = friend;
+
+      return {
+        is_friend: true as const,
+        friendship_data: {
+          ...cond_details,
+          is_active: false,
+        },
+        profile_info: {
+          avatarurl: to.avatarurl,
+          about: to.about,
+          name: to.name,
+          favorite: to.favorite,
+          status: to.status,
+        },
+      };
     },
 });

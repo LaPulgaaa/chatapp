@@ -5,7 +5,10 @@ import { useSession } from "next-auth/react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useRecoilRefresher_UNSTABLE, useRecoilStateLoadable } from "recoil";
 
-import type { PinMsgCallbackData, StarMsgCallbackData } from "../../msg_connect";
+import type {
+  PinMsgCallbackData,
+  StarMsgCallbackData,
+} from "../../msg_connect";
 import { get_new_local_id } from "../../util";
 import type { UnitDM } from "../dm_ui";
 import DmRender from "../dm_ui";
@@ -24,13 +27,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { direct_msg_state } from "@/lib/store/atom/dm";
 import { dm_details_state } from "@/lib/store/atom/dm_details_state";
 import { fetch_dms } from "@/lib/store/selector/fetch_dms";
-import type {
-  FriendSearchResult,
-  MessageDeletePayload} from "@/packages/zod";
-import {
-  friend_search_result_schema,
-} from "@/packages/zod";
-
+import type { FriendSearchResult, MessageDeletePayload } from "@/packages/zod";
+import { friend_search_result_schema } from "@/packages/zod";
 
 type DeleteMsgCallbackData = {
   type: string;
@@ -57,33 +55,34 @@ export default function Direct({ params }: { params: { slug: string } }) {
 
   const recipient: Recipient | null = useMemo(() => {
     if (
-      dmStateDetails !== undefined &&
-      dmStateDetails.is_friend === true &&
-      session.status === "authenticated"
-    ) {
-      const username = session.data.username;
-      return {
-        message_type: "DM",
-        notification_type: "typing",
-        conc_id: dmStateDetails.friendship_data.connectionId,
-        user_id: username,
-      };
-    }
+      dmStateDetails === undefined ||
+      dmStateDetails.is_friend !== true ||
+      session.status !== "authenticated"
+    )
+      return null;
 
-    return null;
+    const username = session.data.username;
+    return {
+      message_type: "DM",
+      notification_type: "typing",
+      conc_id: dmStateDetails.friendship_data.connectionId,
+      user_id: username,
+    };
   }, [dmStateDetails, session]);
 
   const pinned_msg = useMemo(() => {
-    if (dmStateDetails !== undefined && dmStateDetails.is_friend === true) {
-      const pinned_history_msgs =
-        dmStateDetails.friendship_data.messages.filter((msg) => {
-          if (msg.pinned === true) return msg;
-        });
-      const pinned_live_msg = inbox.filter((msg) => {
+    if (dmStateDetails === undefined || dmStateDetails.is_friend !== true)
+      return undefined;
+
+    const pinned_history_msgs = dmStateDetails.friendship_data.messages.filter(
+      (msg) => {
         if (msg.pinned === true) return msg;
-      });
-      return [...pinned_history_msgs, ...pinned_live_msg];
-    }
+      },
+    );
+    const pinned_live_msg = inbox.filter((msg) => {
+      if (msg.pinned === true) return msg;
+    });
+    return [...pinned_history_msgs, ...pinned_live_msg];
     //eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dms, dmStateDetails, inbox]);
 
@@ -93,28 +92,28 @@ export default function Direct({ params }: { params: { slug: string } }) {
         if (dm.to.username === params.slug) return dm;
       });
 
-      if (friend !== undefined) {
-        const { to, ...cond_details } = friend;
-        const data = {
-          is_friend: true as const,
-          friendship_data: {
-            ...cond_details,
-            is_active: false,
-          },
-          profile_info: {
-            avatarurl: to.avatarurl,
-            about: to.about,
-            name: to.name,
-            favorite: to.favorite,
-            status: to.status,
-          },
-        };
-
-        setDmStateDetails(data);
-        setCompose(friend.draft ?? "");
-      } else {
+      if (friend === undefined) {
         fetch_user_details();
+        return;
       }
+
+      const { to, ...cond_details } = friend;
+      const data = {
+        is_friend: true as const,
+        friendship_data: {
+          ...cond_details,
+          is_active: false,
+        },
+        profile_info: {
+          avatarurl: to.avatarurl,
+          about: to.about,
+          name: to.name,
+          favorite: to.favorite,
+          status: to.status,
+        },
+      };
+      setDmStateDetails(data);
+      setCompose(friend.draft ?? "");
     }
     //eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dms]);
@@ -199,14 +198,13 @@ export default function Direct({ params }: { params: { slug: string } }) {
       });
     }
     if (inbox.length >= 5) {
+      if (dmStateDetails?.friendship_data === undefined) return;
       const friendship_data = dmStateDetails!.friendship_data;
-      const conc_id = friendship_data?.connectionId;
-      const last_msg = friendship_data?.messages.slice(-1);
+      const conc_id = friendship_data.connectionId;
+      const last_msg = friendship_data.messages.slice(-1);
 
-      if (conc_id !== undefined && last_msg) {
-        setSweeped([]);
-        sweep_lastest_messages(conc_id, last_msg[0]?.id);
-      }
+      setSweeped([]);
+      sweep_lastest_messages(conc_id, last_msg[0]?.id);
     }
     //eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inbox]);
@@ -231,16 +229,18 @@ export default function Direct({ params }: { params: { slug: string } }) {
 
   useEffect(() => {
     async function sweep_lastest_dms() {
-      if (dmStateDetails !== undefined) {
-        const friendship_data = dmStateDetails.friendship_data;
-        const conc_id = friendship_data?.connectionId;
-        const last_msg = friendship_data?.messages.slice(-1);
+      if (
+        dmStateDetails === undefined ||
+        dmStateDetails.friendship_data === undefined
+      )
+        return;
 
-        if (conc_id !== undefined && last_msg) {
-          setSweeped([]);
-          sweep_lastest_messages(conc_id, last_msg[0]?.id);
-        }
-      }
+      const friendship_data = dmStateDetails.friendship_data;
+      const conc_id = friendship_data.connectionId;
+      const last_msg = friendship_data.messages.slice(-1);
+
+      setSweeped([]);
+      sweep_lastest_messages(conc_id, last_msg[0]?.id);
     }
 
     sweep_lastest_dms();
@@ -259,7 +259,8 @@ export default function Direct({ params }: { params: { slug: string } }) {
               lastmsgAt:
                 sweeped.slice(-1)[0]?.createdAt ?? prev_state.lastmsgAt,
             };
-          } return dm;
+          }
+          return dm;
         });
 
         return updated_dms;
@@ -270,28 +271,6 @@ export default function Direct({ params }: { params: { slug: string } }) {
   }, [sweeped]);
 
   useEffect(() => {
-    if (
-      session.status === "authenticated" &&
-      dmStateDetails !== undefined &&
-      dmStateDetails.is_friend === true
-    ) {
-      const username = session.data.username;
-      const user_id = session.data.id;
-      const conc_id = dmStateDetails.friendship_data!.connectionId;
-      setActive(dmStateDetails.friendship_data!.is_active);
-      setHistory(dmStateDetails.friendship_data!.messages);
-      Signal.get_instance(username).SUBSCRIBE(conc_id, user_id, username);
-    } else if (
-      session.status === "authenticated" &&
-      dmStateDetails !== undefined &&
-      dmStateDetails.is_friend === false
-    ) {
-      const username = session.data.username;
-      Signal.get_instance(username).REGISTER_CALLBACK(
-        "DM_INVITE_SUCCESS",
-        invite_success_callback,
-      );
-    }
     Signal.get_instance().REGISTER_CALLBACK(
       "MSG_CALLBACK",
       pm_recieve_callback,
@@ -310,23 +289,44 @@ export default function Direct({ params }: { params: { slug: string } }) {
       star_echo_msg_callback,
     );
 
+    if (session.status !== "authenticated" || dmStateDetails === undefined)
+      return;
+
+    if (dmStateDetails.is_friend === true) {
+      const username = session.data.username;
+      const user_id = session.data.id;
+      const conc_id = dmStateDetails.friendship_data!.connectionId;
+      setActive(dmStateDetails.friendship_data!.is_active);
+      setHistory(dmStateDetails.friendship_data!.messages);
+      Signal.get_instance(username).SUBSCRIBE(conc_id, user_id, username);
+    } else {
+      const username = session.data.username;
+      Signal.get_instance(username).REGISTER_CALLBACK(
+        "DM_INVITE_SUCCESS",
+        invite_success_callback,
+      );
+    }
+
     return () => {
-      if (
-        session.status === "authenticated" &&
-        dmStateDetails !== undefined &&
-        dmStateDetails.is_friend === true
-      ) {
-        const username = session.data.username;
-        Signal.get_instance(username).UNSUBSCRIBE(
-          dmStateDetails.friendship_data!.connectionId,
-          username,
-        );
-      }
       Signal.get_instance().DEREGISTER("MSG_CALLBACK");
       Signal.get_instance().DEREGISTER("ONLINE_CALLBACK");
       Signal.get_instance().DEREGISTER("PIN_MSG_CALLBACK_ECHO");
       Signal.get_instance().DEREGISTER("STARRED_ECHO_CALLBACK");
       Signal.get_instance().DEREGISTER("DELETE_ECHO");
+
+      if (
+        session.status !== "authenticated" ||
+        dmStateDetails === undefined ||
+        dmStateDetails.is_friend === false
+      )
+        return;
+
+      const username = session.data.username;
+      Signal.get_instance(username).UNSUBSCRIBE(
+        dmStateDetails.friendship_data!.connectionId,
+        username,
+      );
+
       // update_draft();
       // maybe_clear_draft_cache();
     };
@@ -335,35 +335,31 @@ export default function Direct({ params }: { params: { slug: string } }) {
 
   function pm_recieve_callback(raw_data: string) {
     const data: RecievedMessage = JSON.parse(raw_data);
-    if (
-      dmStateDetails === undefined ||
-      (dmStateDetails !== undefined && !dmStateDetails.is_friend)
-    )
+    if (dmStateDetails === undefined || dmStateDetails.is_friend === false)
       return;
     if (data.payload.roomId !== dmStateDetails.friendship_data.connectionId)
       return;
-    
-      const last_msg = dmStateDetails.friendship_data.messages.slice(-1)[0];
 
-      setInbox((inbox) => {
-        const last_local_msg = inbox.slice(-1);
-        const local_id = get_new_local_id(last_msg?.id, last_local_msg[0]?.id);
-        console.log(local_id);
-        const new_dm = {
-          id: local_id,
-          content: data.payload.message.content,
-          createdAt: data.payload.createdAt,
-          sendBy: {
-            username: data.payload.message.user,
-          },
-          is_local_echo: true,
-          hash: data.payload.hash,
-          pinned: false,
-          starred: [],
-        };
-        return [...inbox, new_dm];
-      });
-    
+    const last_msg = dmStateDetails.friendship_data.messages.slice(-1)[0];
+
+    setInbox((inbox) => {
+      const last_local_msg = inbox.slice(-1);
+      const local_id = get_new_local_id(last_msg?.id, last_local_msg[0]?.id);
+      console.log(local_id);
+      const new_dm = {
+        id: local_id,
+        content: data.payload.message.content,
+        createdAt: data.payload.createdAt,
+        sendBy: {
+          username: data.payload.message.user,
+        },
+        is_local_echo: true,
+        hash: data.payload.hash,
+        pinned: false,
+        starred: [],
+      };
+      return [...inbox, new_dm];
+    });
   }
 
   function star_echo_msg_callback(raw_data: string) {

@@ -3,7 +3,8 @@ import {
   MessageSquareDotIcon,
   PlusSquare,
   SettingsIcon,
- UserSearchIcon } from "lucide-react";
+  UserSearchIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -20,12 +21,11 @@ export default function Sidebar() {
 
   function get_initials() {
     const names = session.data!.name?.split(" ");
-    let initials = session.data?.username?.substring(0, 2);
-    if (names !== undefined) {
-      initials = names.map((name) => name.charAt(0)).join("");
-    }
+    const initials = session.data?.username?.substring(0, 2);
 
-    return initials;
+    if (names === undefined) return initials;
+
+    return names.map((name) => name.charAt(0)).join("");
   }
 
   return (

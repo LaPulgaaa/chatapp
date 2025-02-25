@@ -7,7 +7,6 @@ import type WebSocket from "ws";
 
 import { prisma } from "../../packages/prisma/prisma_client";
 
-
 import { typing_notification_payload } from "./client_data";
 import { RedisSubscriptionManager } from "./redisClient";
 
@@ -704,18 +703,19 @@ export async function ws(wss: WebSocketServer) {
               console.log(err);
             }
           }
-          if (conc_id !== undefined && msg !== undefined) {
-            RedisSubscriptionManager.get_instance().addChatMessage(
-              conc_id,
-              "PIN_MSG_CALLBACK_NON_ECHO",
-              msg,
-            );
-            RedisSubscriptionManager.get_instance().addChatMessage(
-              conc_id,
-              "PIN_MSG_CALLBACK_ECHO",
-              msg,
-            );
-          }
+
+          if (conc_id === undefined || msg === undefined) return;
+
+          RedisSubscriptionManager.get_instance().addChatMessage(
+            conc_id,
+            "PIN_MSG_CALLBACK_NON_ECHO",
+            msg,
+          );
+          RedisSubscriptionManager.get_instance().addChatMessage(
+            conc_id,
+            "PIN_MSG_CALLBACK_ECHO",
+            msg,
+          );
         }
       }
 
@@ -734,26 +734,26 @@ export async function ws(wss: WebSocketServer) {
       }
     });
     ws.on("close", async () => {
-      if (users[wsId] !== undefined) {
-        const userId = users[wsId].userId;
-        try {
-          const rooms_subscribed = await prisma.directory.findMany({
-            where: {
-              userId,
-            },
-            select: {
-              chat_id: true,
-            },
-          });
-          const rooms_arr = rooms_subscribed.map((rooms) => rooms.chat_id);
-          RedisSubscriptionManager.get_instance().bulk_unsubscribe(
+      if (users[wsId] === undefined) return;
+
+      const userId = users[wsId].userId;
+      try {
+        const rooms_subscribed = await prisma.directory.findMany({
+          where: {
             userId,
-            rooms_arr,
-          );
-          delete users[wsId];
-        } catch (err) {
-          console.log(err);
-        }
+          },
+          select: {
+            chat_id: true,
+          },
+        });
+        const rooms_arr = rooms_subscribed.map((rooms) => rooms.chat_id);
+        RedisSubscriptionManager.get_instance().bulk_unsubscribe(
+          userId,
+          rooms_arr,
+        );
+        delete users[wsId];
+      } catch (err) {
+        console.log(err);
       }
     });
   });
