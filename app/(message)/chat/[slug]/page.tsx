@@ -37,7 +37,7 @@ import { UserStateChats } from "@/lib/store/atom/chats";
 import { isSidebarHidden } from "@/lib/store/atom/sidebar";
 import { member_online_state } from "@/lib/store/atom/status";
 import { subscribed_chats_state } from "@/lib/store/atom/subscribed_chats_state";
-import type { ChatMessageData, RoomHeaderDetails , UserChat } from "@/packages/zod";
+import type { ChatMessageData, RoomHeaderDetails } from "@/packages/zod";
 import { chat_messages_schema, room_member_details_schema } from "@/packages/zod";
 
 export type RecievedMessage = {
@@ -113,11 +113,10 @@ export default function Chat({ params }: { params: { slug: string } }) {
       const rooms_with_draft_msg = roomsStateData.getValue().map((room) => {
         if (room.id !== params.slug) return room;
         
-          const room_with_draft: UserChat = {
+          return {
             ...room,
             draft,
           };
-          return room_with_draft;
         
       });
       setRoomsStateData([...rooms_with_draft_msg]);
