@@ -18,7 +18,13 @@ export async function GET(req: NextRequest) {
       },
       select: {
         chat: {
-          include: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            createdAt: true,
+            lastmsgAt: true,
+            deleted: true,
             messages: {
               where: {
                 deleted: false,
