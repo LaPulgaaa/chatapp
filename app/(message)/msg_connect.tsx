@@ -8,6 +8,7 @@ import {
   useRecoilStateLoadable,
   useSetRecoilState,
 } from "recoil";
+import * as v from "valibot";
 
 import { inbound_typing_event } from "../home/connect";
 import { Signal } from "../home/signal";
@@ -21,7 +22,7 @@ import type {
   MessageDeletePayload,
   MessagePinPayload,
   MessageStarPayload,
-} from "@/packages/zod";
+} from "@/packages/valibot";
 
 type DeleteMsgCallbackData = {
   type: string;
@@ -172,7 +173,7 @@ export default function Connect() {
 
   function handle_inbound_typing_event(raw_data: string) {
     const username = session.data?.username;
-    const data = inbound_typing_event.parse(JSON.parse(raw_data));
+    const data = v.parse(inbound_typing_event, JSON.parse(raw_data));
     const payload = data.payload;
     setTypingState((curr_state) => {
       return curr_state.map((s) => {

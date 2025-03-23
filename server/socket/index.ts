@@ -2,6 +2,7 @@ import { createId } from "@paralleldrive/cuid2";
 import Base64 from "crypto-js/enc-base64";
 import sha256 from "crypto-js/sha256";
 import { createClient } from "redis";
+import * as v from "valibot";
 import type { WebSocketServer } from "ws";
 import type WebSocket from "ws";
 
@@ -303,7 +304,7 @@ export async function ws(wss: WebSocketServer) {
       }
 
       if (data.type === "TYPING") {
-        const parsed_data = typing_notification_payload.parse(data.payload);
+        const parsed_data = v.parse(typing_notification_payload, data.payload);
         const { user_id, type } = parsed_data;
 
         if (type === "DM") {

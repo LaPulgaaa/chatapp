@@ -1,12 +1,12 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
+import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useRecoilRefresher_UNSTABLE, useRecoilValueLoadable } from "recoil";
-import type { z } from "zod";
+import * as v from "valibot";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -30,9 +30,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { UserDetails } from "@/lib/store/atom/userDetails";
-import { user_details_edit_form_schema } from "@/packages/zod";
+import { user_details_edit_form_schema } from "@/packages/valibot";
 
-type FormValue = z.output<typeof user_details_edit_form_schema>;
+type FormValue = v.InferOutput<typeof user_details_edit_form_schema>;
 
 const AVATAR_PROD_URL = "https://avatar.varuncodes.com";
 
@@ -50,7 +50,7 @@ export default function Profile() {
   const { toast } = useToast();
 
   const form_details = useForm<FormValue>({
-    resolver: zodResolver(user_details_edit_form_schema.required()),
+    resolver: valibotResolver(v.required(user_details_edit_form_schema)),
     defaultValues: {
       username: "",
       name: "",

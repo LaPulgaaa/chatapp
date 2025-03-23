@@ -8,7 +8,7 @@ import { useRecoilValue, useRecoilValueLoadable } from "recoil";
 import { direct_msg_state } from "@/lib/store/atom/dm";
 import { subscribed_chats_state } from "@/lib/store/atom/subscribed_chats_state";
 import { typing_event_store } from "@/lib/store/atom/typing_event_store";
-import type { ChatReponse, PrivateChats } from "@/packages/zod";
+import type { ChatReponse, PrivateChats } from "@/packages/valibot";
 
 function get_last_msg_time(lastmsgAt: string | undefined): string {
   if (lastmsgAt === undefined) return "-";

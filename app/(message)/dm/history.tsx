@@ -1,6 +1,6 @@
 import DmRender from "./dm_ui";
 
-import type { DirectMessage } from "@/packages/zod";
+import type { DirectMessage } from "@/packages/valibot";
 
 export default function DirectMessageHistory({
   dms,
