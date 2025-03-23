@@ -3,7 +3,7 @@ import { selectorFamily } from "recoil";
 
 import { fetch_user_chats } from "./fetch_chats";
 
-import type { ChatMessageData } from "@/packages/zod";
+import type { ChatMessageData } from "@/packages/valibot";
 
 export const fetch_chat_msgs = selectorFamily<
   ChatMessageData["messages"] | undefined,

@@ -1,8 +1,9 @@
 import { createClient } from "redis";
+import * as v from "valibot";
 
 import { prisma } from "../../packages/prisma/prisma_client";
-import { worker_payload } from "../../packages/zod";
-import type { WorkerPayload } from "../../packages/zod";
+import { worker_payload as worker_payload_schema } from "../../packages/valibot";
+import type { WorkerPayload } from "../../packages/valibot";
 
 const client = createClient();
 
@@ -14,7 +15,8 @@ export async function start_worker() {
     try {
       while (true) {
         const payload = await client.brPop("message", 0);
-        const message = worker_payload.parse(
+        const message = v.parse(
+          worker_payload_schema,
           JSON.parse(payload?.element ?? ""),
         );
         process_msg(message);

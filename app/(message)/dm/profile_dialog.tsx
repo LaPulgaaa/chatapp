@@ -1,7 +1,7 @@
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { DialogContent, DialogHeader } from "@/components/ui/dialog";
-import type { DmProfileInfo } from "@/packages/zod";
+import type { DmProfileInfo } from "@/packages/valibot";
 
 export default function ProfileDialog({
   profile_info,

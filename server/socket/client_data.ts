@@ -1,23 +1,22 @@
-import { z } from "zod";
+import * as v from "valibot";
 
-export const typing_notification_payload = z
-  .object({
-    operation: z.enum(["start", "stop"]),
-    user_id: z.string(),
-  })
-  .and(
-    z.discriminatedUnion("type", [
-      z.object({
-        type: z.literal("CHAT"),
-        room_id: z.string(),
-      }),
-      z.object({
-        type: z.literal("DM"),
-        conc_id: z.string(),
-      }),
-    ]),
-  );
-export const typing_notification_client_data = z.object({
-  type: z.literal("TYPING"),
+export const typing_notification_payload = v.intersect([
+  v.object({
+    operation: v.union([v.literal("start"), v.literal("stop")]),
+    user_id: v.string(),
+  }),
+  v.variant("type", [
+    v.object({
+      type: v.literal("CHAT"),
+      room_id: v.string(),
+    }),
+    v.object({
+      type: v.literal("DM"),
+      conc_id: v.string(),
+    }),
+  ]),
+]);
+export const typing_notification_client_data = v.object({
+  type: v.literal("TYPING"),
   payload: typing_notification_payload,
 });

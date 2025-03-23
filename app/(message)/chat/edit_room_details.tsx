@@ -1,7 +1,7 @@
 "use client";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useForm } from "react-hook-form";
-import type { z } from "zod";
+import type * as v from "valibot";
 
 import { Signal } from "@/app/home/signal";
 import { Button } from "@/components/ui/button";
@@ -23,9 +23,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { room_details_schema } from "@/packages/zod";
+import { room_details_schema } from "@/packages/valibot";
 
-type FormValue = z.output<typeof room_details_schema>;
+type FormValue = v.InferOutput<typeof room_details_schema>;
 
 export default function EditRoomDetails({
   room_details,
@@ -35,7 +35,7 @@ export default function EditRoomDetails({
   chat_id: string;
 }) {
   const form_details = useForm<FormValue>({
-    resolver: zodResolver(room_details_schema),
+    resolver: valibotResolver(room_details_schema),
     defaultValues: {
       name: room_details?.name ?? "",
       description: room_details?.description ?? "",

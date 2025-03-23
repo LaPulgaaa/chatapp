@@ -1,6 +1,6 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
+import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useSession } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { useRecoilRefresher_UNSTABLE } from "recoil";
@@ -27,14 +27,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { fetch_user_chats } from "@/lib/store/selector/fetch_chats";
-import { room_details_schema } from "@/packages/zod";
-import type { RoomType } from "@/packages/zod";
+import { room_details_schema } from "@/packages/valibot";
+import type { RoomType } from "@/packages/valibot";
 
 export default function CreateRoom() {
   const session = useSession();
   const refresh_chats = useRecoilRefresher_UNSTABLE(fetch_user_chats);
   const form = useForm<RoomType>({
-    resolver: zodResolver(room_details_schema),
+    resolver: valibotResolver(room_details_schema),
     defaultValues: {
       name: "",
       description: "",
