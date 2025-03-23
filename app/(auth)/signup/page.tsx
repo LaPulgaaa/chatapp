@@ -1,11 +1,11 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
+import { valibotResolver } from "@hookform/resolvers/valibot";
 import { GitHubLogoIcon } from "@radix-ui/react-icons";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
-import type { z } from "zod";
+import type * as v from "valibot";
 
 import { create_user } from "./actions";
 
@@ -29,14 +29,14 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
-import { user_signup_form_schema } from "@/packages/zod";
+import { user_signup_form_schema } from "@/packages/valibot";
 
-type FormValue = z.output<typeof user_signup_form_schema>;
+type FormValue = v.InferOutput<typeof user_signup_form_schema>;
 
 export default function Signup() {
   const router = useRouter();
   const form = useForm<FormValue>({
-    resolver: zodResolver(user_signup_form_schema),
+    resolver: valibotResolver(user_signup_form_schema),
     defaultValues: {
       username: "",
       password: "",

@@ -4,6 +4,7 @@ import assert from "minimalistic-assert";
 import { useSession } from "next-auth/react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useRecoilRefresher_UNSTABLE, useRecoilStateLoadable } from "recoil";
+import * as v from "valibot";
 
 import type {
   PinMsgCallbackData,
@@ -27,8 +28,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { direct_msg_state } from "@/lib/store/atom/dm";
 import { dm_details_state } from "@/lib/store/atom/dm_details_state";
 import { fetch_dms } from "@/lib/store/selector/fetch_dms";
-import type { FriendSearchResult, MessageDeletePayload } from "@/packages/zod";
-import { friend_search_result_schema } from "@/packages/zod";
+import type { FriendSearchResult, MessageDeletePayload } from "@/packages/valibot";
+import { friend_search_result_schema } from "@/packages/valibot";
 
 type DeleteMsgCallbackData = {
   type: string;
@@ -164,7 +165,7 @@ export default function Direct({ params }: { params: { slug: string } }) {
     try {
       const resp = await fetch(`/api/dm/${params.slug}`);
       const { raw_data } = await resp.json();
-      const data = friend_search_result_schema.parse(raw_data);
+      const data = v.parse(friend_search_result_schema, raw_data);
       assert(data.is_friend === false);
       setDmStateDetails(data);
     } catch (err) {

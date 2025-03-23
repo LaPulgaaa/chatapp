@@ -1,9 +1,10 @@
 import { selectorFamily } from "recoil";
+import * as v from "valibot";
 
 import { fetch_dms } from "./fetch_dms";
 
-import type { FriendSearchResult } from "@/packages/zod";
-import { friend_search_result_schema } from "@/packages/zod";
+import type { FriendSearchResult } from "@/packages/valibot";
+import { friend_search_result_schema } from "@/packages/valibot";
 
 export const get_friend_by_username = selectorFamily<
   FriendSearchResult | undefined,
@@ -22,7 +23,7 @@ export const get_friend_by_username = selectorFamily<
         try {
           const resp = await fetch(`/api/dm/${username}`);
           const { raw_data } = await resp.json();
-          const data = friend_search_result_schema.parse(raw_data);
+          const data = v.parse(friend_search_result_schema, raw_data);
           return data;
         } catch (err) {
           console.log(err);

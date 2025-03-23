@@ -1,16 +1,16 @@
 import { atom, selector } from "recoil";
-import { z } from "zod";
+import * as v from "valibot";
 
-const fetch_user_details = z.object({
-  username: z.string(),
-  name: z.string().nullish(),
-  status: z.string().nullish(),
-  favorite: z.array(z.string()),
-  avatarurl: z.string().nullish(),
-  about: z.string().nullish(),
+const fetch_user_details = v.object({
+  username: v.string(),
+  name: v.nullish(v.string()),
+  status: v.nullish(v.string()),
+  favorite: v.array(v.string()),
+  avatarurl: v.nullish(v.string()),
+  about: v.nullish(v.string()),
 });
 
-type UserDetails = z.output<typeof fetch_user_details>;
+type UserDetails = v.InferOutput<typeof fetch_user_details>;
 
 export const UserDetails = atom<UserDetails | null>({
   key: "user_details",
@@ -24,7 +24,7 @@ export const UserDetails = atom<UserDetails | null>({
           },
         });
         const { raw_data } = await resp.json();
-        const data = fetch_user_details.parse(raw_data);
+        const data = v.parse(fetch_user_details, raw_data);
         return data;
       } catch (err) {
         console.log(err);

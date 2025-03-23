@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useRecoilState, useRecoilStateLoadable, useRecoilValue } from "recoil";
+import * as v from "valibot";
 
 import { TypingEvent } from "../../dm/typing_event";
 import { ComposeBox } from "../../dm/typing_status";
@@ -37,11 +38,11 @@ import { UserStateChats } from "@/lib/store/atom/chats";
 import { isSidebarHidden } from "@/lib/store/atom/sidebar";
 import { member_online_state } from "@/lib/store/atom/status";
 import { subscribed_chats_state } from "@/lib/store/atom/subscribed_chats_state";
-import type { ChatMessageData, RoomHeaderDetails } from "@/packages/zod";
+import type { ChatMessageData, RoomHeaderDetails } from "@/packages/valibot";
 import {
   chat_messages_schema,
   room_member_details_schema,
-} from "@/packages/zod";
+} from "@/packages/valibot";
 
 export type RecievedMessage = {
   type: string;
@@ -190,7 +191,7 @@ export default function Chat({ params }: { params: { slug: string } }) {
         }),
       });
       const { raw_data } = await resp.json();
-      const data = chat_messages_schema.parse(raw_data);
+      const data = v.parse(chat_messages_schema, raw_data);
       setSweeped(data);
     } catch (err) {
       console.log(err);
@@ -471,10 +472,10 @@ function Members({ room_id, username }: { room_id: string; username: string }) {
         if (resp.status !== 200) return;
 
         const { raw_data } = await resp.json();
-        const parsed = room_member_details_schema.safeParse(raw_data);
+        const parsed = v.safeParser(room_member_details_schema)(raw_data);
         if (parsed.success) {
-          setMemberStatus(parsed.data);
-        } else console.log(parsed.error);
+          setMemberStatus(parsed.output);
+        } else console.log(parsed.issues);
       } catch (err) {
         console.log(err);
       }

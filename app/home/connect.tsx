@@ -8,7 +8,7 @@ import {
   useRecoilStateLoadable,
   useSetRecoilState,
 } from "recoil";
-import { z } from "zod";
+import * as v from "valibot";
 
 import type { UpdateDetailsData } from "../(message)/msg_connect";
 
@@ -19,7 +19,7 @@ import { direct_msg_state } from "@/lib/store/atom/dm";
 import { subscribed_chats_state } from "@/lib/store/atom/subscribed_chats_state";
 import { typing_event_store } from "@/lib/store/atom/typing_event_store";
 import { fetch_dms } from "@/lib/store/selector/fetch_dms";
-import type { MessageDeletePayload, MessagePinPayload } from "@/packages/zod";
+import type { MessageDeletePayload, MessagePinPayload } from "@/packages/valibot";
 
 type DeleteMsgCallbackData = {
   type: string;
@@ -31,20 +31,20 @@ type PinMsgCallbackData = {
   payload: MessagePinPayload;
 };
 
-export const inbound_typing_event = z.object({
-  type: z.literal("TYPING"),
-  payload: z.discriminatedUnion("type", [
-    z.object({
-      type: z.literal("CHAT"),
-      room_id: z.string(),
-      user_id: z.string(),
-      op: z.enum(["start", "stop"]),
+export const inbound_typing_event = v.object({
+  type: v.literal("TYPING"),
+  payload: v.variant("type", [
+    v.object({
+      type: v.literal("CHAT"),
+      room_id: v.string(),
+      user_id: v.string(),
+      op: v.union([v.literal("start"), v.literal("stop")]),
     }),
-    z.object({
-      type: z.literal("DM"),
-      conc_id: z.string(),
-      user_id: z.string(),
-      op: z.enum(["start", "stop"]),
+    v.object({
+      type: v.literal("DM"),
+      conc_id: v.string(),
+      user_id: v.string(),
+      op: v.union([v.literal("start"), v.literal("stop")]),
     }),
   ]),
 });
@@ -144,7 +144,7 @@ export default function Connect() {
   function handle_inbound_typing_event(raw_data: string) {
     assert(session.status === "authenticated");
     const username = session.data.username;
-    const data = inbound_typing_event.parse(JSON.parse(raw_data));
+    const data = v.parse(inbound_typing_event, JSON.parse(raw_data));
     const payload = data.payload;
     setTypingState((curr_state) => {
       return curr_state.map((s) => {

@@ -1,10 +1,10 @@
 import express from "express";
 import jwt from "jsonwebtoken";
 import assert from "minimalistic-assert";
-import { z } from "zod";
+import * as v from "valibot";
 
 import { prisma } from "../../packages/prisma/prisma_client";
-import { member_profile_schema } from "../../packages/zod";
+import { member_profile_schema } from "../../packages/valibot";
 import authenticate from "../middleware/authenticate";
 import { Cache } from "../util/jwt";
 
@@ -142,24 +142,25 @@ router.get("/getCreds/:username", authenticate, async (req, res) => {
 });
 
 router.patch("/editProfile", authenticate, async (req, res) => {
-  const result = z
-    .intersection(
-      z.object({
-        id: z.string(),
+  const profile_parser = v.safeParser(
+    v.intersect([
+      v.object({
+        id: v.string(),
       }),
-      member_profile_schema.omit({ username: true }),
-    )
-    .safeParse(req.body);
+      v.omit(member_profile_schema, ["username"]),
+    ]),
+  );
+  const result = profile_parser(req.body);
 
   if (!result.success) {
     return res.status(400).json({
       msg: "could not update field",
-      data: result.error,
+      data: result.issues,
     });
   }
 
   try {
-    const profile_fields = result.data;
+    const profile_fields = result.output;
     const updated_profile = await prisma.member.update({
       where: {
         id: profile_fields.id,

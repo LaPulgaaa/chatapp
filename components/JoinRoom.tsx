@@ -2,6 +2,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useRecoilRefresher_UNSTABLE, useRecoilState } from "recoil";
+import * as v from "valibot";
 
 import { Button } from "./ui/button";
 import {
@@ -17,7 +18,7 @@ import { Label } from "./ui/label";
 import { Signal } from "@/app/home/signal";
 import { UserStateChats } from "@/lib/store/atom/chats";
 import { fetch_user_chats } from "@/lib/store/selector/fetch_chats";
-import { user_chat_schema } from "@/packages/zod";
+import { user_chat_schema } from "@/packages/valibot";
 
 export default function JoinRoomDialog() {
   const [roomid, setRoomId] = useState<string>("");
@@ -56,7 +57,7 @@ export default function JoinRoomDialog() {
 
       if (resp.status === 200) {
         console.log("room found");
-        const room_info = user_chat_schema.parse(raw_resp.raw_data);
+        const room_info = v.parse(user_chat_schema, raw_resp.raw_data);
         refresh_chats();
         setRooms([...rooms, room_info]);
         Signal.get_instance().ADD_ROOM(session.data.id, room_info.id);
