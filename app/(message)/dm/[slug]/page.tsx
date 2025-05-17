@@ -199,7 +199,7 @@ export default function Direct({ params }: { params: { slug: string } }) {
       });
     }
     if (inbox.length >= 5) {
-      if (dmStateDetails?.friendship_data === undefined) return;
+      if (dmStateDetails?.is_friend === false) return;
       const friendship_data = dmStateDetails!.friendship_data;
       const conc_id = friendship_data.connectionId;
       const last_msg = friendship_data.messages.slice(-1);
@@ -232,7 +232,7 @@ export default function Direct({ params }: { params: { slug: string } }) {
     async function sweep_lastest_dms() {
       if (
         dmStateDetails === undefined ||
-        dmStateDetails.friendship_data === undefined
+        dmStateDetails.is_friend === false
       )
         return;
 
@@ -402,8 +402,8 @@ export default function Direct({ params }: { params: { slug: string } }) {
   function delete_msg_callback(raw_data: string) {
     const data: DeleteMsgCallbackData = JSON.parse(`${raw_data}`);
     const payload = data.payload;
-    if (dmStateDetails === undefined) return;
-    else if (payload.conc_id === dmStateDetails.friendship_data?.connectionId) {
+    if (dmStateDetails === undefined || dmStateDetails.is_friend === false) return;
+    else if (payload.conc_id === dmStateDetails.friendship_data.connectionId) {
       setInbox((inbox) => {
         return inbox.filter((dm) => {
           assert(dm.is_local_echo === true);

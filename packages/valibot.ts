@@ -212,7 +212,6 @@ export const friend_search_result_schema = v.intersect([
   v.variant("is_friend", [
     v.object({
       is_friend: v.literal(false),
-      friendship_data: v.undefined(),
     }),
     v.object({
       is_friend: v.literal(true),
