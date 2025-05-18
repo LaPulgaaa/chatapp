@@ -1,6 +1,7 @@
 "use client";
 
 import { GitHubLogoIcon } from "@radix-ui/react-icons";
+import GoogleLogoIcon from "@/public/icons8-google-logo-48.png";
 import { useRouter } from "next/navigation";
 import { signIn, useSession } from "next-auth/react";
 import { useLayoutEffect, useState } from "react";
@@ -19,6 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ToastAction } from "@/components/ui/toast";
 import { toast } from "@/hooks/use-toast";
+import Image from "next/image";
 
 export default function Login() {
   const session = useSession();
@@ -120,6 +122,17 @@ export default function Login() {
             >
               <GitHubLogoIcon />
               <span className="ml-2">Github</span>
+            </Button>
+            <Button
+              onClick={async () => {
+                await signIn("google", {
+                  callbackUrl: "/home",
+                });
+              }}
+              className="w-full my-4"
+            >
+              <Image width={24} height={24} src={GoogleLogoIcon} alt="google logo" />
+              <span className="ml-2">Google</span>
             </Button>
           </div>
         </Card>
