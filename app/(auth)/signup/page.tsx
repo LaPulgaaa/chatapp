@@ -2,6 +2,7 @@
 
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { GitHubLogoIcon } from "@radix-ui/react-icons";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
@@ -30,6 +31,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
 import { user_signup_form_schema } from "@/packages/valibot";
+import GoogleLogoIcon from "@/public/icons8-google-logo-48.png";
+
 
 type FormValue = v.InferOutput<typeof user_signup_form_schema>;
 
@@ -182,6 +185,17 @@ export default function Signup() {
             >
               <GitHubLogoIcon />
               <p className="ml-2">GitHub</p>
+            </Button>
+            <Button
+              onClick={async () => {
+                await signIn("google", {
+                  callbackUrl: "/home",
+                });
+              }}
+              className="w-full mt-4"
+            >
+              <Image height={24} width={24} src={GoogleLogoIcon} alt="google logo" />
+              <p className="ml-2">Google</p>
             </Button>
           </div>
         </Card>
