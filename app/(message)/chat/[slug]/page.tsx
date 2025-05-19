@@ -464,7 +464,7 @@ function Members({ room_id, username }: { room_id: string; username: string }) {
     const fetch_members = async () => {
       try {
         const resp = await fetch(
-          `http://localhost:3001/chat/getMembers/${room_id}`,
+          `https://chatbackend.varuncodes.com/chat/getMembers/${room_id}`,
           {
             credentials: "include",
           },
