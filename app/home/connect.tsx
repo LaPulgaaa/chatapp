@@ -282,10 +282,6 @@ export default function Connect() {
 
 
   useEffect(() => {
-    Signal.get_instance().REGISTER_CALLBACK(
-      "MSG_CALLBACK",
-      handle_recieved_msg
-    );
     if (session.status === "authenticated") {
       Signal.get_instance(session.data.username).REGISTER_CALLBACK(
         "INVITE",
@@ -306,6 +302,10 @@ export default function Connect() {
       Signal.get_instance().REGISTER_CALLBACK(
         "UPDATE_DETAILS_CALLBACK",
         details_update_callback,
+      );
+      Signal.get_instance().REGISTER_CALLBACK(
+        "MSG_CALLBACK",
+        handle_recieved_msg
       );
     }
 
