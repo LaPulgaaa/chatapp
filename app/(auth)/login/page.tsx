@@ -1,7 +1,7 @@
 "use client";
 
 import { GitHubLogoIcon } from "@radix-ui/react-icons";
-import GoogleLogoIcon from "@/public/icons8-google-logo-48.png";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { signIn, useSession } from "next-auth/react";
 import { useLayoutEffect, useState } from "react";
@@ -20,7 +20,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ToastAction } from "@/components/ui/toast";
 import { toast } from "@/hooks/use-toast";
-import Image from "next/image";
+import GoogleLogoIcon from "@/public/icons8-google-logo-48.png";
+
 
 export default function Login() {
   const session = useSession();

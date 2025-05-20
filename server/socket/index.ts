@@ -7,6 +7,7 @@ import type { WebSocketServer } from "ws";
 import type WebSocket from "ws";
 
 import { prisma } from "../../packages/prisma/prisma_client";
+import { IDGenSingleton } from "../util/id_gen";
 
 import { typing_notification_payload } from "./client_data";
 import { RedisSubscriptionManager } from "./redisClient";
@@ -23,6 +24,7 @@ const users: {
 let count = 0;
 export async function ws(wss: WebSocketServer) {
   await client.connect();
+  await IDGenSingleton.get_instance().init();
   wss.on("connection", async (ws, _req: Request) => {
     const wsId = count++;
     console.log("connection made");
@@ -261,9 +263,13 @@ export async function ws(wss: WebSocketServer) {
         const createdAt = new Date().toISOString();
         const hash = sha256(message.content + createdAt + message.user);
         const hash_str = Base64.stringify(hash);
+        const msg_id = IDGenSingleton.get_instance().gen_id(msg_type);
+
         const msg_data = JSON.stringify({
           type: "message",
           payload: {
+            id: msg_id,
+            msg_type,
             roomId,
             message: content,
             createdAt,

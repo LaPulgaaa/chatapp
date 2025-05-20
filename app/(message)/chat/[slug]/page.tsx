@@ -21,7 +21,6 @@ import { Signal } from "@/app/home/signal";
 import { leave_room } from "@/app/home/util";
 import { DarkLight } from "@/components/DarkLight";
 import Inbox from "@/components/Inbox";
-import Message from "@/components/Message";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -33,20 +32,20 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { chat_details_state } from "@/lib/store/atom/chat_details_state";
 import { UserStateChats } from "@/lib/store/atom/chats";
 import { isSidebarHidden } from "@/lib/store/atom/sidebar";
 import { member_online_state } from "@/lib/store/atom/status";
 import { subscribed_chats_state } from "@/lib/store/atom/subscribed_chats_state";
-import type { ChatMessageData, RoomHeaderDetails } from "@/packages/valibot";
 import {
-  chat_messages_schema,
   room_member_details_schema,
 } from "@/packages/valibot";
+import type { ChatMessageData , RoomHeaderDetails } from "@/packages/valibot";
 
 export type RecievedMessage = {
   type: string;
   payload: {
+    id: number,
+    msg_type: "dm" | "chat",
     roomId: string;
     message: {
       content: string;
@@ -61,10 +60,7 @@ export type RecievedMessage = {
 export default function Chat({ params }: { params: { slug: string } }) {
   const compose_ref = useRef<string | null>(null);
   const chat_ref = useRef<HTMLDivElement>(null);
-  const [sweeped, setSweeped] = useState<ChatMessageData["messages"]>([]);
-  const [realtimechat, setRealtimechat] = useState<React.JSX.Element[]>([]);
   const [compose, setCompose] = useState<string>("");
-  const [chat, setChat] = useState<RecievedMessage[]>([]);
   const session = useSession();
   const [rooms, setRooms] = useRecoilState(UserStateChats);
   const [ishidden, setIshidden] = useRecoilState(isSidebarHidden);
@@ -76,9 +72,7 @@ export default function Chat({ params }: { params: { slug: string } }) {
   const [roomsStateData, setRoomsStateData] = useRecoilStateLoadable(
     subscribed_chats_state,
   );
-  const [roomDetailState, setRoomDetailState] = useRecoilStateLoadable(
-    chat_details_state({ chat_id: params.slug }),
-  );
+  const [chatMessages, setchatMessages] = useState<ChatMessageData["messages"]>([]);
 
   const recipient = useMemo(() => {
     if (session.status !== "authenticated") return null;
@@ -92,6 +86,7 @@ export default function Chat({ params }: { params: { slug: string } }) {
     //eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.slug, session]);
 
+  //TODO: Can this be converted to useMemo
   useEffect(() => {
     if (roomsStateData.state === "hasValue" && roomsStateData.getValue()) {
       const all_rooms_data = roomsStateData.getValue();
@@ -106,122 +101,29 @@ export default function Chat({ params }: { params: { slug: string } }) {
         createdAt: narrowed_room.createdAt,
       });
       setCompose(narrowed_room.draft ?? "");
+      setchatMessages(narrowed_room.messages);
     }
     //eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomsStateData]);
 
   function update_draft() {
+    
     const draft = compose_ref.current;
-    if (draft !== null && roomsStateData.state === "hasValue") {
-      const rooms_with_draft_msg = roomsStateData.getValue().map((room) => {
-        if (room.id !== params.slug) return room;
-
-        return {
-          ...room,
-          draft,
-        };
-      });
-      setRoomsStateData([...rooms_with_draft_msg]);
+    if (roomsStateData.state === "hasValue" && roomsStateData.getValue() !== undefined) {
+      setRoomsStateData((rooms) => {
+        return rooms.map((room) => {
+          if(room.id !== params.slug)
+            return room;
+          console.log("updating unreads")
+          return {
+            ...room,
+            draft: draft ?? "",
+            unreads: 0,
+          }
+        })
+      })
     }
   }
-
-  function update_last_sent_message() {
-    if (roomsStateData.state === "hasValue") {
-      console.log("is this being updated");
-      const all_rooms_data = roomsStateData.getValue();
-      const narrowed_room = all_rooms_data.find(
-        (room) => room.id === params.slug,
-      );
-      assert(narrowed_room !== undefined);
-      const other_rooms = all_rooms_data.filter(
-        (room) => room.id !== narrowed_room.id,
-      );
-
-      let new_last_msg;
-
-      if (chat.length > 0) {
-        const last_recent_msg = chat.slice(-1)[0];
-        new_last_msg = {
-          id: Math.random(),
-          createdAt: last_recent_msg.payload.createdAt,
-          content: last_recent_msg.payload.message.content,
-          sender: {
-            username: last_recent_msg.payload.message.user,
-            name: last_recent_msg.payload.message.name,
-          },
-        };
-      } else if (sweeped.length > 0) {
-        const last_sweeped_msg = sweeped.slice(-1)[0];
-        new_last_msg = {
-          createdAt: last_sweeped_msg.createdAt,
-          content: last_sweeped_msg.content,
-          sender: {
-            username: last_sweeped_msg.sender.username,
-          },
-        };
-      }
-
-      if (new_last_msg === undefined) return;
-
-      const room_details_with_updated_last_msg = {
-        ...narrowed_room,
-        lastmsgAt: new_last_msg.createdAt,
-        messages: [
-          {
-            id: Math.random(),
-            content: new_last_msg.content,
-            createdAt: new_last_msg.createdAt,
-            sender: {
-              username: new_last_msg.sender.username,
-              name: new_last_msg.sender.name,
-            },
-          },
-        ],
-      };
-      setRoomsStateData([...other_rooms, room_details_with_updated_last_msg]);
-    }
-  }
-
-  async function sweep_latest_messages(last_msg_id: number | undefined) {
-    try {
-      const resp = await fetch(`/api/message/chat/sweep/${params.slug}`, {
-        method: "POST",
-        body: JSON.stringify({
-          last_msg_id: last_msg_id ?? -1,
-        }),
-      });
-      const { raw_data } = await resp.json();
-      const data = v.parse(chat_messages_schema, raw_data);
-      setSweeped(data);
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  useEffect(() => {
-    async function sweep_recent_chat_msgs() {
-      if (
-        roomDetailState.state !== "hasValue" ||
-        roomDetailState.getValue() === undefined
-      )
-        return;
-
-      setSweeped([]);
-      const last_msg = roomDetailState.getValue()!.slice(-1);
-      sweep_latest_messages(last_msg[0]?.id);
-    }
-    sweep_recent_chat_msgs();
-    //eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roomDetailState.state]);
-
-  useEffect(() => {
-    if (sweeped.length > 0) {
-      setRoomDetailState((prev_state) => [...(prev_state ?? []), ...sweeped]);
-      setRealtimechat([]);
-      update_last_sent_message();
-    }
-    //eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sweeped]);
 
   useEffect(() => {
     if (room_id === undefined || session.status !== "authenticated") return;
@@ -231,7 +133,6 @@ export default function Chat({ params }: { params: { slug: string } }) {
       session.data.id,
       session.data.username,
     );
-    Signal.get_instance().REGISTER_CALLBACK("MSG_CALLBACK", recieve_msg);
     Signal.get_instance().REGISTER_CALLBACK(
       "ONLINE_CALLBACK",
       update_member_online_status,
@@ -241,25 +142,11 @@ export default function Chat({ params }: { params: { slug: string } }) {
       if (room_id === undefined || session.status !== "authenticated") return;
 
       Signal.get_instance().UNSUBSCRIBE(params.slug, session.data.username);
-      Signal.get_instance().DEREGISTER("MSG_CALLBACK");
       Signal.get_instance().DEREGISTER("ONLINE_CALLBACK");
       update_draft();
     };
     //eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room_id, user_id, session.status]);
-  function recieve_msg(raw_data: string) {
-    const data: RecievedMessage = JSON.parse(`${raw_data}`);
-    if (data.payload.roomId !== params.slug) return;
-
-    setChat([...chat, data]);
-    setRealtimechat((realtimechat) => [
-      ...realtimechat,
-      <Message
-        key={(session.data?.user?.email?.substring(5) || "") + Date.now()}
-        data={data}
-      />,
-    ]);
-  }
 
   function update_member_online_status(raw_data: string) {
     const data = JSON.parse(`${raw_data}`);
@@ -288,31 +175,11 @@ export default function Chat({ params }: { params: { slug: string } }) {
 
       const last_comp_idx = chat_history_comps.length - 1;
       chat_history_comps[last_comp_idx].scrollIntoView({
-        behavior: "instant",
-        inline: "center",
-      });
-    }
-  }, [roomDetailState]);
-
-  useEffect(() => {
-    const chat_node = chat_ref.current;
-    if (chat_node !== null) {
-      const recent_msg_comps = chat_node.querySelectorAll("#recent");
-      if (recent_msg_comps.length < 1) return;
-
-      const last_recent_idx = recent_msg_comps.length - 1;
-      recent_msg_comps[last_recent_idx].scrollIntoView({
         behavior: "smooth",
         inline: "center",
       });
     }
-    if (realtimechat.length > 10) {
-      setSweeped([]);
-      const last_msg = roomDetailState.getValue()!.slice(-1);
-      sweep_latest_messages(last_msg[0]?.id);
-    }
-    //eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chat]);
+  }, [chatMessages]);
 
   function sendMessage() {
     const data = {
@@ -421,18 +288,12 @@ export default function Chat({ params }: { params: { slug: string } }) {
         >
           <div className="mb-2" ref={chat_ref}>
             <div>
-              {roomDetailState.state === "hasValue" &&
-              roomDetailState.getValue() ? (
-                roomDetailState.getValue()!.map((message) => {
+              {
+                chatMessages.map((message) => {
                   return <Inbox key={message.id} data={message} />;
                 })
-              ) : (
-                <div className="flex flex-col items-center justify-center mt-4">
-                  Loading...
-                </div>
-              )}
+              }
             </div>
-            <div>{realtimechat}</div>
           </div>
           {session.status === "authenticated" && (
             <TypingEvent
