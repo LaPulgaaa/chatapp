@@ -61,6 +61,7 @@ export const user_chat_schema = v.object({
     }),
   ),
   draft: v.optional(v.string()),
+  unreads: v.optional(v.number()),
 });
 
 export type UserChat = v.InferOutput<typeof user_chat_schema>;
@@ -180,6 +181,7 @@ export const private_chat_schema = v.object({
   messages: v.array(direct_msg_schema),
   connectionId: v.string(),
   draft: v.optional(v.string()),
+  unreads: v.optional(v.number()),
 });
 
 export const private_chats_schema = v.array(private_chat_schema);

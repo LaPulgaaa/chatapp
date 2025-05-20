@@ -1,6 +1,7 @@
 "use client";
 
 import assert from "minimalistic-assert";
+import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
 import {
@@ -12,6 +13,8 @@ import * as v from "valibot";
 
 import { inbound_typing_event } from "../home/connect";
 import { Signal } from "../home/signal";
+
+import type { RecievedMessage } from "./chat/[slug]/page";
 
 import { useToast } from "@/hooks/use-toast";
 import { direct_msg_state } from "@/lib/store/atom/dm";
@@ -53,6 +56,7 @@ export type UpdateDetailsData = {
 export default function Connect() {
   const session = useSession();
   const { toast } = useToast();
+  const pathname = usePathname();
   const [dms, setDms] = useRecoilStateLoadable(direct_msg_state);
   const [roomsStateData, setRoomsStateData] = useRecoilStateLoadable(
     subscribed_chats_state,
@@ -238,6 +242,74 @@ export default function Connect() {
     });
   }
 
+  function handle_recieved_msg(raw_data: string){
+    console.log("this is the /message route")
+    const is_narrowed = !pathname.includes("home");
+    const data:RecievedMessage = JSON.parse(raw_data);
+    const payload = data.payload;
+
+    if(payload.msg_type === "dm"){
+      const narrowed_dm = is_narrowed === true && pathname.includes("dm") ? pathname.split("/").slice(-1)[0] : undefined;
+      setDms((dms) => {
+        const new_dms = dms.map((dm) => {
+          if(dm.connectionId !== payload.roomId)
+            return dm;
+
+          const old_msgs = dm.messages;
+          const updated_unreads = narrowed_dm === dm.to.username ? 0 : (dm.unreads ?? 0) + 1; 
+          const new_msg = {
+            id: payload.id,
+            content: payload.message.content,
+            sendBy: {
+              username: payload.message.user,
+              name: payload.message.name,
+            },
+            createdAt: payload.createdAt,
+            pinned: false,
+            starred: [],
+          }
+          return {
+            ...dm,
+            lastmsgAt: new Date().toISOString(),
+            messages: [...old_msgs,new_msg],
+            unreads: updated_unreads,
+          }
+        })
+
+        return new_dms;
+      })
+    }else{
+      
+      const narrowed_chat = is_narrowed === true && pathname.includes("chat") ? pathname.split("/").slice(-1)[0] : undefined;
+      setRoomsStateData((chats) => {
+        const new_chats = chats.map((chat) => {
+          if(chat.id !== payload.roomId){
+            return chat;
+          }
+
+          const old_msgs = chat.messages;
+          const updated_unreads = narrowed_chat === chat.id ? 0 : (chat.unreads ?? 0) + 1;
+          const new_msg = {
+            id: payload.id,
+            content: payload.message.content,
+            sender: {
+              username: payload.message.user,
+              name: payload.message.name,
+            },
+            createdAt: payload.createdAt,
+          }
+          return {
+            ...chat,
+            lastmsgAt: new Date().toISOString(),
+            messages: [...old_msgs, new_msg],
+            unreads: updated_unreads,
+          }
+        })
+        return new_chats;
+      })
+    }
+  }
+
   useEffect(() => {
     if (session.status === "authenticated") {
       Signal.get_instance(session.data.username).REGISTER_CALLBACK(
@@ -264,6 +336,10 @@ export default function Connect() {
         "TYPING_CALLBACK",
         handle_inbound_typing_event,
       );
+      Signal.get_instance().REGISTER_CALLBACK(
+        "MSG_CALLBACK",
+        handle_recieved_msg
+      );
     }
 
     return () => {
@@ -274,10 +350,11 @@ export default function Connect() {
         Signal.get_instance().DEREGISTER("STARRED_NON_ECHO_CALLBACK");
         Signal.get_instance().DEREGISTER("UPDATE_DETAILS_CALLBACK");
         Signal.get_instance().DEREGISTER("TYPING_CALLBACK");
+        Signal.get_instance().DEREGISTER("MSG_CALLBACK");
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session.status, session.data]);
+  }, [session]);
 
   return <></>;
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import assert from "minimalistic-assert";
+import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
 import {
@@ -10,6 +11,7 @@ import {
 } from "recoil";
 import * as v from "valibot";
 
+import type { RecievedMessage } from "../(message)/chat/[slug]/page";
 import type { UpdateDetailsData } from "../(message)/msg_connect";
 
 import { Signal } from "./signal";
@@ -51,6 +53,7 @@ export const inbound_typing_event = v.object({
 
 export default function Connect() {
   const session = useSession();
+  const pathname = usePathname();
   const { toast } = useToast();
   const refresh_dms = useRecoilRefresher_UNSTABLE(fetch_dms);
   const [dms, setDms] = useRecoilStateLoadable(direct_msg_state);
@@ -209,7 +212,80 @@ export default function Connect() {
     });
   }
 
+  function handle_recieved_msg(raw_data: string){
+    console.log("this is in /home route")
+    const is_narrowed = !pathname.includes("home");
+    const data:RecievedMessage = JSON.parse(raw_data);
+    const payload = data.payload;
+
+    if(payload.msg_type === "dm"){
+      const narrowed_dm = is_narrowed === true && pathname.includes("dm") ? pathname.split("/").slice(-1)[0] : undefined;
+      setDms((dms) => {
+        const new_dms = dms.map((dm) => {
+          if(dm.connectionId !== payload.roomId)
+            return dm;
+
+          const old_msgs = dm.messages;
+          const updated_unreads = narrowed_dm === dm.to.username ? 0 : (dm.unreads ?? 0) + 1; 
+          const new_msg = {
+            id: payload.id,
+            content: payload.message.content,
+            sendBy: {
+              username: payload.message.user,
+              name: payload.message.name,
+            },
+            createdAt: payload.createdAt,
+            pinned: false,
+            starred: [],
+          }
+          return {
+            ...dm,
+            lastmsgAt: new Date().toISOString(),
+            messages: [...old_msgs,new_msg],
+            unreads: updated_unreads,
+          }
+        })
+
+        return new_dms;
+      })
+    }else{
+      const narrowed_chat = is_narrowed === true && pathname.includes("chat") ? pathname.split("/").slice(-1)[0] : undefined;
+      setRoomsStateData((chats) => {
+        const new_chats = chats.map((chat) => {
+          if(chat.id !== payload.roomId){
+            return chat;
+          }
+
+          const old_msgs = chat.messages;
+          const updated_unreads = narrowed_chat === chat.id ? 0 : (chat.unreads ?? 0) + 1;
+          const new_msg = {
+            id: payload.id,
+            content: payload.message.content,
+            sender: {
+              username: payload.message.user,
+              name: payload.message.name,
+            },
+            createdAt: payload.createdAt,
+          }
+          return {
+            ...chat,
+            lastmsgAt: new Date().toISOString(),
+            messages: [...old_msgs, new_msg],
+            unreads: updated_unreads,
+          }
+        })
+
+        return new_chats;
+      })
+    }
+  }
+
+
   useEffect(() => {
+    Signal.get_instance().REGISTER_CALLBACK(
+      "MSG_CALLBACK",
+      handle_recieved_msg
+    );
     if (session.status === "authenticated") {
       Signal.get_instance(session.data.username).REGISTER_CALLBACK(
         "INVITE",
@@ -239,10 +315,11 @@ export default function Connect() {
         Signal.get_instance().DEREGISTER("DELETE_NON_ECHO");
         Signal.get_instance().DEREGISTER("PIN_MSG_CALLBACK");
         Signal.get_instance().DEREGISTER("UPDATE_DETAILS_CALLBACK");
+        Signal.get_instance().DEREGISTER("MSG_CALLBACK");
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session.status, session.data]);
+  }, [session]);
 
   return <></>;
 }
