@@ -57,7 +57,7 @@ export default [
         { assertionStyle: "never" },
       ],
       "@typescript-eslint/consistent-type-imports": "error",
-      "no-undef": "warning",
+      "no-undef": "warn",
     },
   },
   {
