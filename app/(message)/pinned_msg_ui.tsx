@@ -2,14 +2,14 @@ import { PinIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 import React, { useState } from "react";
 
-import type { UnitDM } from "./dm_ui";
+import type { UnitMsg } from "./dm_ui";
 
 export function PinnedMessages({
   dm_ref,
   msgs,
 }: {
   dm_ref: React.RefObject<HTMLDivElement>;
-  msgs: UnitDM[];
+  msgs: UnitMsg[];
 }) {
   const [active, setActive] = useState<number>(0);
   const { theme } = useTheme();
@@ -50,13 +50,7 @@ export function PinnedMessages({
       {msgs.map((msg, i) => {
         return (
           <div
-            onClick={() =>
-              scroll_into_view(
-                msg.is_local_echo
-                  ? msg.hash.substring(0, 4)
-                  : msg.id.toString(),
-              )
-            }
+            onClick={() => scroll_into_view(msg.id.toString())}
             key={msg.id}
             className={` ${active !== i && "hidden"} flex flex-row gap-2 rounded-sm cursor-pointer bg-slate-100 dark:bg-slate-900 p-2 my-1 mr-4`}
           >

@@ -15,12 +15,12 @@ import * as v from "valibot";
 
 import { TypingEvent } from "../../dm/typing_event";
 import { ComposeBox } from "../../dm/typing_status";
+import ChatMessageHistory from "../../history";
 import EditRoomDetails from "../edit_room_details";
 
 import { Signal } from "@/app/home/signal";
 import { leave_room } from "@/app/home/util";
 import { DarkLight } from "@/components/DarkLight";
-import Inbox from "@/components/Inbox";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -36,16 +36,14 @@ import { UserStateChats } from "@/lib/store/atom/chats";
 import { isSidebarHidden } from "@/lib/store/atom/sidebar";
 import { member_online_state } from "@/lib/store/atom/status";
 import { subscribed_chats_state } from "@/lib/store/atom/subscribed_chats_state";
-import {
-  room_member_details_schema,
-} from "@/packages/valibot";
-import type { ChatMessageData , RoomHeaderDetails } from "@/packages/valibot";
+import { room_member_details_schema } from "@/packages/valibot";
+import type { RenderedMessage, RoomHeaderDetails } from "@/packages/valibot";
 
 export type RecievedMessage = {
   type: string;
   payload: {
-    id: number,
-    msg_type: "dm" | "chat",
+    id: number;
+    msg_type: "dm" | "chat";
     roomId: string;
     message: {
       content: string;
@@ -72,7 +70,7 @@ export default function Chat({ params }: { params: { slug: string } }) {
   const [roomsStateData, setRoomsStateData] = useRecoilStateLoadable(
     subscribed_chats_state,
   );
-  const [chatMessages, setchatMessages] = useState<ChatMessageData["messages"]>([]);
+  const [chatMessages, setchatMessages] = useState<RenderedMessage[]>([]);
 
   const recipient = useMemo(() => {
     if (session.status !== "authenticated") return null;
@@ -101,27 +99,36 @@ export default function Chat({ params }: { params: { slug: string } }) {
         createdAt: narrowed_room.createdAt,
       });
       setCompose(narrowed_room.draft ?? "");
-      setchatMessages(narrowed_room.messages);
+      const chatMessages = narrowed_room.messages.map((msg) => {
+        const { sender, ...rest_msg } = msg;
+        return {
+          ...rest_msg,
+          type: "CHAT" as const,
+          sendBy: msg.sender,
+        };
+      });
+      setchatMessages(chatMessages);
     }
     //eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomsStateData]);
 
   function update_draft() {
-    
     const draft = compose_ref.current;
-    if (roomsStateData.state === "hasValue" && roomsStateData.getValue() !== undefined) {
+    if (
+      roomsStateData.state === "hasValue" &&
+      roomsStateData.getValue() !== undefined
+    ) {
       setRoomsStateData((rooms) => {
         return rooms.map((room) => {
-          if(room.id !== params.slug)
-            return room;
-          console.log("updating unreads")
+          if (room.id !== params.slug) return room;
+          console.log("updating unreads");
           return {
             ...room,
             draft: draft ?? "",
             unreads: 0,
-          }
-        })
-      })
+          };
+        });
+      });
     }
   }
 
@@ -223,7 +230,7 @@ export default function Chat({ params }: { params: { slug: string } }) {
   return (
     <div className="h-svh w-full pb-24">
       <div className="flex justify-between mt-2 mx-1">
-        {roomDetails && (
+        {roomDetails && session.status === "authenticated" && (
           <>
             <div className="w-full flex justify-between mx-2 mr-4 border-[1.5px] border-slate-800 rounded">
               <div className="w-full flex px-3 pt-1 mx-2 ">
@@ -288,11 +295,12 @@ export default function Chat({ params }: { params: { slug: string } }) {
         >
           <div className="mb-2" ref={chat_ref}>
             <div>
-              {
-                chatMessages.map((message) => {
-                  return <Inbox key={message.id} data={message} />;
-                })
-              }
+              {session.status === "authenticated" && (
+                <ChatMessageHistory
+                  msgs={chatMessages}
+                  username={session.data.username}
+                />
+              )}
             </div>
           </div>
           {session.status === "authenticated" && (

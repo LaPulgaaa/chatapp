@@ -9,8 +9,6 @@ import {
 } from "lucide-react";
 import React, { useMemo } from "react";
 
-import type { UnitDM } from "./dm_ui";
-
 import { Signal } from "@/app/home/signal";
 import {
   ContextMenu,
@@ -20,29 +18,30 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import { toast } from "@/hooks/use-toast";
+import type { RenderedMessage } from "@/packages/valibot";
 
 export function DmContextMenu({
   children,
-  dm,
+  msg,
   username,
 }: {
   children: React.ReactNode;
-  dm: UnitDM;
+  msg: RenderedMessage;
   username: string;
 }) {
   const delete_for_ev_disabled = useMemo(() => {
-    const timestamp = new Date(dm.createdAt).getTime();
+    const timestamp = new Date(msg.createdAt).getTime();
     if (
       (Date.now() - timestamp) / 60 <= 43200 &&
-      dm.sendBy.username === username
+      msg.sendBy.username === username
     )
       return false;
     return true;
     //eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dm]);
+  }, [msg]);
 
   function copy_to_clipboard() {
-    navigator.clipboard.writeText(dm.content).then(
+    navigator.clipboard.writeText(msg.content).then(
       () => {
         toast({
           title: "Copied message to clipboard",
@@ -59,86 +58,43 @@ export function DmContextMenu({
     );
   }
 
-  function star_msg({ starred }: { starred: string[] }) {
-    let msg;
-    if (dm.is_local_echo === true) {
-      msg = JSON.stringify({
-        type: "star_msg",
-        payload: {
-          type: "DM",
-          is_local_echo: true,
-          hash: dm.hash,
-          sender_id: username,
-          starred,
-        },
-      });
-    } else {
-      msg = JSON.stringify({
-        type: "star_msg",
-        payload: {
-          type: "DM",
-          is_local_echo: false,
-          id: dm.id,
-          starred,
-        },
-      });
-    }
-    Signal.get_instance().SEND(msg);
+  function star_msg({ starred }: { starred: boolean }) {
+    const payload = JSON.stringify({
+      type: "star_msg",
+      payload: {
+        type: msg.type,
+        id: msg.id,
+        sender_id: username,
+        starred,
+      },
+    });
+    Signal.get_instance().SEND(payload);
   }
 
   function pin_msg({ pinned }: { pinned: boolean }) {
-    let msg;
-    if (dm.is_local_echo === true) {
-      msg = JSON.stringify({
-        type: "pin_msg",
-        payload: {
-          type: "DM",
-          is_local_echo: true,
-          hash: dm.hash,
-          sender_id: username,
-          pinned,
-        },
-      });
-    } else {
-      msg = JSON.stringify({
-        type: "pin_msg",
-        payload: {
-          type: "DM",
-          is_local_echo: false,
-          id: dm.id,
-          pinned,
-        },
-      });
-    }
-    Signal.get_instance().SEND(msg);
+    const payload = JSON.stringify({
+      type: "pin_msg",
+      payload: {
+        type: msg.type,
+        id: msg.id,
+        sender_id: username,
+        pinned,
+      },
+    });
+    Signal.get_instance().SEND(payload);
   }
 
   function delete_msg(delete_for_me?: undefined | boolean) {
-    let msg;
-    if (dm.is_local_echo === true) {
-      msg = JSON.stringify({
-        type: "delete",
-        payload: {
-          type: "DM",
-          is_local_echo: true,
-          hash: dm.hash,
-          delete_for_me,
-          sender_id: username,
-        },
-      });
-    } else {
-      msg = JSON.stringify({
-        type: "delete",
-        payload: {
-          type: "DM",
-          is_local_echo: false,
-          id: dm.id,
-          delete_for_me,
-          sender_id: username,
-        },
-      });
-    }
-    Signal.get_instance().SEND(msg);
+    const payload = JSON.stringify({
+      type: "delete",
+      payload: {
+        type: msg.type,
+        id: msg.id,
+        delete_for_me,
+        sender_id: username,
+      },
+    });
+    Signal.get_instance().SEND(payload);
   }
 
   return (
@@ -165,7 +121,7 @@ export function DmContextMenu({
           <span className="ml-2">Delete for me</span>
         </ContextMenuItem>
         <ContextMenuSeparator />
-        {dm.pinned ? (
+        {msg.pinned ? (
           <ContextMenuItem
             onSelect={() => {
               pin_msg({
@@ -190,13 +146,10 @@ export function DmContextMenu({
             <span className="ml-2">Pin</span>
           </ContextMenuItem>
         )}
-        {dm.starred.includes(username) ? (
+        {msg.starred === true ? (
           <ContextMenuItem
             onSelect={() => {
-              const left_starred = dm.starred.filter(
-                (member) => member !== username,
-              );
-              star_msg({ starred: left_starred });
+              star_msg({ starred: false });
             }}
             className="ml-1"
             inset
@@ -207,7 +160,7 @@ export function DmContextMenu({
         ) : (
           <ContextMenuItem
             onSelect={() => {
-              star_msg({ starred: [...dm.starred, username] });
+              star_msg({ starred: true });
             }}
             className="ml-1"
             inset

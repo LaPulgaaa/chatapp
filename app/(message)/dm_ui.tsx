@@ -3,15 +3,10 @@ import { useMemo } from "react";
 
 import { DmContextMenu } from "./dm_context";
 
-export type UnitDM = (
-  | {
-      is_local_echo?: false | undefined;
-    }
-  | {
-      is_local_echo: true;
-      hash: string;
-    }
-) & {
+import type { RenderedMessage } from "@/packages/valibot";
+
+export type UnitMsg = {
+  type: "CHAT" | "DM";
   id: number;
   content: string;
   createdAt: string;
@@ -19,15 +14,15 @@ export type UnitDM = (
     username: string;
   };
   pinned: boolean;
-  starred: string[];
+  starred: boolean;
 };
 
 export default function DmRender({
-  dm,
+  msg,
   username,
   id,
 }: {
-  dm: UnitDM;
+  msg: RenderedMessage;
   username: string;
   id: string;
 }) {
@@ -40,31 +35,28 @@ export default function DmRender({
     return `${time[0]}:${time[1]}`;
   }
 
-  const dm_created_at = useMemo(() => {
-    return create_timestamp(dm.createdAt);
-  }, [dm.createdAt]);
+  const msg_created_at = useMemo(() => {
+    return create_timestamp(msg.createdAt);
+  }, [msg.createdAt]);
 
   return (
-    <div key={dm.id} id={id}>
-      {dm.sendBy.username !== username ? (
-        <div
-          id={dm.is_local_echo ? `dm-${dm.hash}` : `dm-${dm.id.toString()}`}
-          className="flex m-2"
-        >
-          <DmContextMenu dm={dm} username={username}>
+    <div key={msg.id} id={id}>
+      {msg.sendBy.username !== username ? (
+        <div id={`msg-${msg.id.toString()}`} className="flex m-2">
+          <DmContextMenu msg={msg} username={username}>
             <div
               className={`w-full border-2 pb-1 mr-2 bg-slate-200 dark:bg-slate-900  max-w-prose rounded-md flex`}
             >
               <p className="w-7/8 italic text-wrap break-all mx-2 my-2">
-                {dm.content}
+                {msg.content}
               </p>
               <div className="flex flex-col gap-2 mt-1 mr-1">
                 <div className="justify-end flex-1 ml-4">
-                  {dm.starred.includes(username) && <StarFilledIcon />}
+                  {msg.starred === true && <StarFilledIcon />}
                 </div>
                 <div className="w-full flex flex-row gap-1 justify-end text-[10px] ml-2 mr-1">
-                  <div>{dm.pinned && <DrawingPinFilledIcon />}</div>
-                  <p className="mx-2">{dm_created_at}</p>
+                  <div>{msg.pinned && <DrawingPinFilledIcon />}</div>
+                  <p className="mx-2">{msg_created_at}</p>
                 </div>
               </div>
             </div>
@@ -72,29 +64,25 @@ export default function DmRender({
         </div>
       ) : (
         <div
-          id={
-            dm.is_local_echo
-              ? `dm-${dm.hash.substring(0, 4)}`
-              : `dm-${dm.id.toString()}`
-          }
+          id={`msg-${msg.id.toString()}`}
           className="flex m-2 justify-end mr-3"
         >
-          <DmContextMenu dm={dm} username={username}>
+          <DmContextMenu msg={msg} username={username}>
             <div
               className={`w-full border-2 pb-1 mr-2 bg-slate-200 dark:bg-slate-900  max-w-prose rounded-md flex`}
             >
               <p className="w-7/8 italic text-wrap break-all mx-2 my-2">
-                {dm.content}
+                {msg.content}
               </p>
               <div className="flex flex-col gap-2 mt-1 mr-1">
                 <div className="w-full flex-1 flex justify-end ml-4 ">
-                  {dm.starred.includes(username) && (
+                  {msg.starred === true && (
                     <StarFilledIcon className="justify-end mr-2" />
                   )}
                 </div>
                 <div className="w-full flex flex-row gap-1 justify-end text-[10px] ml-2">
-                  <div>{dm.pinned && <DrawingPinFilledIcon />}</div>
-                  <p className="mx-2">{dm_created_at}</p>
+                  <div>{msg.pinned && <DrawingPinFilledIcon />}</div>
+                  <p className="mx-2">{msg_created_at}</p>
                 </div>
               </div>
             </div>

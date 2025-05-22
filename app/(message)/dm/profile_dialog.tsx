@@ -34,7 +34,9 @@ export default function ProfileDialog({
           About
         </h4>
         <p>
-          {(profile_info.about ?? "").length > 0 ? profile_info.about : "NA"}
+          {(profile_info.about ?? "").length > 0
+            ? profile_info.about
+            : "Hey there! I am not using whattsapp."}
         </p>
       </div>
       <div>
@@ -42,7 +44,7 @@ export default function ProfileDialog({
           Status
         </h4>
         <p>
-          {(profile_info.status ?? "").length > 0 ? profile_info.status : "NA"}
+          {(profile_info.status ?? "").length > 0 ? profile_info.status : ""}
         </p>
       </div>
     </DialogContent>

@@ -94,6 +94,20 @@ export default function Connect() {
         });
         return updated_dms;
       });
+    } else if (payload.type === "CHAT" && roomsStateData.state === "hasValue") {
+      setRoomsStateData((rooms) => {
+        return rooms.map((room) => {
+          if (room.id !== payload.room_id) return room;
+
+          const updated_msg_arr = room.messages.filter(
+            (msg) => msg.id !== payload.id,
+          );
+          return {
+            ...room,
+            messages: updated_msg_arr,
+          };
+        });
+      });
     }
   }
 
@@ -123,6 +137,26 @@ export default function Connect() {
 
         return new_dms;
       });
+    } else if (payload.type === "CHAT" && roomsStateData.state === "hasValue") {
+      setRoomsStateData((rooms) => {
+        const updated_rooms = rooms.map((room) => {
+          if (room.id !== payload.room_id) return room;
+
+          const updated_msgs = room.messages.map((msg) => {
+            if (msg.id !== payload.id) return msg;
+            return {
+              ...msg,
+              starred: payload.starred,
+            };
+          });
+
+          return {
+            ...room,
+            messages: updated_msgs,
+          };
+        });
+        return updated_rooms;
+      });
     }
   }
 
@@ -151,6 +185,26 @@ export default function Connect() {
         });
 
         return new_dms;
+      });
+    } else if (payload.type === "CHAT" && roomsStateData.state === "hasValue") {
+      setRoomsStateData((rooms) => {
+        return rooms.map((room) => {
+          if (room.id !== payload.room_id) return room;
+
+          const updated_msgs = room.messages.map((msg) => {
+            if (msg.id !== payload.id) return msg;
+
+            return {
+              ...msg,
+              pinned: payload.pinned,
+            };
+          });
+
+          return {
+            ...room,
+            messages: updated_msgs,
+          };
+        });
       });
     }
   }
@@ -242,21 +296,24 @@ export default function Connect() {
     });
   }
 
-  function handle_recieved_msg(raw_data: string){
-    console.log("this is the /message route")
+  function handle_recieved_msg(raw_data: string) {
+    console.log("this is the /message route");
     const is_narrowed = !pathname.includes("home");
-    const data:RecievedMessage = JSON.parse(raw_data);
+    const data: RecievedMessage = JSON.parse(raw_data);
     const payload = data.payload;
 
-    if(payload.msg_type === "dm"){
-      const narrowed_dm = is_narrowed === true && pathname.includes("dm") ? pathname.split("/").slice(-1)[0] : undefined;
+    if (payload.msg_type === "dm") {
+      const narrowed_dm =
+        is_narrowed === true && pathname.includes("dm")
+          ? pathname.split("/").slice(-1)[0]
+          : undefined;
       setDms((dms) => {
         const new_dms = dms.map((dm) => {
-          if(dm.connectionId !== payload.roomId)
-            return dm;
+          if (dm.connectionId !== payload.roomId) return dm;
 
           const old_msgs = dm.messages;
-          const updated_unreads = narrowed_dm === dm.to.username ? 0 : (dm.unreads ?? 0) + 1; 
+          const updated_unreads =
+            narrowed_dm === dm.to.username ? 0 : (dm.unreads ?? 0) + 1;
           const new_msg = {
             id: payload.id,
             content: payload.message.content,
@@ -266,29 +323,32 @@ export default function Connect() {
             },
             createdAt: payload.createdAt,
             pinned: false,
-            starred: [],
-          }
+            starred: false,
+          };
           return {
             ...dm,
             lastmsgAt: new Date().toISOString(),
-            messages: [...old_msgs,new_msg],
+            messages: [...old_msgs, new_msg],
             unreads: updated_unreads,
-          }
-        })
+          };
+        });
 
         return new_dms;
-      })
-    }else{
-      
-      const narrowed_chat = is_narrowed === true && pathname.includes("chat") ? pathname.split("/").slice(-1)[0] : undefined;
+      });
+    } else {
+      const narrowed_chat =
+        is_narrowed === true && pathname.includes("chat")
+          ? pathname.split("/").slice(-1)[0]
+          : undefined;
       setRoomsStateData((chats) => {
         const new_chats = chats.map((chat) => {
-          if(chat.id !== payload.roomId){
+          if (chat.id !== payload.roomId) {
             return chat;
           }
 
           const old_msgs = chat.messages;
-          const updated_unreads = narrowed_chat === chat.id ? 0 : (chat.unreads ?? 0) + 1;
+          const updated_unreads =
+            narrowed_chat === chat.id ? 0 : (chat.unreads ?? 0) + 1;
           const new_msg = {
             id: payload.id,
             content: payload.message.content,
@@ -297,16 +357,18 @@ export default function Connect() {
               name: payload.message.name,
             },
             createdAt: payload.createdAt,
-          }
+            starred: false,
+            pinned: false,
+          };
           return {
             ...chat,
             lastmsgAt: new Date().toISOString(),
             messages: [...old_msgs, new_msg],
             unreads: updated_unreads,
-          }
-        })
+          };
+        });
         return new_chats;
-      })
+      });
     }
   }
 
@@ -317,15 +379,15 @@ export default function Connect() {
         recieve_invite_callback,
       );
       Signal.get_instance().REGISTER_CALLBACK(
-        "DELETE_NON_ECHO",
+        "DELETE_CALLBACK",
         delete_msg_callback,
       );
       Signal.get_instance().REGISTER_CALLBACK(
-        "PIN_MSG_CALLBACK_NON_ECHO",
+        "PIN_MSG_CALLBACK",
         pin_msg_callback,
       );
       Signal.get_instance().REGISTER_CALLBACK(
-        "STARRED_NON_ECHO_CALLBACK",
+        "STARRED_CALLBACK",
         star_msg_callback,
       );
       Signal.get_instance().REGISTER_CALLBACK(
@@ -338,16 +400,16 @@ export default function Connect() {
       );
       Signal.get_instance().REGISTER_CALLBACK(
         "MSG_CALLBACK",
-        handle_recieved_msg
+        handle_recieved_msg,
       );
     }
 
     return () => {
       if (session.status === "authenticated") {
         Signal.get_instance(session.data.username).DEREGISTER("INVITE");
-        Signal.get_instance().DEREGISTER("DELETE_NON_ECHO");
-        Signal.get_instance().DEREGISTER("PIN_MSG_CALLBACK_NON_ECHO");
-        Signal.get_instance().DEREGISTER("STARRED_NON_ECHO_CALLBACK");
+        Signal.get_instance().DEREGISTER("DELETE_CALLBACK");
+        Signal.get_instance().DEREGISTER("PIN_MSG_CALLBACK");
+        Signal.get_instance().DEREGISTER("STARRED_CALLBACK");
         Signal.get_instance().DEREGISTER("UPDATE_DETAILS_CALLBACK");
         Signal.get_instance().DEREGISTER("TYPING_CALLBACK");
         Signal.get_instance().DEREGISTER("MSG_CALLBACK");

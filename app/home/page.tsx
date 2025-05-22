@@ -139,9 +139,13 @@ const RoomTabs = memo(function ({
                 ) : (
                   <div>No messages yet.</div>
                 )}
-                {convo.unreads !== undefined && convo.unreads > 0 &&  <div className="dark:bg-white bg-slate-900 rounded-full md:w-[32px] md:block hidden">
-                  <p className="w-full pl-2 dark:text-red-800 text-white">{convo.unreads}</p>
-                </div>}
+                {convo.unreads !== undefined && convo.unreads > 0 && (
+                  <div className="dark:bg-white bg-slate-900 rounded-full md:w-[32px] md:block hidden">
+                    <p className="w-full pl-2 dark:text-red-800 text-white">
+                      {convo.unreads}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           );
@@ -186,9 +190,13 @@ const RoomTabs = memo(function ({
                   {convo.messages.slice(-1)[0]?.content}
                 </p>
               )}
-              {convo.unreads !== undefined && convo.unreads > 0 &&  <div className="dark:bg-white bg-slate-900 rounded-full md:w-[32px] md:block hidden">
-                  <p className="w-full pl-2 dark:text-red-800 text-white">{convo.unreads}</p>
-                </div>}
+              {convo.unreads !== undefined && convo.unreads > 0 && (
+                <div className="dark:bg-white bg-slate-900 rounded-full md:w-[32px] md:block hidden">
+                  <p className="w-full pl-2 dark:text-red-800 text-white">
+                    {convo.unreads}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         );

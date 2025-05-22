@@ -51,7 +51,7 @@ export async function GET(req: NextRequest) {
     await Promise.all(
       resp.map(async (frnd) => {
         try {
-          const message = await prisma.directMessage.findMany({
+          const raw_messages = await prisma.directMessage.findMany({
             where: {
               connectionId: frnd.connectionId,
               createdAt: {
@@ -82,9 +82,17 @@ export async function GET(req: NextRequest) {
             },
           });
 
+          const messages = raw_messages.map((msg) => {
+            const { starred, ...unfiltered_msg } = msg;
+            return {
+              ...unfiltered_msg,
+              starred: starred.includes(username),
+            };
+          });
+
           friendships_with_last_dm.push({
             ...frnd,
-            messages: message,
+            messages: messages,
           });
         } catch (err) {
           console.log(err);

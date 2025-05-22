@@ -22,7 +22,6 @@ import { ToastAction } from "@/components/ui/toast";
 import { toast } from "@/hooks/use-toast";
 import GoogleLogoIcon from "@/public/icons8-google-logo-48.png";
 
-
 export default function Login() {
   const session = useSession();
   const [email, setEmail] = useState("");
@@ -132,7 +131,12 @@ export default function Login() {
               }}
               className="w-full my-4"
             >
-              <Image width={24} height={24} src={GoogleLogoIcon} alt="google logo" />
+              <Image
+                width={24}
+                height={24}
+                src={GoogleLogoIcon}
+                alt="google logo"
+              />
               <span className="ml-2">Google</span>
             </Button>
           </div>
