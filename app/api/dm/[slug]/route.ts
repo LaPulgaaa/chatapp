@@ -63,7 +63,7 @@ export async function GET(
       });
     }
 
-    const messages = await prisma.directMessage.findMany({
+    const unfiltered_msgs = await prisma.directMessage.findMany({
       where: {
         connectionId: friendship_status.connectionId,
         deleted: false,
@@ -87,6 +87,13 @@ export async function GET(
         starred: true,
       },
     });
+
+    const messages = unfiltered_msgs.map((msg) => {
+      return {
+        ...msg,
+        starred: msg.starred.includes(username)
+      }
+    })
 
     const data = {
       profile_info: search_result,

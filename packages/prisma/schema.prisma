@@ -34,6 +34,8 @@ model Member{
 
   deleted Boolean @default(false)
 
+  starredMsgs StarredMessage[]
+
   @@unique([username])
   @@unique([email])
   @@index([username])
@@ -67,6 +69,23 @@ model Message {
 
   hash String? @unique
 
+  pinned Boolean @default(false)
+
+  starredBy StarredMessage[]
+
+  deletedFor String @default("")
+
+}
+
+model StarredMessage {
+  id Int @id @default(autoincrement())
+  msg Message @relation(fields: [msgId], references: [id])
+  msgId Int 
+
+  member Member @relation(fields: [memberId], references: [username])
+  memberId String
+
+  @@unique([memberId,msgId])
 }
 
 model Chat {

@@ -92,6 +92,19 @@ export default function Connect() {
         });
         return updated_dms;
       });
+    }else if(payload.type === "CHAT" && roomsStateData.state === "hasValue"){
+      setRoomsStateData((rooms) => {
+        return rooms.map((room) => {
+          if(room.id !== payload.room_id)
+            return room;
+
+          const updated_msg_arr = room.messages.filter((msg) => msg.id !== payload.id)
+          return {
+            ...room,
+            messages: updated_msg_arr
+          }
+        })
+      })
     }
   }
 
@@ -121,6 +134,28 @@ export default function Connect() {
 
         return new_dms;
       });
+    }else if(payload.type === "CHAT" && roomsStateData.state === "hasValue"){
+      setRoomsStateData((rooms) => {
+        return rooms.map((room) => {
+          if(room.id !== payload.room_id)
+            return room;
+
+          const updated_msgs = room.messages.map((msg) => {
+            if(msg.id !== payload.id)
+              return msg;
+
+            return {
+              ...msg,
+              pinned: payload.pinned
+            }
+          })
+
+          return {
+            ...room,
+            messages: updated_msgs
+          }
+        })
+      })
     }
   }
 
@@ -236,7 +271,7 @@ export default function Connect() {
             },
             createdAt: payload.createdAt,
             pinned: false,
-            starred: [],
+            starred: false,
           }
           return {
             ...dm,
@@ -266,6 +301,8 @@ export default function Connect() {
               name: payload.message.name,
             },
             createdAt: payload.createdAt,
+            pinned: false,
+            starred: false,
           }
           return {
             ...chat,
@@ -288,7 +325,7 @@ export default function Connect() {
         recieve_invite_callback,
       );
       Signal.get_instance().REGISTER_CALLBACK(
-        "DELETE_NON_ECHO",
+        "DELETE_CALLBACK",
         delete_msg_callback,
       );
       Signal.get_instance().REGISTER_CALLBACK(
@@ -312,7 +349,7 @@ export default function Connect() {
     return () => {
       if (session.status === "authenticated") {
         Signal.get_instance(session.data.username).DEREGISTER("INVITE");
-        Signal.get_instance().DEREGISTER("DELETE_NON_ECHO");
+        Signal.get_instance().DEREGISTER("DELETE_CALLBACK");
         Signal.get_instance().DEREGISTER("PIN_MSG_CALLBACK");
         Signal.get_instance().DEREGISTER("UPDATE_DETAILS_CALLBACK");
         Signal.get_instance().DEREGISTER("MSG_CALLBACK");

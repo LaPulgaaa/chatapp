@@ -11,6 +11,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const memberId = token.id;
+    const username = token.username;
     const message_subscribed_rooms = await prisma.message.findMany({
       where: {
         content: `chat_${memberId}`,
@@ -28,6 +29,11 @@ export async function GET(req: NextRequest) {
             messages: {
               where: {
                 deleted: false,
+                NOT: {
+                  deletedFor: {
+                    contains: username,
+                  }
+                }
               },
               select: {
                 id: true,
@@ -39,15 +45,36 @@ export async function GET(req: NextRequest) {
                   },
                 },
                 createdAt: true,
+                pinned: true,
+                starredBy: {
+                  where: {
+                    member: {
+                      username: username,
+                    }
+                  },
+                  select: {
+                    msgId: true,
+                  }
+                }
               },
             },
           },
         },
         id: true,
       },
+      orderBy: {
+        createdAt: "asc"
+      }
     });
     const raw_data = message_subscribed_rooms.map((room) => {
-      return { ...room.chat, conn_id: room.id };
+      const filtered_msgs = room.chat.messages.map((msg) => {
+        const {starredBy, ...filtered_msg} = msg; 
+        return {
+          ...filtered_msg,
+          starred: msg.starredBy.length > 0,
+        }
+      })
+      return { ...room.chat, conn_id: room.id, messages: filtered_msgs };
     });
 
     return Response.json(

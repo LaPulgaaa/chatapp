@@ -6,9 +6,9 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useRecoilRefresher_UNSTABLE, useRecoilStateLoadable } from "recoil";
 import * as v from "valibot";
 
-import type { UnitDM } from "../dm_ui";
-import DirectMessageHistory from "../history";
-import { PinnedMessages } from "../pinned_msg_ui";
+import type { UnitMsg } from "../../dm_ui";
+import DirectMessageHistory from "../../history";
+import { PinnedMessages } from "../../pinned_msg_ui";
 import ProfileDialog from "../profile_dialog";
 import { TypingEvent } from "../typing_event";
 import type { Recipient } from "../typing_status";
@@ -37,7 +37,7 @@ export default function Direct({ params }: { params: { slug: string } }) {
     dm_details_state({ username: params.slug }),
   );
   const refresh_dms = useRecoilRefresher_UNSTABLE(fetch_dms);
-  const [history, setHistory] = useState<UnitDM[]>([]);
+  const [history, setHistory] = useState<(Omit<UnitMsg,"type">)[]>([]);
   const [active, setActive] = useState<boolean>(false);
 
   const recipient: Recipient | null = useMemo(() => {
@@ -61,9 +61,15 @@ export default function Direct({ params }: { params: { slug: string } }) {
     if (dmStateDetails === undefined || dmStateDetails.is_friend !== true)
       return undefined;
 
-    const pinned_history_msgs = dmStateDetails.friendship_data.messages.filter(
+    const pinned_history_msgs: UnitMsg[] = [];
+
+    dmStateDetails.friendship_data.messages.forEach(
       (msg) => {
-        if (msg.pinned === true) return msg;
+        if (msg.pinned === true) 
+          pinned_history_msgs.push({
+            ...msg,
+            type: 'DM' as const,
+          })
       },
     );
     
@@ -292,7 +298,12 @@ export default function Direct({ params }: { params: { slug: string } }) {
             <div className="my-16" ref={dm_ref}>
               {dmStateDetails.is_friend && (
                 <DirectMessageHistory
-                  dms={dmStateDetails.friendship_data.messages}
+                  msgs={dmStateDetails.friendship_data.messages.map((msg) => {
+                    return {
+                      ...msg,
+                      type: 'DM' as const,
+                    }
+                  })}
                   username={username}
                 />
               )}
