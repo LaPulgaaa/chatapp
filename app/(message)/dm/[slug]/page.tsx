@@ -32,12 +32,12 @@ export default function Direct({ params }: { params: { slug: string } }) {
   const [dmStateDetails, setDmStateDetails] = useState<
     FriendSearchResult | undefined
   >();
-  const [dms,setDms] = useRecoilStateLoadable(direct_msg_state);
+  const [dms, setDms] = useRecoilStateLoadable(direct_msg_state);
   const refresh_dm_state = useRecoilRefresher_UNSTABLE(
     dm_details_state({ username: params.slug }),
   );
   const refresh_dms = useRecoilRefresher_UNSTABLE(fetch_dms);
-  const [history, setHistory] = useState<(Omit<UnitMsg,"type">)[]>([]);
+  const [history, setHistory] = useState<Omit<UnitMsg, "type">[]>([]);
   const [active, setActive] = useState<boolean>(false);
 
   const recipient: Recipient | null = useMemo(() => {
@@ -63,16 +63,14 @@ export default function Direct({ params }: { params: { slug: string } }) {
 
     const pinned_history_msgs: UnitMsg[] = [];
 
-    dmStateDetails.friendship_data.messages.forEach(
-      (msg) => {
-        if (msg.pinned === true) 
-          pinned_history_msgs.push({
-            ...msg,
-            type: 'DM' as const,
-          })
-      },
-    );
-    
+    dmStateDetails.friendship_data.messages.forEach((msg) => {
+      if (msg.pinned === true)
+        pinned_history_msgs.push({
+          ...msg,
+          type: "DM" as const,
+        });
+    });
+
     return [...pinned_history_msgs];
     //eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dms, dmStateDetails]);
@@ -109,27 +107,22 @@ export default function Direct({ params }: { params: { slug: string } }) {
     //eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dms]);
 
+  function update_draft() {
+    const draft = compose_ref.current;
+    if (dms.state === "hasValue" && dms.getValue() !== undefined) {
+      setDms((dms) => {
+        return dms.map((dm) => {
+          if (dm.to.username !== params.slug) return dm;
 
-
-  function update_draft(){
-      const draft = compose_ref.current;
-      if(dms.state === "hasValue" && dms.getValue() !== undefined){
-          setDms((dms) => {
-            return dms.map((dm) => {
-              if(dm.to.username !== params.slug)
-                return dm;
-
-              return {
-                ...dm,
-                draft: draft ?? "",
-                unreads: 0,
-              }
-            })
-          })
-      }
+          return {
+            ...dm,
+            draft: draft ?? "",
+            unreads: 0,
+          };
+        });
+      });
+    }
   }
-
-
 
   async function fetch_user_details() {
     try {
@@ -156,7 +149,6 @@ export default function Direct({ params }: { params: { slug: string } }) {
       });
     }
   }, [history]);
-
 
   useEffect(() => {
     Signal.get_instance().REGISTER_CALLBACK(
@@ -202,10 +194,9 @@ export default function Direct({ params }: { params: { slug: string } }) {
         dmStateDetails.friendship_data!.connectionId,
         username,
       );
-    }
+    };
     //eslint-disable-next-line react-hooks/exhaustive-deps
-  },[session, dmStateDetails])
-
+  }, [session, dmStateDetails]);
 
   function invite_success_callback(_raw_data: string) {
     refresh_dm_state();
@@ -301,8 +292,8 @@ export default function Direct({ params }: { params: { slug: string } }) {
                   msgs={dmStateDetails.friendship_data.messages.map((msg) => {
                     return {
                       ...msg,
-                      type: 'DM' as const,
-                    }
+                      type: "DM" as const,
+                    };
                   })}
                   username={username}
                 />

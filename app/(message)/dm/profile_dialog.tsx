@@ -34,7 +34,9 @@ export default function ProfileDialog({
           About
         </h4>
         <p>
-          {(profile_info.about ?? "").length > 0 ? profile_info.about : "Hey there! I am not using whattsapp."}
+          {(profile_info.about ?? "").length > 0
+            ? profile_info.about
+            : "Hey there! I am not using whattsapp."}
         </p>
       </div>
       <div>

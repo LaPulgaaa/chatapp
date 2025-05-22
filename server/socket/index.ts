@@ -385,10 +385,14 @@ export async function ws(wss: WebSocketServer) {
       }
 
       if (data.type === "delete") {
-        const { type,  delete_for_me, sender_id }:{
-          type: 'CHAT' | 'DM',
-          delete_for_me: boolean,
-          sender_id: string,
+        const {
+          type,
+          delete_for_me,
+          sender_id,
+        }: {
+          type: "CHAT" | "DM";
+          delete_for_me: boolean;
+          sender_id: string;
         } = data.payload;
         let msg;
         let conc_id;
@@ -396,52 +400,52 @@ export async function ws(wss: WebSocketServer) {
           if (delete_for_me === true) {
             if (type === "DM") {
               const id = data.payload.id;
-                try {
-                  const resp = await prisma.$transaction(async (tx) => {
-                    const dm = await tx.directMessage.findUniqueOrThrow({
-                      where: {
-                        id,
-                      },
-                      select: {
-                        deleteFor: true,
-                        id: true,
-                        connectionId: true,
-                        hash: true,
-                      },
-                    });
-                    await tx.directMessage.update({
-                      where: {
-                        id: dm.id,
-                      },
-                      data: {
-                        deleteFor: `${dm.deleteFor}:${sender_id}`,
-                      },
-                    });
-
-                    return dm;
+              try {
+                const resp = await prisma.$transaction(async (tx) => {
+                  const dm = await tx.directMessage.findUniqueOrThrow({
+                    where: {
+                      id,
+                    },
+                    select: {
+                      deleteFor: true,
+                      id: true,
+                      connectionId: true,
+                      hash: true,
+                    },
                   });
-                  msg = JSON.stringify({
-                    type: "delete",
-                    payload: {
-                      type: "DM",
-                      conc_id: resp.connectionId,
-                      id: resp.id,
+                  await tx.directMessage.update({
+                    where: {
+                      id: dm.id,
+                    },
+                    data: {
+                      deleteFor: `${dm.deleteFor}:${sender_id}`,
                     },
                   });
 
-                  ws.send(
-                    JSON.stringify({
-                      type: "DELETE_CALLBACK",
-                      data: msg,
-                    }),
-                  );
-                } catch (err) {
-                  console.log(err);
-                }
-            }else{
+                  return dm;
+                });
+                msg = JSON.stringify({
+                  type: "delete",
+                  payload: {
+                    type: "DM",
+                    conc_id: resp.connectionId,
+                    id: resp.id,
+                  },
+                });
+
+                ws.send(
+                  JSON.stringify({
+                    type: "DELETE_CALLBACK",
+                    data: msg,
+                  }),
+                );
+              } catch (err) {
+                console.log(err);
+              }
+            } else {
               const id = data.payload.id;
-              const username = data.payload.sender_id
-              const tx_resp = await prisma.$transaction(async(tx) => {
+              const username = data.payload.sender_id;
+              const tx_resp = await prisma.$transaction(async (tx) => {
                 const to_delete_msg = await tx.message.findUniqueOrThrow({
                   where: {
                     id: id,
@@ -450,19 +454,19 @@ export async function ws(wss: WebSocketServer) {
                     deletedFor: true,
                     id: true,
                     chatId: true,
-                  }
-                })
+                  },
+                });
 
                 await prisma.message.update({
                   where: {
-                    id: to_delete_msg.id
+                    id: to_delete_msg.id,
                   },
                   data: {
-                    deletedFor: `${to_delete_msg.deletedFor}:${username}`
-                  }
-                })
+                    deletedFor: `${to_delete_msg.deletedFor}:${username}`,
+                  },
+                });
 
-                return to_delete_msg
+                return to_delete_msg;
               });
 
               msg = JSON.stringify({
@@ -484,33 +488,33 @@ export async function ws(wss: WebSocketServer) {
           } else {
             if (type === "DM") {
               const id = data.payload.id;
-                const resp = await prisma.directMessage.update({
-                  where: {
-                    id,
-                  },
-                  data: {
-                    deleted: true,
-                  },
-                });
-                msg = JSON.stringify({
-                  type: "delete",
-                  payload: {
-                    type: "DM",
-                    conc_id: resp.connectionId,
-                    id: resp.id,
-                  },
-                });
-                conc_id = resp.connectionId;
-                RedisSubscriptionManager.get_instance().addChatMessage(
-                  conc_id,
-                  "DELETE_CALLBACK",
-                  msg,
-                );
-            }else{
+              const resp = await prisma.directMessage.update({
+                where: {
+                  id,
+                },
+                data: {
+                  deleted: true,
+                },
+              });
+              msg = JSON.stringify({
+                type: "delete",
+                payload: {
+                  type: "DM",
+                  conc_id: resp.connectionId,
+                  id: resp.id,
+                },
+              });
+              conc_id = resp.connectionId;
+              RedisSubscriptionManager.get_instance().addChatMessage(
+                conc_id,
+                "DELETE_CALLBACK",
+                msg,
+              );
+            } else {
               const id = data.payload.id;
               const qry_resp = await prisma.message.update({
                 where: {
-                  id
+                  id,
                 },
                 data: {
                   deleted: true,
@@ -518,8 +522,8 @@ export async function ws(wss: WebSocketServer) {
                 select: {
                   id: true,
                   chatId: true,
-                }
-              })
+                },
+              });
               msg = JSON.stringify({
                 type: "delete",
                 payload: {
@@ -542,35 +546,30 @@ export async function ws(wss: WebSocketServer) {
       }
 
       if (data.type === "star_msg") {
-        const {
-          sender_id,
-          type,
-        }: { sender_id: string; type: "DM" | "CHAT"; } =
+        const { sender_id, type }: { sender_id: string; type: "DM" | "CHAT" } =
           data.payload;
-          const starred:boolean = data.payload.starred;
-          const id:number = data.payload.id;
+        const starred: boolean = data.payload.starred;
+        const id: number = data.payload.id;
         switch (type) {
           case "DM": {
             let msg;
-            if(starred === true)
-            {
-              try{
+            if (starred === true) {
+              try {
                 const resp = await prisma.directMessage.update({
                   where: {
                     id: id,
                   },
                   data: {
                     starred: {
-                      push: sender_id
-                    }
+                      push: sender_id,
+                    },
                   },
                   select: {
                     starred: true,
                     hash: true,
                     id: true,
                     connectionId: true,
-
-                  }
+                  },
                 });
                 msg = JSON.stringify({
                   type: "star",
@@ -583,32 +582,35 @@ export async function ws(wss: WebSocketServer) {
                     conc_id: resp.connectionId,
                   },
                 });
-              }catch(err){
+              } catch (err) {
                 console.log(err);
               }
-            }else{
-              try{
-                const unupdated_dm = await prisma.directMessage.findUniqueOrThrow({
-                  where: {
-                    id: id
-                  },
-                  select: {
-                    id: true,
-                    starred: true,
-                  }
-                });
+            } else {
+              try {
+                const unupdated_dm =
+                  await prisma.directMessage.findUniqueOrThrow({
+                    where: {
+                      id: id,
+                    },
+                    select: {
+                      id: true,
+                      starred: true,
+                    },
+                  });
                 const resp = await prisma.directMessage.update({
                   where: {
                     id: unupdated_dm.id,
                   },
                   data: {
-                    starred: unupdated_dm.starred.filter((ids) => ids !== sender_id)
+                    starred: unupdated_dm.starred.filter(
+                      (ids) => ids !== sender_id,
+                    ),
                   },
                   select: {
                     id: true,
                     connectionId: true,
                     hash: true,
-                  }
+                  },
                 });
                 msg = JSON.stringify({
                   type: "star",
@@ -621,8 +623,8 @@ export async function ws(wss: WebSocketServer) {
                     conc_id: resp.connectionId,
                   },
                 });
-              }catch(err){
-                console.log(err)
+              } catch (err) {
+                console.log(err);
               }
             }
             ws.send(
@@ -633,25 +635,25 @@ export async function ws(wss: WebSocketServer) {
             );
             break;
           }
-          case "CHAT" : {
+          case "CHAT": {
             let msg;
-            try{
-              if(starred === true){
+            try {
+              if (starred === true) {
                 const resp = await prisma.starredMessage.create({
                   data: {
                     msgId: id,
-                    memberId: sender_id
+                    memberId: sender_id,
                   },
                   select: {
                     msg: {
                       select: {
                         chatId: true,
                         id: true,
-                      }
-                    }
-                  }
+                      },
+                    },
+                  },
                 });
-  
+
                 msg = JSON.stringify({
                   type: "star",
                   payload: {
@@ -660,25 +662,25 @@ export async function ws(wss: WebSocketServer) {
                     id: resp.msg.id,
                     room_id: resp.msg.chatId,
                     sender_id,
-                  }
-                })
-              }else{
+                  },
+                });
+              } else {
                 const resp = await prisma.starredMessage.delete({
                   where: {
-                   memberId_msgId: {
-                    memberId: sender_id,
-                    msgId: id,
-                   }
+                    memberId_msgId: {
+                      memberId: sender_id,
+                      msgId: id,
+                    },
                   },
                   select: {
                     msg: {
                       select: {
                         id: true,
                         chatId: true,
-                      }
-                    }
-                  }
-                })
+                      },
+                    },
+                  },
+                });
                 msg = JSON.stringify({
                   type: "star",
                   payload: {
@@ -687,8 +689,8 @@ export async function ws(wss: WebSocketServer) {
                     id: resp.msg.id,
                     room_id: resp.msg.chatId,
                     sender_id: true,
-                  }
-                })
+                  },
+                });
               }
               ws.send(
                 JSON.stringify({
@@ -696,26 +698,31 @@ export async function ws(wss: WebSocketServer) {
                   data: msg,
                 }),
               );
-            }catch(err){
+            } catch (err) {
               console.log(err);
             }
-            
+
             break;
           }
         }
       }
 
       if (data.type === "pin_msg") {
-        const { pinned, sender_id, type }:{pinned: boolean, sender_id: string, type: "DM" | "CHAT"} = data.payload;
+        const {
+          pinned,
+          sender_id,
+          type,
+        }: { pinned: boolean; sender_id: string; type: "DM" | "CHAT" } =
+          data.payload;
 
         if (type === "DM") {
           let msg;
           const msg_id = data.payload.id;
-          
-          try{
+
+          try {
             const resp = await prisma.directMessage.update({
               where: {
-                id: msg_id
+                id: msg_id,
               },
               data: {
                 pinned: pinned,
@@ -724,8 +731,8 @@ export async function ws(wss: WebSocketServer) {
                 pinned: true,
                 id: true,
                 connectionId: true,
-              }
-            })
+              },
+            });
             msg = JSON.stringify({
               type: "pin",
               payload: {
@@ -737,43 +744,49 @@ export async function ws(wss: WebSocketServer) {
               },
             });
 
-            RedisSubscriptionManager.get_instance().
-            addChatMessage(resp.connectionId,"PIN_MSG_CALLBACK",msg);
-          }catch(err){
+            RedisSubscriptionManager.get_instance().addChatMessage(
+              resp.connectionId,
+              "PIN_MSG_CALLBACK",
+              msg,
+            );
+          } catch (err) {
             console.log(err);
           }
-        }else{
+        } else {
           const msg_id = data.payload.id;
-          try{
+          try {
             const resp = await prisma.message.update({
               where: {
-                id: msg_id
+                id: msg_id,
               },
               data: {
-                pinned
+                pinned,
               },
               select: {
                 pinned: true,
                 id: true,
                 chatId: true,
-              }
+              },
             });
 
             const msg = JSON.stringify({
               type: "pin",
               payload: {
-                type: 'CHAT',
+                type: "CHAT",
                 pinned: resp.pinned,
                 room_id: resp.chatId,
                 id: resp.id,
                 sender_id,
-              }
+              },
             });
 
-            RedisSubscriptionManager.get_instance().
-            addChatMessage(resp.chatId,'PIN_MSG_CALLBACK',msg)
-          }catch(err){
-            console.log(err)
+            RedisSubscriptionManager.get_instance().addChatMessage(
+              resp.chatId,
+              "PIN_MSG_CALLBACK",
+              msg,
+            );
+          } catch (err) {
+            console.log(err);
           }
         }
       }

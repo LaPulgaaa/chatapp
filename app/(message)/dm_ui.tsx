@@ -5,8 +5,8 @@ import { DmContextMenu } from "./dm_context";
 
 import type { RenderedMessage } from "@/packages/valibot";
 
-export type UnitMsg= {
-  type: 'CHAT' | 'DM',
+export type UnitMsg = {
+  type: "CHAT" | "DM";
   id: number;
   content: string;
   createdAt: string;
@@ -42,10 +42,7 @@ export default function DmRender({
   return (
     <div key={msg.id} id={id}>
       {msg.sendBy.username !== username ? (
-        <div
-          id={`msg-${msg.id.toString()}`}
-          className="flex m-2"
-        >
+        <div id={`msg-${msg.id.toString()}`} className="flex m-2">
           <DmContextMenu msg={msg} username={username}>
             <div
               className={`w-full border-2 pb-1 mr-2 bg-slate-200 dark:bg-slate-900  max-w-prose rounded-md flex`}
@@ -67,9 +64,7 @@ export default function DmRender({
         </div>
       ) : (
         <div
-          id={
-            `msg-${msg.id.toString()}`
-          }
+          id={`msg-${msg.id.toString()}`}
           className="flex m-2 justify-end mr-3"
         >
           <DmContextMenu msg={msg} username={username}>

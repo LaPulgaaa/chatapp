@@ -36,17 +36,14 @@ import { UserStateChats } from "@/lib/store/atom/chats";
 import { isSidebarHidden } from "@/lib/store/atom/sidebar";
 import { member_online_state } from "@/lib/store/atom/status";
 import { subscribed_chats_state } from "@/lib/store/atom/subscribed_chats_state";
-import {
-  room_member_details_schema,
-} from "@/packages/valibot";
+import { room_member_details_schema } from "@/packages/valibot";
 import type { RenderedMessage, RoomHeaderDetails } from "@/packages/valibot";
-
 
 export type RecievedMessage = {
   type: string;
   payload: {
-    id: number,
-    msg_type: "dm" | "chat",
+    id: number;
+    msg_type: "dm" | "chat";
     roomId: string;
     message: {
       content: string;
@@ -103,34 +100,35 @@ export default function Chat({ params }: { params: { slug: string } }) {
       });
       setCompose(narrowed_room.draft ?? "");
       const chatMessages = narrowed_room.messages.map((msg) => {
-        const {sender, ...rest_msg} = msg;
+        const { sender, ...rest_msg } = msg;
         return {
           ...rest_msg,
           type: "CHAT" as const,
-          sendBy: msg.sender
-        }
-      })
+          sendBy: msg.sender,
+        };
+      });
       setchatMessages(chatMessages);
     }
     //eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomsStateData]);
 
   function update_draft() {
-    
     const draft = compose_ref.current;
-    if (roomsStateData.state === "hasValue" && roomsStateData.getValue() !== undefined) {
+    if (
+      roomsStateData.state === "hasValue" &&
+      roomsStateData.getValue() !== undefined
+    ) {
       setRoomsStateData((rooms) => {
         return rooms.map((room) => {
-          if(room.id !== params.slug)
-            return room;
-          console.log("updating unreads")
+          if (room.id !== params.slug) return room;
+          console.log("updating unreads");
           return {
             ...room,
             draft: draft ?? "",
             unreads: 0,
-          }
-        })
-      })
+          };
+        });
+      });
     }
   }
 
@@ -297,9 +295,12 @@ export default function Chat({ params }: { params: { slug: string } }) {
         >
           <div className="mb-2" ref={chat_ref}>
             <div>
-              {
-                session.status === "authenticated" && <ChatMessageHistory msgs={chatMessages} username={session.data.username}/>
-              }
+              {session.status === "authenticated" && (
+                <ChatMessageHistory
+                  msgs={chatMessages}
+                  username={session.data.username}
+                />
+              )}
             </div>
           </div>
           {session.status === "authenticated" && (

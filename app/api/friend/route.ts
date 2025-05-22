@@ -83,12 +83,12 @@ export async function GET(req: NextRequest) {
           });
 
           const messages = raw_messages.map((msg) => {
-            const {starred, ...unfiltered_msg} = msg;
+            const { starred, ...unfiltered_msg } = msg;
             return {
               ...unfiltered_msg,
               starred: starred.includes(username),
-            }
-          })
+            };
+          });
 
           friendships_with_last_dm.push({
             ...frnd,

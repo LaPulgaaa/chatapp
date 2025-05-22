@@ -91,9 +91,9 @@ export async function GET(
     const messages = unfiltered_msgs.map((msg) => {
       return {
         ...msg,
-        starred: msg.starred.includes(username)
-      }
-    })
+        starred: msg.starred.includes(username),
+      };
+    });
 
     const data = {
       profile_info: search_result,

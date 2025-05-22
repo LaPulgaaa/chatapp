@@ -240,12 +240,12 @@ export type DmProfileInfo = FriendSearchResult["profile_info"];
 
 export const rendered_msgs = v.object({
   ...direct_msg_schema.entries,
-  type: v.union([v.literal("DM"),v.literal("CHAT")])
+  type: v.union([v.literal("DM"), v.literal("CHAT")]),
 });
 
 export type RenderedMessage = v.InferOutput<typeof rendered_msgs>;
 
-export const message_delete_payload = v.variant("type",[
+export const message_delete_payload = v.variant("type", [
   v.object({
     conc_id: v.string(),
     type: v.literal("DM"),
@@ -255,13 +255,13 @@ export const message_delete_payload = v.variant("type",[
     type: v.literal("CHAT"),
     room_id: v.string(),
     id: v.number(),
-  })
-])
+  }),
+]);
 
 export type MessageDeletePayload = v.InferOutput<typeof message_delete_payload>;
 
 export const message_pin_payload = v.intersect([
-  v.variant("type",[
+  v.variant("type", [
     v.object({
       type: v.literal("CHAT"),
       room_id: v.string(),
@@ -269,17 +269,17 @@ export const message_pin_payload = v.intersect([
     v.object({
       type: v.literal("DM"),
       conc_id: v.string(),
-    })
+    }),
   ]),
   v.object({
     pinned: v.boolean(),
     id: v.number(),
-    sender_id: v.string()
-  })
-])
+    sender_id: v.string(),
+  }),
+]);
 
 export const message_star_payload = v.intersect([
-  v.variant("type",[
+  v.variant("type", [
     v.object({
       type: v.literal("CHAT"),
       room_id: v.string(),
@@ -287,14 +287,14 @@ export const message_star_payload = v.intersect([
     v.object({
       type: v.literal("DM"),
       conc_id: v.string(),
-    })
+    }),
   ]),
   v.object({
     starred: v.boolean(),
     id: v.number(),
     sender_id: v.string(),
-  })
-])
+  }),
+]);
 
 export type MessagePinPayload = v.InferOutput<typeof message_pin_payload>;
 export type MessageStarPayload = v.InferOutput<typeof message_star_payload>;

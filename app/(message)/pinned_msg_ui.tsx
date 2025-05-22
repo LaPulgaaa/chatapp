@@ -50,11 +50,7 @@ export function PinnedMessages({
       {msgs.map((msg, i) => {
         return (
           <div
-            onClick={() =>
-              scroll_into_view(
-                msg.id.toString(),
-              )
-            }
+            onClick={() => scroll_into_view(msg.id.toString())}
             key={msg.id}
             className={` ${active !== i && "hidden"} flex flex-row gap-2 rounded-sm cursor-pointer bg-slate-100 dark:bg-slate-900 p-2 my-1 mr-4`}
           >

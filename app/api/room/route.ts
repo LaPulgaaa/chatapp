@@ -32,8 +32,8 @@ export async function GET(req: NextRequest) {
                 NOT: {
                   deletedFor: {
                     contains: username,
-                  }
-                }
+                  },
+                },
               },
               select: {
                 id: true,
@@ -50,12 +50,12 @@ export async function GET(req: NextRequest) {
                   where: {
                     member: {
                       username: username,
-                    }
+                    },
                   },
                   select: {
                     msgId: true,
-                  }
-                }
+                  },
+                },
               },
             },
           },
@@ -63,17 +63,17 @@ export async function GET(req: NextRequest) {
         id: true,
       },
       orderBy: {
-        createdAt: "asc"
-      }
+        createdAt: "asc",
+      },
     });
     const raw_data = message_subscribed_rooms.map((room) => {
       const filtered_msgs = room.chat.messages.map((msg) => {
-        const {starredBy, ...filtered_msg} = msg; 
+        const { starredBy, ...filtered_msg } = msg;
         return {
           ...filtered_msg,
           starred: msg.starredBy.length > 0,
-        }
-      })
+        };
+      });
       return { ...room.chat, conn_id: room.id, messages: filtered_msgs };
     });
 

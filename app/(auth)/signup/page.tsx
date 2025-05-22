@@ -33,7 +33,6 @@ import { toast } from "@/hooks/use-toast";
 import { user_signup_form_schema } from "@/packages/valibot";
 import GoogleLogoIcon from "@/public/icons8-google-logo-48.png";
 
-
 type FormValue = v.InferOutput<typeof user_signup_form_schema>;
 
 export default function Signup() {
@@ -194,7 +193,12 @@ export default function Signup() {
               }}
               className="w-full mt-4"
             >
-              <Image height={24} width={24} src={GoogleLogoIcon} alt="google logo" />
+              <Image
+                height={24}
+                width={24}
+                src={GoogleLogoIcon}
+                alt="google logo"
+              />
               <p className="ml-2">Google</p>
             </Button>
           </div>
