@@ -302,10 +302,10 @@ export default function Chat({ params }: { params: { slug: string } }) {
           id="chatbox"
           className="flex flex-col w-full h-full rounded-md border m-2"
         >
-          <PinnedMessages msg_ref={chat_ref}  msgs={pinned_messages}/>
+          <PinnedMessages msg_ref={chat_ref}  msgs={pinned_messages} type="CHAT"/>
           <div
-          className={`${pinned_messages.length > 0 ? 'my-16' : 'mb-2'}`} ref={chat_ref}>
-            <div>
+          className={`${pinned_messages.length > 0 ? 'my-16' : 'mb-2'}`}>
+            <div ref={chat_ref}>
               {session.status === "authenticated" && (
                 <ChatMessageHistory
                   msgs={chatMessages}
