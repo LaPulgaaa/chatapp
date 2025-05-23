@@ -51,7 +51,7 @@ export default function DmRender({
       {msg.sendBy.username !== username ? (
         <div id={`msg-${msg.id.toString()}`} className="flex m-2">
           {msg.type === "CHAT" && <Avatar
-            className={`w-[35px] h-[35px] mr-2 mt-2 ${
+            className={`w-[35px] h-[35px] mr-2 mt-2 z-0 ${
               msg.sendBy.username === username ? "hidden" : ""
             }`}
           >
