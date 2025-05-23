@@ -3,6 +3,7 @@ import { useMemo } from "react";
 
 import { DmContextMenu } from "./dm_context";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { RenderedMessage } from "@/packages/valibot";
 
 export type UnitMsg = {
@@ -39,10 +40,26 @@ export default function DmRender({
     return create_timestamp(msg.createdAt);
   }, [msg.createdAt]);
 
+  let initials = msg.sendBy.username.substring(0, 2);
+  const names = msg.sendBy.name?.split(" ");
+  if (names) {
+    initials = names.map((name) => name.charAt(0)).join("");
+  }
+
   return (
     <div key={msg.id} id={id}>
       {msg.sendBy.username !== username ? (
         <div id={`msg-${msg.id.toString()}`} className="flex m-2">
+          {msg.type === "CHAT" && <Avatar
+            className={`w-[35px] h-[35px] mr-2 mt-2 ${
+              msg.sendBy.username === username ? "hidden" : ""
+            }`}
+          >
+            <AvatarImage
+              src={`https://avatar.varuncodes.com/${msg.sendBy.username}`}
+            />
+            <AvatarFallback>{initials}</AvatarFallback>
+          </Avatar>}
           <DmContextMenu msg={msg} username={username}>
             <div
               className={`w-full border-2 pb-1 mr-2 bg-slate-200 dark:bg-slate-900  max-w-prose rounded-md flex`}
