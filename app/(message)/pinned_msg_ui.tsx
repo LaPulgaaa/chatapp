@@ -46,7 +46,7 @@ export function PinnedMessages({
     });
   }
   return (
-    <div className="absolute w-full mx-1">
+    <div className="absolute w-full mx-1 z-10">
       {msgs.map((msg, i) => {
         return (
           <div
