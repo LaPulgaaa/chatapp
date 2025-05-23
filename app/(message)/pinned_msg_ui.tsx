@@ -7,9 +7,11 @@ import type { UnitMsg } from "./dm_ui";
 export function PinnedMessages({
   msg_ref,
   msgs,
+  type
 }: {
   msg_ref: React.RefObject<HTMLDivElement>;
   msgs: UnitMsg[];
+  type: "CHAT" | "DM";
 }) {
   const [active, setActive] = useState<number>(0);
   const { theme } = useTheme();
@@ -18,7 +20,7 @@ export function PinnedMessages({
     const pinned_node = msg_ref.current;
     if (pinned_node === null) return;
 
-    const focused_msg_node = pinned_node.querySelector(`#dm-${id}`);
+    const focused_msg_node = pinned_node.querySelector(`#${type}-${id}`);
 
     if (focused_msg_node === null) return;
 

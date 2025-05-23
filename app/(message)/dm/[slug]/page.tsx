@@ -284,7 +284,7 @@ export default function Direct({ params }: { params: { slug: string } }) {
             className="flex flex-col h-full rounded-md border m-2"
           >
             {pinned_msg && pinned_msg.length > 0 && (
-              <PinnedMessages msg_ref={dm_ref} msgs={pinned_msg ?? []} />
+              <PinnedMessages msg_ref={dm_ref} msgs={pinned_msg ?? []} type="DM" />
             )}
             <div
             className={`${pinned_msg.length > 0 ? 'my-16' : 'mb-2'}`}

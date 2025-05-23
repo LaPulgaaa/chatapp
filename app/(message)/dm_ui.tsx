@@ -49,7 +49,7 @@ export default function DmRender({
   return (
     <div key={msg.id} id={id}>
       {msg.sendBy.username !== username ? (
-        <div id={`msg-${msg.id.toString()}`} className="flex m-2">
+        <div id={`${msg.type}-${msg.id.toString()}`} className="flex m-2">
           {msg.type === "CHAT" && <Avatar
             className={`w-[35px] h-[35px] mr-2 mt-2 z-0 ${
               msg.sendBy.username === username ? "hidden" : ""
@@ -81,7 +81,7 @@ export default function DmRender({
         </div>
       ) : (
         <div
-          id={`msg-${msg.id.toString()}`}
+          id={`${msg.type}-${msg.id.toString()}`}
           className="flex m-2 justify-end mr-3"
         >
           <DmContextMenu msg={msg} username={username}>
