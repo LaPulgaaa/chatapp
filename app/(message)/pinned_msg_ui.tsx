@@ -5,17 +5,17 @@ import React, { useState } from "react";
 import type { UnitMsg } from "./dm_ui";
 
 export function PinnedMessages({
-  dm_ref,
+  msg_ref,
   msgs,
 }: {
-  dm_ref: React.RefObject<HTMLDivElement>;
+  msg_ref: React.RefObject<HTMLDivElement>;
   msgs: UnitMsg[];
 }) {
   const [active, setActive] = useState<number>(0);
   const { theme } = useTheme();
 
   function scroll_into_view(id: string) {
-    const pinned_node = dm_ref.current;
+    const pinned_node = msg_ref.current;
     if (pinned_node === null) return;
 
     const focused_msg_node = pinned_node.querySelector(`#dm-${id}`);
