@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "NODE_ENV=production ts-node server.ts",
     "format": "npx prettier . --write",
-    "lint": "next lint",
+    "lint": "npx eslint .",
     "test": "vitest",
     "dev:combined": "npm run dev & npx next dev",
     "prisma:migrate": "npx prisma migrate dev --schema=./packages/prisma/schema.prisma",
