@@ -16,6 +16,7 @@ import * as v from "valibot";
 import { TypingEvent } from "../../dm/typing_event";
 import { ComposeBox } from "../../dm/typing_status";
 import ChatMessageHistory from "../../history";
+import { PinnedMessages } from "../../pinned_msg_ui";
 import EditRoomDetails from "../edit_room_details";
 
 import { Signal } from "@/app/home/signal";
@@ -83,6 +84,14 @@ export default function Chat({ params }: { params: { slug: string } }) {
     };
     //eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.slug, session]);
+
+  const pinned_messages = useMemo(() => {
+    if(chatMessages.length > 0){
+      return chatMessages.filter((msg) => msg.pinned === true)
+    }
+
+    return []
+  },[chatMessages])
 
   //TODO: Can this be converted to useMemo
   useEffect(() => {
@@ -293,7 +302,9 @@ export default function Chat({ params }: { params: { slug: string } }) {
           id="chatbox"
           className="flex flex-col w-full h-full rounded-md border m-2"
         >
-          <div className="mb-2" ref={chat_ref}>
+          <PinnedMessages msg_ref={chat_ref}  msgs={pinned_messages}/>
+          <div
+          className={`${pinned_messages.length > 0 ? 'my-16' : 'mb-2'}`} ref={chat_ref}>
             <div>
               {session.status === "authenticated" && (
                 <ChatMessageHistory

@@ -59,7 +59,7 @@ export default function Direct({ params }: { params: { slug: string } }) {
 
   const pinned_msg = useMemo(() => {
     if (dmStateDetails === undefined || dmStateDetails.is_friend !== true)
-      return undefined;
+      return [];
 
     const pinned_history_msgs: UnitMsg[] = [];
 
@@ -284,9 +284,11 @@ export default function Direct({ params }: { params: { slug: string } }) {
             className="flex flex-col h-full rounded-md border m-2"
           >
             {pinned_msg && pinned_msg.length > 0 && (
-              <PinnedMessages dm_ref={dm_ref} msgs={pinned_msg ?? []} />
+              <PinnedMessages msg_ref={dm_ref} msgs={pinned_msg ?? []} />
             )}
-            <div className="my-16" ref={dm_ref}>
+            <div
+            className={`${pinned_msg.length > 0 ? 'my-16' : 'mb-2'}`}
+            ref={dm_ref}>
               {dmStateDetails.is_friend && (
                 <DirectMessageHistory
                   msgs={dmStateDetails.friendship_data.messages.map((msg) => {
