@@ -616,7 +616,7 @@ export async function ws(wss: WebSocketServer) {
                   type: "star",
                   payload: {
                     type: "DM",
-                    starred: true,
+                    starred: false,
                     hash: resp.hash,
                     id: resp.id,
                     sender_id,
