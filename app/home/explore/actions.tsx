@@ -8,24 +8,26 @@ export async function search_by_username(
   host_name?: string | null,
 ) {
   try {
-    const possible_members = await prisma.member.findMany({
+    const search_word = cred.trim();
+
+    const search_results = await prisma.member.findMany({
       where: {
         OR: [
           {
             username: {
-              contains: cred,
+              contains: search_word,
               not: host_username,
-              mode: "insensitive",
-            },
+              mode: "insensitive"
+            }
           },
           {
             name: {
-              contains: cred,
+              contains: search_word,
               not: host_name,
-              mode: "insensitive",
-            },
-          },
-        ],
+              mode: "insensitive"
+            }
+          }
+        ]
       },
       select: {
         username: true,
@@ -34,9 +36,9 @@ export async function search_by_username(
         name: true,
       },
       take: 10,
-    });
+    })
 
-    return possible_members;
+    return search_results;
   } catch (err) {
     console.log(err);
     return [];
