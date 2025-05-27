@@ -17,17 +17,17 @@ export async function search_by_username(
             username: {
               contains: search_word,
               not: host_username,
-              mode: "insensitive"
-            }
+              mode: "insensitive",
+            },
           },
           {
             name: {
               contains: search_word,
               not: host_name,
-              mode: "insensitive"
-            }
-          }
-        ]
+              mode: "insensitive",
+            },
+          },
+        ],
       },
       select: {
         username: true,
@@ -36,7 +36,7 @@ export async function search_by_username(
         name: true,
       },
       take: 10,
-    })
+    });
 
     return search_results;
   } catch (err) {
