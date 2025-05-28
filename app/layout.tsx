@@ -9,6 +9,7 @@ import { AuthProvider } from "@/components/Provider";
 import RecoilContextProvider from "@/components/providers/RecoilContextProvider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
+import { KeyboardShortcutProvider } from "@/hooks/useKeyboardShortcut";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -27,26 +28,28 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <RecoilContextProvider>
-        <body
-          className={cn(
-            "min-h-screen bg-background font-sans antialiased",
-            fontSans.variable,
-          )}
-        >
-          <AuthProvider>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
-            >
-              {children}
-              <Toaster />
-            </ThemeProvider>
-          </AuthProvider>
-        </body>
-      </RecoilContextProvider>
+      <KeyboardShortcutProvider>
+        <RecoilContextProvider>
+          <body
+            className={cn(
+              "min-h-screen bg-background font-sans antialiased",
+              fontSans.variable,
+            )}
+          >
+            <AuthProvider>
+              <ThemeProvider
+                attribute="class"
+                defaultTheme="system"
+                enableSystem
+                disableTransitionOnChange
+              >
+                {children}
+                <Toaster />
+              </ThemeProvider>
+            </AuthProvider>
+          </body>
+        </RecoilContextProvider>
+      </KeyboardShortcutProvider>
     </html>
   );
 }

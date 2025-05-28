@@ -7,7 +7,7 @@ import type { UnitMsg } from "./dm_ui";
 export function PinnedMessages({
   msg_ref,
   msgs,
-  type
+  type,
 }: {
   msg_ref: React.RefObject<HTMLDivElement>;
   msgs: UnitMsg[];
