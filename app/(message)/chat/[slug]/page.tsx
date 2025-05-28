@@ -86,12 +86,12 @@ export default function Chat({ params }: { params: { slug: string } }) {
   }, [params.slug, session]);
 
   const pinned_messages = useMemo(() => {
-    if(chatMessages.length > 0){
-      return chatMessages.filter((msg) => msg.pinned === true)
+    if (chatMessages.length > 0) {
+      return chatMessages.filter((msg) => msg.pinned === true);
     }
 
-    return []
-  },[chatMessages])
+    return [];
+  }, [chatMessages]);
 
   //TODO: Can this be converted to useMemo
   useEffect(() => {
@@ -302,9 +302,12 @@ export default function Chat({ params }: { params: { slug: string } }) {
           id="chatbox"
           className="flex flex-col w-full h-full rounded-md border m-2"
         >
-          <PinnedMessages msg_ref={chat_ref}  msgs={pinned_messages} type="CHAT"/>
-          <div
-          className={`${pinned_messages.length > 0 ? 'my-16' : 'mb-2'}`}>
+          <PinnedMessages
+            msg_ref={chat_ref}
+            msgs={pinned_messages}
+            type="CHAT"
+          />
+          <div className={`${pinned_messages.length > 0 ? "my-16" : "mb-2"}`}>
             <div ref={chat_ref}>
               {session.status === "authenticated" && (
                 <ChatMessageHistory

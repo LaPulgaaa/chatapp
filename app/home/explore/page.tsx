@@ -71,6 +71,7 @@ export default function Search() {
         />
         <Input
           ref={searchRef}
+          id="explore-search-box"
           className="w-full bg-slate-800"
           placeholder="Search by username or name"
           type="text"

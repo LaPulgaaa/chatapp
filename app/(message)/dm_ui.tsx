@@ -50,16 +50,18 @@ export default function DmRender({
     <div key={msg.id} id={id}>
       {msg.sendBy.username !== username ? (
         <div id={`${msg.type}-${msg.id.toString()}`} className="flex m-2">
-          {msg.type === "CHAT" && <Avatar
-            className={`w-[35px] h-[35px] mr-2 mt-2 z-0 ${
-              msg.sendBy.username === username ? "hidden" : ""
-            }`}
-          >
-            <AvatarImage
-              src={`https://avatar.varuncodes.com/${msg.sendBy.username}`}
-            />
-            <AvatarFallback>{initials}</AvatarFallback>
-          </Avatar>}
+          {msg.type === "CHAT" && (
+            <Avatar
+              className={`w-[35px] h-[35px] mr-2 mt-2 z-0 ${
+                msg.sendBy.username === username ? "hidden" : ""
+              }`}
+            >
+              <AvatarImage
+                src={`https://avatar.varuncodes.com/${msg.sendBy.username}`}
+              />
+              <AvatarFallback>{initials}</AvatarFallback>
+            </Avatar>
+          )}
           <DmContextMenu msg={msg} username={username}>
             <div
               className={`w-full border-2 pb-1 mr-2 bg-slate-200 dark:bg-slate-900  max-w-prose rounded-md flex`}

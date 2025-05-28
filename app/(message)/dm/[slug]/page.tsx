@@ -284,11 +284,16 @@ export default function Direct({ params }: { params: { slug: string } }) {
             className="flex flex-col h-full rounded-md border m-2"
           >
             {pinned_msg && pinned_msg.length > 0 && (
-              <PinnedMessages msg_ref={dm_ref} msgs={pinned_msg ?? []} type="DM" />
+              <PinnedMessages
+                msg_ref={dm_ref}
+                msgs={pinned_msg ?? []}
+                type="DM"
+              />
             )}
             <div
-            className={`${pinned_msg.length > 0 ? 'my-16' : 'mb-2'}`}
-            ref={dm_ref}>
+              className={`${pinned_msg.length > 0 ? "my-16" : "mb-2"}`}
+              ref={dm_ref}
+            >
               {dmStateDetails.is_friend && (
                 <DirectMessageHistory
                   msgs={dmStateDetails.friendship_data.messages.map((msg) => {
