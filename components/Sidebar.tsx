@@ -5,7 +5,6 @@ import { useState } from "react";
 
 import CreateRoom from "./CreateRoom";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { Button } from "./ui/button";
 import { Dialog, DialogTrigger } from "./ui/dialog";
 import { ScrollArea } from "./ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
@@ -69,17 +68,17 @@ export default function Sidebar() {
         </div>
       )}
       <div className="text-center sm:text-left grid grid-cols-1 divide-y">
-        <TabButton tab_name="Explore" shortcut="k" tooltip_msg="Press 'k' to open explore/search section"></TabButton>
-        <TabButton tab_name="Status" shortcut="i" tooltip_msg="Press 'i' to set your status"></TabButton>
+        <TabButton tab_name="Explore" shortcut="k" tooltip_msg="Press 'k' to open explore/search section"/>
+        <TabButton tab_name="Status" shortcut="i" tooltip_msg="Press 'i' to set your status"/>
         <Dialog open={openRoomDialog} onOpenChange={setOpenRoomDialog}>
           <DialogTrigger>
-            <TabButton tab_name="Create" shortcut="a" tooltip_msg="Press 'a' to open create room dialog"></TabButton>
+            <TabButton tab_name="Create" shortcut="a" tooltip_msg="Press 'a' to open create room dialog"/>
           </DialogTrigger>
           <CreateRoom />
         </Dialog>
         <Dialog open={joinRoomDialog} onOpenChange={setJoinRoomDialog}>
           <DialogTrigger>
-            <TabButton tab_name="Join" shortcut="r" tooltip_msg="Press 'r' to open join room dialog"></TabButton>
+            <TabButton tab_name="Join" shortcut="r" tooltip_msg="Press 'r' to open join room dialog"/>
           </DialogTrigger>
           <JoinRoomDialog />
         </Dialog>
@@ -90,7 +89,7 @@ export default function Sidebar() {
         onClick={()=>{
           router.push(`/home/profile`)
         }}
-        ></TabButton>
+        />
       </div>
     </ScrollArea>
   );
@@ -100,9 +99,9 @@ export default function Sidebar() {
 function TabButton(
   {tab_name,shortcut,tooltip_msg,onClick}
   :
-  {tab_name: string,shortcut: string,tooltip_msg: string;onClick?: () => void}){
+  {tab_name: string,shortcut: string,tooltip_msg: string,onClick?: () => void}){
   return (
-    <Button variant={"ghost"} onClick={onClick} className="w-full flex justify-between space-x-2">
+    <div  onClick={onClick} className="w-full flex justify-between space-x-2 py-2 px-4 cursor-pointer rounded-sm hover:bg-slate-800 transition duration-300 ease-in-out">
       <span>{tab_name}</span>
        <TooltipProvider>
         <Tooltip>
@@ -110,10 +109,10 @@ function TabButton(
             <span className="bg-slate-600 px-2 py-1 font-semibold rounded-sm">{shortcut}</span>
           </TooltipTrigger>
           <TooltipContent>
-            <p>{tooltip_msg}</p>
+            <span>{tooltip_msg}</span>
           </TooltipContent>
         </Tooltip>
        </TooltipProvider>
-    </Button>
+    </div>
   )
 }
