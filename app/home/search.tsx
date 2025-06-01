@@ -85,7 +85,7 @@ function DirectMessageSearchResults({query}:{query: string}){
         ]
     });
 
-    return fuse.search(query);
+    return fuse.search(query).sort((a,b) => (b.score ?? 0) - (a.score ?? 0));
   }, [query,dmState]);
 
   console.log(matched_results)
@@ -139,7 +139,7 @@ function GroupChatSearchResults({query}:{query: string}){
             ]
         });
 
-        return fuse.search(query);
+        return fuse.search(query).sort((a,b) => (b.score ?? 0) - (a.score ?? 0));
     }, [query,roomState]);
 
     return (
