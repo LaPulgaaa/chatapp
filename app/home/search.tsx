@@ -108,9 +108,9 @@ function DirectMessageSearchResults({query}:{query: string}){
                             <AvatarFallback>{item.to.username.substring(0,2)}</AvatarFallback>
                         </Avatar>
                         <div className="mx-1 px-1">
-                            <div>{item.to.name}</div>
+                            <div>{item.to.name || item.to.username}</div>
                             <div className="italic text-muted-foreground truncate w-[124px] text-[15px]">
-                            {`@${item.to.name}`}
+                            {`@${item.to.username}`}
                             </div>
                         </div>
                     </div>
