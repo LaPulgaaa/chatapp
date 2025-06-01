@@ -5,7 +5,6 @@ import {
   MessageSquareDotIcon,
   PlusSquare,
   SettingsIcon,
-  UserSearchIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -42,14 +41,6 @@ export default function CandleSidebar() {
             </Avatar>
           </Link>
         )}
-        <Button
-          onClick={() => router.push("/home/explore")}
-          className="mt-1 p-1"
-          variant={"ghost"}
-          size={"icon"}
-        >
-          <UserSearchIcon />
-        </Button>
         <Button className="mt-1 p-1" variant={"ghost"} size={"icon"}>
           <HeartPulseIcon />
         </Button>
