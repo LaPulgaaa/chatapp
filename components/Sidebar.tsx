@@ -68,7 +68,6 @@ export default function Sidebar() {
         </div>
       )}
       <div className="text-center sm:text-left grid grid-cols-1 divide-y">
-        <TabButton tab_name="Explore" shortcut="k" tooltip_msg="Press 'k' to open explore/search section"/>
         <TabButton tab_name="Status" shortcut="i" tooltip_msg="Press 'i' to set your status"/>
         <Dialog open={openRoomDialog} onOpenChange={setOpenRoomDialog}>
           <DialogTrigger>
