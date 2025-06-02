@@ -14,7 +14,7 @@ import * as v from "valibot";
 import { inbound_typing_event } from "../home/connect";
 import { Signal } from "../home/signal";
 
-import type { RecievedMessage } from "./chat/[slug]/page";
+import type { RecievedMessage } from "./chat/[...slug]/page";
 
 import { useToast } from "@/hooks/use-toast";
 import { direct_msg_state } from "@/lib/store/atom/dm";

@@ -29,6 +29,7 @@ export function PinnedMessages({
       inline: "center",
       block: "center",
     });
+
     focused_msg_node.style.transition = "all 0.5s ease";
     if (theme === "dark")
       focused_msg_node.style.backgroundColor =

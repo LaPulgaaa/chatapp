@@ -298,3 +298,61 @@ export const message_star_payload = v.intersect([
 
 export type MessagePinPayload = v.InferOutput<typeof message_pin_payload>;
 export type MessageStarPayload = v.InferOutput<typeof message_star_payload>;
+
+export const search_api_dm_schema = v.array(
+  v.object({
+    id: v.number(),
+    content: v.string(),
+    createdAt: v.string(),
+    deleted: v.boolean(),
+    friendshipId: v.string(),
+    senderId: v.string(),
+    connectionId: v.string(),
+    hash: v.string(),
+    pinned: v.boolean(),
+    starred: v.nullable(v.array(v.string())),
+    toId: v.string(),
+    fromId: v.string(),
+    rank: v.number(),
+  })
+);
+
+export type DirectMessageSearchResult = v.InferOutput<typeof search_api_dm_schema>;
+
+export const search_api_profile_schema = v.array(
+  v.intersect([
+    v.object({
+      id: v.number(),
+    }),
+    v.omit(member_profile_schema,['favorite','status'])
+  ])
+);
+
+export type ProfileSearchResult = v.InferOutput<typeof search_api_profile_schema>;
+
+export const search_api_chat_schema = v.array(
+  v.object({
+    id: v.number(),
+    content: v.string(),
+    memberId: v.string(),
+    chatId: v.string(),
+    createdAt: v.string(),
+    deleted: v.boolean(),
+    hash: v.nullable(v.string()),
+    deletedFor: v.nullable(v.string()),
+    pinned: v.boolean(),
+    chatName: v.string(),
+    sender: v.string(),
+    rank: v.number(),
+  })
+)
+
+export type ChatSearchResult = v.InferOutput<typeof search_api_chat_schema>;
+
+export const search_api_data_schema = v.object({
+  profile: search_api_profile_schema,
+  dm: search_api_dm_schema,
+  chat: search_api_chat_schema
+});
+
+export type SearchApiDataSchema = v.InferOutput<typeof search_api_data_schema>;

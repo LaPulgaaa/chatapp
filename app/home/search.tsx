@@ -23,6 +23,7 @@ function SearchBox({
     setSearch: Dispatch<SetStateAction<string>>,
     setFocus: Dispatch<SetStateAction<boolean>>
 }){
+    const router = useRouter();
 
     const search_ref = useRef<HTMLInputElement | null>(null);
 
@@ -35,6 +36,12 @@ function SearchBox({
 
         setFocus(true);
     })
+
+    function handle_click(){
+        setFocus(false);
+        router.push(`/home/search/${search}`);
+    }
+
     return (
         <div className="w-full flex justify-end">
             <div className="w-full flex space-x-2 justify-end pr-2 border-2 rounded-2xl">
@@ -50,6 +57,10 @@ function SearchBox({
                         return;
 
                     setFocus(false);
+                }}
+                onKeyDown={(e) => {
+                    if(e.key === "Enter")
+                        handle_click();
                 }}
                 />
                 <TooltipProvider>
@@ -170,9 +181,16 @@ function GroupChatSearchResults({query}:{query: string}){
 
 
 export function Search(){
+    const router = useRouter();
+
     const [search,setSearch] = useState<string>("");
     const [focus,setFocus] = useState<boolean>(false);
     const [overResults,setOverResults] = useState<boolean>(false);
+
+    function handle_click(){
+        setFocus(false);
+        router.push(`/home/search/${search}`);
+    }
 
     return (
         <div className="flex justify-end items-center shadow z-10">
@@ -183,7 +201,9 @@ export function Search(){
                     onMouseEnter={() => setOverResults(true)}
                     onMouseLeave={() => setOverResults(false)}
                     className="bg-slate-950 absolute z-50 shadow w-full rounded-md border-2">
-                    <div className="flex space-x-2 py-4 px-2 mx-2">
+                    <div
+                    onClick={handle_click}
+                    className="flex space-x-2 py-4 px-2 mx-2 cursor-pointer">
                         <SearchIcon/>
                         <span>{`Search for ${search}`}</span>
                     </div>

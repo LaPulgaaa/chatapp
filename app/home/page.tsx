@@ -5,8 +5,6 @@ import { useSession } from "next-auth/react";
 import { memo } from "react";
 import { useRecoilValue, useRecoilValueLoadable } from "recoil";
 
-import { Search } from "./search";
-
 import { direct_msg_state } from "@/lib/store/atom/dm";
 import { subscribed_chats_state } from "@/lib/store/atom/subscribed_chats_state";
 import { typing_event_store } from "@/lib/store/atom/typing_event_store";
@@ -45,8 +43,8 @@ export default function Home() {
   return (
     <div className="lg:col-span-4 mr-4 ml-2 pt-2">
       {session.status === "authenticated" ? (
-        <div className="relative">
-          <Search/>
+        <div>
+          
           {roomsStateData.state === "hasValue" &&
           dmStateData.state === "hasValue" ? (
             <RoomTabs
