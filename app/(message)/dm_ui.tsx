@@ -5,6 +5,7 @@ import { DmContextMenu } from "./dm_context";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { RenderedMessage } from "@/packages/valibot";
+import {create_timestamp} from "@/util/date";
 
 export type UnitMsg = {
   type: "CHAT" | "DM";
@@ -27,15 +28,6 @@ export default function DmRender({
   username: string;
   id: string;
 }) {
-  function create_timestamp(createdAt: string) {
-    const time = new Date(createdAt)
-      .toTimeString()
-      .split(" ")[0]
-      .split(":")
-      .slice(0, -1);
-    return `${time[0]}:${time[1]}`;
-  }
-
   const msg_created_at = useMemo(() => {
     return create_timestamp(msg.createdAt);
   }, [msg.createdAt]);
