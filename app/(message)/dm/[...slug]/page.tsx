@@ -2,6 +2,7 @@
 
 import assert from "minimalistic-assert";
 import { useSession } from "next-auth/react";
+import { useTheme } from "next-themes";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useRecoilRefresher_UNSTABLE, useRecoilStateLoadable } from "recoil";
 import * as v from "valibot";
@@ -24,21 +25,28 @@ import { fetch_dms } from "@/lib/store/selector/fetch_dms";
 import type { FriendSearchResult } from "@/packages/valibot";
 import { friend_search_result_schema } from "@/packages/valibot";
 
-export default function Direct({ params }: { params: { slug: string } }) {
-  const dm_ref = useRef<HTMLDivElement>(null);
+export default function Direct({ params }: { params: { slug: string[] } }) {
+  const segments = params.slug;
+
+  const session = useSession();
+  const {theme} = useTheme();
+
+  const [history, setHistory] = useState<Omit<UnitMsg, "type">[]>([]);
+  const [active, setActive] = useState<boolean>(false);
   const compose_ref = useRef<string | null>(null);
   const [compose, setCompose] = useState<string>("");
-  const session = useSession();
+
+  const dm_ref = useRef<HTMLDivElement>(null);
+
   const [dmStateDetails, setDmStateDetails] = useState<
     FriendSearchResult | undefined
   >();
   const [dms, setDms] = useRecoilStateLoadable(direct_msg_state);
   const refresh_dm_state = useRecoilRefresher_UNSTABLE(
-    dm_details_state({ username: params.slug }),
+    dm_details_state({ username: params.slug[0] }),
   );
   const refresh_dms = useRecoilRefresher_UNSTABLE(fetch_dms);
-  const [history, setHistory] = useState<Omit<UnitMsg, "type">[]>([]);
-  const [active, setActive] = useState<boolean>(false);
+
 
   const recipient: Recipient | null = useMemo(() => {
     if (
@@ -78,7 +86,7 @@ export default function Direct({ params }: { params: { slug: string } }) {
   useEffect(() => {
     if (dms.state === "hasValue" && dms.getValue()) {
       const friend = dms.getValue().find((dm) => {
-        if (dm.to.username === params.slug) return dm;
+        if (dm.to.username === params.slug[0]) return dm;
       });
 
       if (friend === undefined) {
@@ -112,7 +120,7 @@ export default function Direct({ params }: { params: { slug: string } }) {
     if (dms.state === "hasValue" && dms.getValue() !== undefined) {
       setDms((dms) => {
         return dms.map((dm) => {
-          if (dm.to.username !== params.slug) return dm;
+          if (dm.to.username !== params.slug[0]) return dm;
 
           return {
             ...dm,
@@ -126,7 +134,7 @@ export default function Direct({ params }: { params: { slug: string } }) {
 
   async function fetch_user_details() {
     try {
-      const resp = await fetch(`/api/dm/${params.slug}`);
+      const resp = await fetch(`/api/dm/${params.slug[0]}`);
       const { raw_data } = await resp.json();
       const data = v.parse(friend_search_result_schema, raw_data);
       assert(data.is_friend === false);
@@ -138,17 +146,49 @@ export default function Direct({ params }: { params: { slug: string } }) {
   }
 
   useEffect(() => {
+    if(segments[1] !== "near")
+      return;
+
+    const msg_id = Number.parseInt(segments[2],10);
+    const chat_node = dm_ref.current;
+    if (chat_node === null) return;
+
+    const dm_comp = chat_node.querySelector(`#DM-${msg_id}`);
+      if(dm_comp === null) return;
+
+      dm_comp.scrollIntoView({
+        behavior: "smooth",
+        inline: "center",
+      });
+
+      dm_comp.style.transition = "all 0.5s ease";
+      if (theme === "dark")
+        dm_comp.style.backgroundColor =
+          "rgb(30 41 59 / var(--tw-bg-opacity, 1))";
+      else
+      dm_comp.style.backgroundColor =
+          "rgb(203 213 225 / var(--tw-bg-opacity, 1))";
+
+    // Reset styles after 3 seconds
+    setTimeout(() => {
+      dm_comp.style.backgroundColor = "";
+    }, 3000);
+
+    //eslint-disable-next-line react-hooks/exhaustive-deps
+  },[history,segments])
+
+  useEffect(() => {
     const chat_node = dm_ref.current;
     if (chat_node !== null) {
       const chat_history_comps = chat_node.querySelectorAll("#history");
-      if (chat_history_comps.length < 1) return;
+      if (chat_history_comps.length < 1 || segments.length > 1) return;
       const last_comp_idx = chat_history_comps.length - 1;
       chat_history_comps[last_comp_idx].scrollIntoView({
         behavior: "smooth",
         inline: "center",
       });
     }
-  }, [history]);
+  }, [history,segments]);
 
   useEffect(() => {
     Signal.get_instance().REGISTER_CALLBACK(
@@ -207,7 +247,7 @@ export default function Direct({ params }: { params: { slug: string } }) {
     const data = JSON.parse(raw_data);
     const type: "MemberJoins" | "MemberLeaves" = data.type;
     const username = data.payload.username;
-    if (username === params.slug) {
+    if (username === params.slug[0]) {
       setActive(type === "MemberJoins");
     }
   }
@@ -222,7 +262,7 @@ export default function Direct({ params }: { params: { slug: string } }) {
     assert(data !== undefined);
 
     if (data.is_friend === false) {
-      Signal.get_instance().INVITE(username, params.slug, compose);
+      Signal.get_instance().INVITE(username, params.slug[0], compose);
     } else {
       const broadcast_data = {
         type: "message",
@@ -253,15 +293,15 @@ export default function Direct({ params }: { params: { slug: string } }) {
                 <div className="flex item-center p-2 ml-2">
                   <Avatar className="mr-1 mt-1">
                     <AvatarImage
-                      src={`https://avatar.varuncodes.com/${params.slug}`}
+                      src={`https://avatar.varuncodes.com/${params.slug[0]}`}
                     />
                     <AvatarFallback>
-                      {params.slug.substring(0, 2)}
+                      {params.slug[0].substring(0, 2)}
                     </AvatarFallback>
                   </Avatar>
                   <div className="mx-1 px-1">
                     <h3 className="scroll-m-20 text-xl font-semibold">
-                      {params.slug}
+                      {params.slug[0]}
                     </h3>
                     <p
                       className={`italic text-muted-foreground truncate w-[124px] text-[15px] ${active ? "text-rose-800" : "text-green-400"}`}
@@ -274,7 +314,7 @@ export default function Direct({ params }: { params: { slug: string } }) {
               <ProfileDialog
                 profile_info={{
                   ...dmStateDetails.profile_info,
-                  username: params.slug,
+                  username: params.slug[0],
                 }}
               />
             </Dialog>

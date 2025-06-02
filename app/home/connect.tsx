@@ -11,7 +11,7 @@ import {
 } from "recoil";
 import * as v from "valibot";
 
-import type { RecievedMessage } from "../(message)/chat/[slug]/page";
+import type { RecievedMessage } from "../(message)/chat/[...slug]/page";
 import type { UpdateDetailsData } from "../(message)/msg_connect";
 
 import { Signal } from "./signal";
