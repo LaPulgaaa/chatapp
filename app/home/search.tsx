@@ -88,8 +88,6 @@ function DirectMessageSearchResults({query}:{query: string}){
     return fuse.search(query).sort((a,b) => (b.score ?? 0) - (a.score ?? 0));
   }, [query,dmState]);
 
-  console.log(matched_results)
-
   return (
     <div className="px-2">
         {
@@ -99,7 +97,6 @@ function DirectMessageSearchResults({query}:{query: string}){
                     key={item.id} 
                     className="w-full flex space-x-4 m-2 bg-slate-950 cursor-pointer"
                     onClick={() => {
-                        console.log("this is the reason")
                         router.push(`/dm/${item.to.username}`);
                     }}
                     >

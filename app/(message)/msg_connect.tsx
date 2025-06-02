@@ -297,7 +297,6 @@ export default function Connect() {
   }
 
   function handle_recieved_msg(raw_data: string) {
-    console.log("this is the /message route");
     const is_narrowed = !pathname.includes("home");
     const data: RecievedMessage = JSON.parse(raw_data);
     const payload = data.payload;
