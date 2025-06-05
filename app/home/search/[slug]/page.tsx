@@ -8,6 +8,7 @@ import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { fetch_search_results } from "@/lib/store/selector/fetch_search_results";
 import type { ChatSearchResult, DirectMessageSearchResult, ProfileSearchResult } from "@/packages/valibot";
 import { create_timestamp } from "@/util/date";
+import Link from "next/link";
 
 export default function Explorer({ params }: { params: { slug: string } }) {
   const query = params.slug;
@@ -17,7 +18,7 @@ export default function Explorer({ params }: { params: { slug: string } }) {
   return(
     resultState.state === "hasValue" ? 
     <>
-      <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">{`Search results for ${query}...`}</h4>
+      <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">{`Search results for "${query}"...`}</h4>
       <ProfileSearchResults profiles={resultState.getValue().profile}/>
       <DirectMessageSearchResults dms={resultState.getValue().dm}/>
       <ChatMessageSearchResults chats={resultState.getValue().chat}/>
@@ -40,7 +41,7 @@ function ProfileSearchResults({profiles}:{ profiles: ProfileSearchResult}){
           return (
             <div 
             key={profile.id} 
-            className="w-full flex space-x-4 m-2 bg-slate-950 cursor-pointer"
+            className="w-full flex space-x-4 m-2 dark:bg-slate-950 bg-slate-200 cursor-pointer"
             onClick={() => {
                 router.push(`/dm/${profile.username}`);
             }}
@@ -78,12 +79,12 @@ function DirectMessageSearchResults({dms}:{dms: DirectMessageSearchResult}){
           return (
             <div 
             key={dm.id}
-            className="flex flex-row space-x-2 dark:bg-slate-900 bg-slate-400 p-2 rounded-sm cursor-pointer m-2"
+            className="flex flex-row space-x-2 dark:bg-slate-900 bg-slate-200 hover:dark:bg-slate-800 hover:bg-slate-300 p-2 rounded-sm cursor-pointer m-2"
             onClick={() => router.push(`/dm/${slug}/near/${dm.id}`)}
             >
               <div className="w-full flex flex-col space-y-2">
                 <div className="flex justify-between">
-                  <p className="text-muted-foreground text-sm">{`DM >> ${slug}`}</p>
+                  <Link href={`/dm/${slug}`} className="text-muted-foreground text-sm hover:text-black hover:dark:text-white">{`${slug}`}</Link>
                   <p className="text-muted-foreground text-sm">{timestamp}</p>
                 </div>
                 <div>
@@ -113,11 +114,11 @@ function ChatMessageSearchResults({chats}:{chats: ChatSearchResult}){
           return(
             <div key={chat.id}
             onClick={() => router.push(`/chat/${chat.chatId}/near/${chat.id}`)}
-            className="dark:bg-slate-900 bg-slate-400 p-2 rounded-sm cursor-pointer m-2"
+            className="dark:bg-slate-900 bg-slate-200 hover:dark:bg-slate-800 hover:bg-slate-300 p-2 rounded-sm cursor-pointer m-2"
             >
-              <div className="w-full flex flex-col space-y-2">
+              <div className="w-full flex flex-col space-y-2 ease-in-out transition duration-300">
                 <div className="flex justify-between">
-                  <p className="text-muted-foreground text-sm">{`Chat >> ${chat.chatName}`}</p>
+                  <Link href={`/chat/${chat.chatId}`} className="text-muted-foreground text-sm hover:text-black hover:dark:text-white">{`${chat.chatName}`}</Link>
                   <p className="text-muted-foreground text-sm">{timestamp}</p>
                 </div>
                 <div>

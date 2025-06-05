@@ -105,7 +105,7 @@ function TabButton(
        <TooltipProvider>
         <Tooltip>
           <TooltipTrigger>
-            <span className="bg-slate-600 px-2 py-1 font-semibold rounded-sm">{shortcut}</span>
+            <span className="dark:bg-slate-600 bg-slate-200 px-2 py-1 font-semibold rounded-sm">{shortcut}</span>
           </TooltipTrigger>
           <TooltipContent>
             <span>{tooltip_msg}</span>

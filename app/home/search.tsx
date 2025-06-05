@@ -66,7 +66,7 @@ function SearchBox({
                 <TooltipProvider>
                     <Tooltip>
                     <TooltipTrigger>
-                        <span className="bg-slate-800 px-2 py-1 rounded-sm">{`ctrl+k`}</span>
+                        <span className="dark:bg-slate-800 bg-slate-300 px-2 py-1 rounded-sm">{`ctrl+k`}</span>
                     </TooltipTrigger>
                     <TooltipContent>
                         <span>{`Press ctrl+k to launch search box`}</span>
