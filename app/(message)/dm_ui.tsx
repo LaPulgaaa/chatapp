@@ -5,7 +5,7 @@ import { DmContextMenu } from "./dm_context";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { RenderedMessage } from "@/packages/valibot";
-import {create_timestamp} from "@/util/date";
+import { create_timestamp } from "@/util/date";
 
 export type UnitMsg = {
   type: "CHAT" | "DM";

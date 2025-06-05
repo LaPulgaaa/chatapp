@@ -44,7 +44,6 @@ export default function Home() {
     <div className="lg:col-span-4 mr-4 ml-2 pt-2">
       {session.status === "authenticated" ? (
         <div>
-          
           {roomsStateData.state === "hasValue" &&
           dmStateData.state === "hasValue" ? (
             <RoomTabs

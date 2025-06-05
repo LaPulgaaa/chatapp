@@ -4,7 +4,7 @@ import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import * as React from "react";
 
-import { DarkLight } from "./DarkLight";
+import { ToggleMode } from "./DarkLight";
 import { Button } from "./ui/button";
 
 export default function Navbar() {
@@ -40,7 +40,7 @@ export default function Navbar() {
             </Link>
           </div>
         )}
-        <DarkLight />
+        <ToggleMode />
       </div>
     </div>
   );

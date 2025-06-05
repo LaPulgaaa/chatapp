@@ -24,7 +24,7 @@ export default function ChatLayout({
             <Sidebar />
           </div>
           <div className="relative w-5/6 mr-4 pt-2 space-y-4">
-            <Search/>
+            <Search />
             <div className={`ml-4`}>{children}</div>
           </div>
         </div>

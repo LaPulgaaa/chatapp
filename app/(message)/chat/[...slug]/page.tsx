@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  Edit,
-  ListEndIcon,
-} from "lucide-react";
+import { ChevronLeftIcon, ChevronRightIcon, Edit, Sidebar } from "lucide-react";
 import assert from "minimalistic-assert";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -22,17 +17,11 @@ import EditRoomDetails from "../edit_room_details";
 
 import { Signal } from "@/app/home/signal";
 import { leave_room } from "@/app/home/util";
-import { DarkLight } from "@/components/DarkLight";
+import { ToggleMode } from "@/components/DarkLight";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { UserStateChats } from "@/lib/store/atom/chats";
 import { isSidebarHidden } from "@/lib/store/atom/sidebar";
@@ -60,7 +49,7 @@ export type RecievedMessage = {
 export default function Chat({ params }: { params: { slug: string[] } }) {
   const segments = params.slug;
 
-  const {theme} = useTheme();
+  const { theme } = useTheme();
   const compose_ref = useRef<string | null>(null);
   const chat_ref = useRef<HTMLDivElement | null>(null);
   const [compose, setCompose] = useState<string>("");
@@ -125,8 +114,6 @@ export default function Chat({ params }: { params: { slug: string[] } }) {
     //eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomsStateData]);
 
-  
-
   function update_draft() {
     const draft = compose_ref.current;
     if (
@@ -190,42 +177,40 @@ export default function Chat({ params }: { params: { slug: string[] } }) {
   }
 
   useEffect(() => {
-    if(segments[1] !== "near")
-      return;
+    if (segments[1] !== "near") return;
 
-    const msg_id = Number.parseInt(segments[2],10);
+    const msg_id = Number.parseInt(segments[2], 10);
     const chat_node = chat_ref.current;
 
     if (chat_node === null) return;
 
     const chat_comp = chat_node.querySelector(`#CHAT-${msg_id}`);
 
-      if(chat_comp === null) return;
+    if (chat_comp === null) return;
 
-      chat_comp.scrollIntoView({
-        behavior: "instant",
-        inline: "center",
-      });
+    chat_comp.scrollIntoView({
+      behavior: "instant",
+      inline: "center",
+    });
 
-      chat_comp.style.transition = "all 0.5s ease";
-      if (theme === "dark")
-        chat_comp.style.backgroundColor =
-          "rgb(30 41 59 / var(--tw-bg-opacity, 1))";
-      else
+    chat_comp.style.transition = "all 0.5s ease";
+    if (theme === "dark")
       chat_comp.style.backgroundColor =
-          "rgb(203 213 225 / var(--tw-bg-opacity, 1))";
+        "rgb(30 41 59 / var(--tw-bg-opacity, 1))";
+    else
+      chat_comp.style.backgroundColor =
+        "rgb(203 213 225 / var(--tw-bg-opacity, 1))";
 
     // Reset styles after 3 seconds
     setTimeout(() => {
       chat_comp.style.backgroundColor = "";
     }, 3000);
-
-  },[chatMessages,segments,theme])
+  }, [chatMessages, segments, theme]);
 
   useEffect(() => {
     const chat_node = chat_ref.current;
 
-    if(chat_node === null || segments.length > 1) return;
+    if (chat_node === null || segments.length > 1) return;
 
     const chat_history_comps = chat_node.querySelectorAll("#history");
     if (chat_history_comps.length < 1) return;
@@ -235,8 +220,7 @@ export default function Chat({ params }: { params: { slug: string[] } }) {
       behavior: "smooth",
       inline: "center",
     });
-
-  }, [chatMessages,segments]);
+  }, [chatMessages, segments]);
 
   function sendMessage() {
     const data = {
@@ -284,22 +268,14 @@ export default function Chat({ params }: { params: { slug: string[] } }) {
           <>
             <div className="w-full flex justify-between mx-2 mr-4 border-[1.5px] border-slate-800 rounded">
               <div className="w-full flex px-3 pt-1 mx-2 ">
-                <h4 className="scroll-m-20 text-xl pb-1 font-semibold tracking-tight mr-3">
+                <h4 className="truncate scroll-m-20 text-xl pb-1 font-semibold tracking-tight mr-3">
                   {roomDetails.name}
                 </h4>
                 <h5 className="truncate border-l-2 pl-4 italic my-1">
                   {roomDetails.description}
                 </h5>
               </div>
-              <div className="flex space-x-2">
-                <Button
-                  className="px-1"
-                  onClick={() => setIshidden(!ishidden)}
-                  size={"icon"}
-                  variant={"ghost"}
-                >
-                  {ishidden ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-                </Button>
+              <div className="space-x-2 hidden md:flex">
                 <Button className="px-1" size={"icon"} variant={"ghost"}>
                   <Dialog>
                     <DialogTrigger>
@@ -314,28 +290,18 @@ export default function Chat({ params }: { params: { slug: string[] } }) {
                     />
                   </Dialog>
                 </Button>
+                <Button
+                  className="px-1"
+                  onClick={() => setIshidden(!ishidden)}
+                  size={"icon"}
+                  variant={"ghost"}
+                >
+                  <Sidebar/>
+                </Button>
               </div>
             </div>
           </>
         )}
-        <div className="flex mr-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button size={`icon`} variant={`outline`} className="mr-4">
-                <ListEndIcon />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                onClick={may_be_leave_room}
-                className="cursor-pointer"
-              >
-                Leave Room
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <DarkLight />
-        </div>
       </div>
 
       <div className="mt-2 h-[100%] flex w-full">

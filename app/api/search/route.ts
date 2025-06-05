@@ -3,61 +3,62 @@ import { getToken } from "next-auth/jwt";
 
 import { prisma } from "@/packages/prisma/prisma_client";
 
-export async function GET(req: NextRequest){
-    const token = await getToken({req});
+export async function GET(req: NextRequest) {
+  const token = await getToken({ req });
 
-    if(token === null)
-        return Response.json({ msg: 'UNAUTHORIZED'}, { status: 401 });
+  if (token === null)
+    return Response.json({ msg: "UNAUTHORIZED" }, { status: 401 });
 
-    try{
-        const resp = req.nextUrl.searchParams;
-        const query = resp.get('query');
-        const username = token.username;
-        const user_id = token.id!;
-        const name = token.name;
+  try {
+    const resp = req.nextUrl.searchParams;
+    const query = resp.get("query");
+    const username = token.username;
+    const user_id = token.id!;
+    const name = token.name;
 
-        if(query === null)
-            return Response.json({
-                msg: "Query parameter not provided.",
-                data: {
-                    dm: [],
-                    chat: [],
-                    profile: [],
-                }
-            },{ status: 200 });
+    if (query === null)
+      return Response.json(
+        {
+          msg: "Query parameter not provided.",
+          data: {
+            dm: [],
+            chat: [],
+            profile: [],
+          },
+        },
+        { status: 200 },
+      );
 
-
-        const profiles = await prisma.member.findMany({
-            where: {
-              OR: [
-                {
-                  username: {
-                    contains: query,
-                    not: username,
-                    mode: "insensitive",
-                  },
-                },
-                {
-                  name: {
-                    contains: query,
-                    not: name,
-                    mode: "insensitive",
-                  },
-                },
-              ],
+    const profiles = await prisma.member.findMany({
+      where: {
+        OR: [
+          {
+            username: {
+              contains: query,
+              not: username,
+              mode: "insensitive",
             },
-            select: {
-              id: true,
-              username: true,
-              avatarurl: true,
-              about: true,
-              name: true,
+          },
+          {
+            name: {
+              contains: query,
+              not: name,
+              mode: "insensitive",
             },
-            take: 10,
-          });
+          },
+        ],
+      },
+      select: {
+        id: true,
+        username: true,
+        avatarurl: true,
+        about: true,
+        name: true,
+      },
+      take: 10,
+    });
 
-        
-        const dms = await prisma.$queryRaw`
+    const dms = await prisma.$queryRaw`
             SELECT dm.*, f."toId", f."fromId",
                 ts_rank(to_tsvector('english',dm.content), plainto_tsquery('english',${query})) as rank
             FROM "DirectMessage" dm
@@ -69,7 +70,7 @@ export async function GET(req: NextRequest){
             LIMIT 20
         `;
 
-        const chat_msgs = await prisma.$queryRaw`
+    const chat_msgs = await prisma.$queryRaw`
             SELECT m.*, c.name as "chatName", mem.username as "sender",
                 ts_rank(to_tsvector('english', m.content), plainto_tsquery('english', ${query})) as rank
             FROM "Message" m
@@ -83,18 +84,24 @@ export async function GET(req: NextRequest){
             LIMIT 20
         `;
 
-        return Response.json({
-            msg: 'SUCCESS',
-            data: {
-                dm: dms,
-                profile: profiles,
-                chat: chat_msgs
-            }
-        }, { status: 200 });
-    }catch(err){
-        console.log(err);
-        Response.json({
-            msg: err,
-        }, { status: 500 });
-    }
+    return Response.json(
+      {
+        msg: "SUCCESS",
+        data: {
+          dm: dms,
+          profile: profiles,
+          chat: chat_msgs,
+        },
+      },
+      { status: 200 },
+    );
+  } catch (err) {
+    console.log(err);
+    Response.json(
+      {
+        msg: err,
+      },
+      { status: 500 },
+    );
+  }
 }
