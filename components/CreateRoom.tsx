@@ -67,7 +67,7 @@ export default function CreateRoom() {
         const raw_data = await resp.json();
         const data = v.parse(create_room_api_resp_schema,raw_data);
 
-        Signal.get_instance().ADD_ROOM(session.data.id!, data.chat.id);
+        Signal.get_instance().ADD_ROOM(session.data.username, data.chat.id);
 
         if(roomsStateData.state === "hasValue"){
           setRoomsStateData((rooms) => {
