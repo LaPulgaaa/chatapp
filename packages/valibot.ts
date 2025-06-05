@@ -314,12 +314,12 @@ export const search_api_dm_schema = v.array(
 export type DirectMessageSearchResult = v.InferOutput<typeof search_api_dm_schema>;
 
 export const search_api_profile_schema = v.array(
-  v.intersect([
-    v.object({
-      id: v.number(),
-    }),
-    v.omit(member_profile_schema,['favorite','status'])
-  ])
+  v.object({
+    id: v.string(),
+    username: v.string(),
+    avatarurl: v.nullish(v.string()),
+    name: v.nullish(v.string())
+  }),
 );
 
 export type ProfileSearchResult = v.InferOutput<typeof search_api_profile_schema>;
