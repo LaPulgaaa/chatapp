@@ -5,7 +5,6 @@ import { useState } from "react";
 
 import CreateRoom from "./CreateRoom";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { Button } from "./ui/button";
 import { Dialog, DialogTrigger } from "./ui/dialog";
 import { ScrollArea } from "./ui/scroll-area";
 import {

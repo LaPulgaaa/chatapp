@@ -192,7 +192,7 @@ export function Search() {
 
   return (
     <div className="flex justify-end items-center shadow z-10">
-      <div className="relative w-full md:w-1/2 space-y-2">
+      <div className="relative w-full md:w-1/2 space-y-2 mx-4">
         <SearchBox
           search={search}
           setSearch={setSearch}

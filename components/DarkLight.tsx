@@ -1,14 +1,17 @@
 "use client";
 
-import { Moon, Sun, Laptop, LucideProps } from "lucide-react";
+import type { LucideProps } from "lucide-react";
+import { Laptop, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-import React, {
+import type {
   ForwardRefExoticComponent,
-  RefAttributes,
+  RefAttributes} from "react";
+import React, {
   useMemo,
 } from "react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
+
 import { Button } from "./ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 
 type NextThemeAndIcon = {
   theme: "light" | "dark" | "system";
@@ -43,9 +46,9 @@ export function ToggleMode() {
   return (
     <TooltipProvider>
       <Tooltip>
-      <TooltipTrigger asChild>
+      <TooltipTrigger className="sm:block hidden p-2" asChild>
         <Button
-          variant={"secondary"}
+          variant={"outline"}
           size={"icon"}
           onClick={() => setTheme(nextThemeIcon.theme)}
         >

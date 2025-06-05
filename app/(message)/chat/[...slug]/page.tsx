@@ -1,8 +1,7 @@
 "use client";
 
-import { ChevronLeftIcon, ChevronRightIcon, Edit, Sidebar } from "lucide-react";
+import { Edit, Sidebar } from "lucide-react";
 import assert from "minimalistic-assert";
-import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useTheme } from "next-themes";
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -16,14 +15,11 @@ import { PinnedMessages } from "../../pinned_msg_ui";
 import EditRoomDetails from "../edit_room_details";
 
 import { Signal } from "@/app/home/signal";
-import { leave_room } from "@/app/home/util";
-import { ToggleMode } from "@/components/DarkLight";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { UserStateChats } from "@/lib/store/atom/chats";
 import { isSidebarHidden } from "@/lib/store/atom/sidebar";
 import { member_online_state } from "@/lib/store/atom/status";
 import { subscribed_chats_state } from "@/lib/store/atom/subscribed_chats_state";
@@ -54,9 +50,7 @@ export default function Chat({ params }: { params: { slug: string[] } }) {
   const chat_ref = useRef<HTMLDivElement | null>(null);
   const [compose, setCompose] = useState<string>("");
   const session = useSession();
-  const [rooms, setRooms] = useRecoilState(UserStateChats);
   const [ishidden, setIshidden] = useRecoilState(isSidebarHidden);
-  const router = useRouter();
   const [roomDetails, setRoomDetails] = useState<RoomHeaderDetails>();
   const room_id = params.slug[0];
   const user_id = session.data?.id;
@@ -241,26 +235,6 @@ export default function Chat({ params }: { params: { slug: string[] } }) {
     Signal.get_instance().SEND(JSON.stringify(data));
   }
 
-  async function may_be_leave_room() {
-    const opcode_id = rooms.find((room) => room.id === params.slug[0])?.conn_id;
-    if (opcode_id === undefined || session.status !== "authenticated") {
-      alert("Could not leave the chat!");
-      return;
-    }
-
-    const is_deleted = await leave_room({
-      member_id: session.data?.id,
-      chat_id: params.slug[0],
-      conn_id: opcode_id,
-    });
-
-    if (is_deleted) {
-      const left_rooms = rooms.filter((room) => room.id !== params.slug[0]);
-      setRooms(left_rooms);
-      router.push("/home");
-    }
-  }
-
   return (
     <div className="h-svh w-full pb-24">
       <div className="flex justify-between mt-2 mx-1">
@@ -271,9 +245,9 @@ export default function Chat({ params }: { params: { slug: string[] } }) {
                 <h4 className="truncate scroll-m-20 text-xl pb-1 font-semibold tracking-tight mr-3">
                   {roomDetails.name}
                 </h4>
-                <h5 className="truncate border-l-2 pl-4 italic my-1">
-                  {roomDetails.description}
-                </h5>
+                <p className="truncate mt-1 italic px-1">
+                  {` >> `}{roomDetails.description}
+                </p>
               </div>
               <div className="space-x-2 hidden md:flex">
                 <Button className="px-1" size={"icon"} variant={"ghost"}>
