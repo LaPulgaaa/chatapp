@@ -1,5 +1,6 @@
 'use client'
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useRecoilValueLoadable } from "recoil";
@@ -8,7 +9,6 @@ import { Avatar,AvatarFallback,AvatarImage } from "@/components/ui/avatar";
 import { fetch_search_results } from "@/lib/store/selector/fetch_search_results";
 import type { ChatSearchResult, DirectMessageSearchResult, ProfileSearchResult } from "@/packages/valibot";
 import { create_timestamp } from "@/util/date";
-import Link from "next/link";
 
 export default function Explorer({ params }: { params: { slug: string } }) {
   const query = params.slug;

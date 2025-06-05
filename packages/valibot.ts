@@ -345,3 +345,17 @@ export const search_api_data_schema = v.object({
 });
 
 export type SearchApiDataSchema = v.InferOutput<typeof search_api_data_schema>;
+
+
+export const create_room_api_resp_schema = v.object({
+  msg: v.string(),
+  chat: v.object({
+    name: v.string(),
+    id: v.string(),
+    createdAt: v.string(),
+    lastmsgAt: v.string(),
+    deleted: v.boolean(),
+    description: v.string(),
+    conn_id: v.number(),
+  })
+})

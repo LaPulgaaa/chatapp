@@ -140,9 +140,8 @@ export async function POST(req: NextRequest) {
     });
     return Response.json(
       {
-        msg: "Created Room Successfully",
-        created_chat: new_room,
-        created_opcode: chat_opcode,
+        msg: "CHAT_CREATED_SUCCESSFULLY",
+        chat: {...new_room, conn_id: chat_opcode.id},
       },
       { status: 201 },
     );
