@@ -29,7 +29,10 @@ import {
 } from "@/components/ui/dialog";
 import { subscribed_chats_state } from "@/lib/store/atom/subscribed_chats_state";
 import type { RoomType } from "@/packages/valibot";
-import { create_room_api_resp_schema, room_details_schema } from "@/packages/valibot";
+import {
+  create_room_api_resp_schema,
+  room_details_schema,
+} from "@/packages/valibot";
 
 export default function CreateRoom() {
   const session = useSession();
@@ -61,25 +64,27 @@ export default function CreateRoom() {
           },
           credentials: "include",
         });
-        
+
         if (resp.status === 400) return alert("Error creating chat.");
 
         const raw_data = await resp.json();
-        const data = v.parse(create_room_api_resp_schema,raw_data);
+        const data = v.parse(create_room_api_resp_schema, raw_data);
 
         Signal.get_instance().ADD_ROOM(session.data.username, data.chat.id);
 
-        if(roomsStateData.state === "hasValue"){
+        if (roomsStateData.state === "hasValue") {
           setRoomsStateData((rooms) => {
-            return [{
-              ...data.chat,
-              messages: [],
-              draft: undefined,
-              unreads: undefined
-            },...rooms]
+            return [
+              {
+                ...data.chat,
+                messages: [],
+                draft: undefined,
+                unreads: undefined,
+              },
+              ...rooms,
+            ];
           });
         }
-
       } catch (err) {
         console.log(err);
       }

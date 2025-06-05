@@ -29,7 +29,7 @@ export default function Direct({ params }: { params: { slug: string[] } }) {
   const segments = params.slug;
 
   const session = useSession();
-  const {theme} = useTheme();
+  const { theme } = useTheme();
 
   const [history, setHistory] = useState<Omit<UnitMsg, "type">[]>([]);
   const [active, setActive] = useState<boolean>(false);
@@ -46,7 +46,6 @@ export default function Direct({ params }: { params: { slug: string[] } }) {
     dm_details_state({ username: params.slug[0] }),
   );
   const refresh_dms = useRecoilRefresher_UNSTABLE(fetch_dms);
-
 
   const recipient: Recipient | null = useMemo(() => {
     if (
@@ -146,28 +145,26 @@ export default function Direct({ params }: { params: { slug: string[] } }) {
   }
 
   useEffect(() => {
-    if(segments[1] !== "near")
-      return;
+    if (segments[1] !== "near") return;
 
-    const msg_id = Number.parseInt(segments[2],10);
+    const msg_id = Number.parseInt(segments[2], 10);
     const chat_node = dm_ref.current;
     if (chat_node === null) return;
 
     const dm_comp = chat_node.querySelector(`#DM-${msg_id}`);
-      if(dm_comp === null) return;
+    if (dm_comp === null) return;
 
-      dm_comp.scrollIntoView({
-        behavior: "smooth",
-        inline: "center",
-      });
+    dm_comp.scrollIntoView({
+      behavior: "smooth",
+      inline: "center",
+    });
 
-      dm_comp.style.transition = "all 0.5s ease";
-      if (theme === "dark")
-        dm_comp.style.backgroundColor =
-          "rgb(30 41 59 / var(--tw-bg-opacity, 1))";
-      else
+    dm_comp.style.transition = "all 0.5s ease";
+    if (theme === "dark")
+      dm_comp.style.backgroundColor = "rgb(30 41 59 / var(--tw-bg-opacity, 1))";
+    else
       dm_comp.style.backgroundColor =
-          "rgb(203 213 225 / var(--tw-bg-opacity, 1))";
+        "rgb(203 213 225 / var(--tw-bg-opacity, 1))";
 
     // Reset styles after 3 seconds
     setTimeout(() => {
@@ -175,7 +172,7 @@ export default function Direct({ params }: { params: { slug: string[] } }) {
     }, 3000);
 
     //eslint-disable-next-line react-hooks/exhaustive-deps
-  },[history,segments])
+  }, [history, segments]);
 
   useEffect(() => {
     const chat_node = dm_ref.current;
@@ -188,7 +185,7 @@ export default function Direct({ params }: { params: { slug: string[] } }) {
         inline: "center",
       });
     }
-  }, [history,segments]);
+  }, [history, segments]);
 
   useEffect(() => {
     Signal.get_instance().REGISTER_CALLBACK(

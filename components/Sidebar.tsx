@@ -8,7 +8,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import { Dialog, DialogTrigger } from "./ui/dialog";
 import { ScrollArea } from "./ui/scroll-area";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./ui/tooltip";
 
 import JoinRoomDialog from "@/components/JoinRoom";
 import { useKeyboardShortcut } from "@/hooks/useKeyboardShortcut";
@@ -17,13 +22,13 @@ export default function Sidebar() {
   const router = useRouter();
   const session = useSession();
 
-  const [openRoomDialog,setOpenRoomDialog] = useState<boolean>(false);
-  const [joinRoomDialog,setJoinRoomDialog] = useState<boolean>(false);
+  const [openRoomDialog, setOpenRoomDialog] = useState<boolean>(false);
+  const [joinRoomDialog, setJoinRoomDialog] = useState<boolean>(false);
 
-  useKeyboardShortcut(["k","i","a","r","s"],(e: KeyboardEvent) => {
+  useKeyboardShortcut(["k", "i", "a", "r", "s"], (e: KeyboardEvent) => {
     const key = e.key;
 
-    switch(key){
+    switch (key) {
       case "k": {
         router.push(`/home/explore`);
         break;
@@ -37,11 +42,11 @@ export default function Sidebar() {
         break;
       }
       case "s": {
-        router.push('/home/profile');
+        router.push("/home/profile");
         break;
       }
     }
-  })
+  });
 
   function get_initials() {
     const names = session.data!.name?.split(" ");
@@ -69,50 +74,73 @@ export default function Sidebar() {
         </div>
       )}
       <div className="text-center sm:text-left grid grid-cols-1 divide-y">
-        <TabButton tab_name="Status" shortcut="i" tooltip_msg="Press 'i' to set your status"/>
+        <TabButton
+          tab_name="Status"
+          shortcut="i"
+          tooltip_msg="Press 'i' to set your status"
+        />
         <Dialog open={openRoomDialog} onOpenChange={setOpenRoomDialog}>
           <DialogTrigger>
-            <TabButton tab_name="Create" shortcut="a" tooltip_msg="Press 'a' to open create room dialog"></TabButton>
+            <TabButton
+              tab_name="Create"
+              shortcut="a"
+              tooltip_msg="Press 'a' to open create room dialog"
+            />
           </DialogTrigger>
           <CreateRoom />
         </Dialog>
         <Dialog open={joinRoomDialog} onOpenChange={setJoinRoomDialog}>
           <DialogTrigger>
-            <TabButton tab_name="Join" shortcut="r" tooltip_msg="Press 'r' to open join room dialog"></TabButton>
+            <TabButton
+              tab_name="Join"
+              shortcut="r"
+              tooltip_msg="Press 'r' to open join room dialog"
+            />
           </DialogTrigger>
           <JoinRoomDialog />
         </Dialog>
         <TabButton
-        tab_name="Settings" 
-        shortcut="s" 
-        tooltip_msg="Press 's' to open settings"
-        onClick={()=>{
-          router.push(`/home/profile`)
-        }}
-        ></TabButton>
+          tab_name="Settings"
+          shortcut="s"
+          tooltip_msg="Press 's' to open settings"
+          onClick={() => {
+            router.push(`/home/profile`);
+          }}
+        />
       </div>
     </ScrollArea>
   );
 }
 
-
-function TabButton(
-  {tab_name,shortcut,tooltip_msg,onClick}
-  :
-  {tab_name: string,shortcut: string,tooltip_msg: string;onClick?: () => void}){
+function TabButton({
+  tab_name,
+  shortcut,
+  tooltip_msg,
+  onClick,
+}: {
+  tab_name: string;
+  shortcut: string;
+  tooltip_msg: string;
+  onClick?: () => void;
+}) {
   return (
-    <Button variant={"ghost"} onClick={onClick} className="w-full flex justify-between space-x-2">
+    <div
+      onClick={onClick}
+      className="w-full flex justify-between space-x-2 py-2 px-4 cursor-pointer rounded-sm hover:bg-slate-800 transition duration-300 ease-in-out"
+    >
       <span>{tab_name}</span>
-       <TooltipProvider>
+      <TooltipProvider>
         <Tooltip>
           <TooltipTrigger>
-            <span className="dark:bg-slate-600 bg-slate-200 px-2 py-1 font-semibold rounded-sm">{shortcut}</span>
+            <span className="dark:bg-slate-600 bg-slate-200 px-2 py-1 font-semibold rounded-sm">
+              {shortcut}
+            </span>
           </TooltipTrigger>
           <TooltipContent>
             <p>{tooltip_msg}</p>
           </TooltipContent>
         </Tooltip>
-       </TooltipProvider>
-    </Button>
-  )
+      </TooltipProvider>
+    </div>
+  );
 }

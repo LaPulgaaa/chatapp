@@ -308,21 +308,25 @@ export const search_api_dm_schema = v.array(
     toId: v.string(),
     fromId: v.string(),
     rank: v.number(),
-  })
+  }),
 );
 
-export type DirectMessageSearchResult = v.InferOutput<typeof search_api_dm_schema>;
+export type DirectMessageSearchResult = v.InferOutput<
+  typeof search_api_dm_schema
+>;
 
 export const search_api_profile_schema = v.array(
   v.object({
     id: v.string(),
     username: v.string(),
     avatarurl: v.nullish(v.string()),
-    name: v.nullish(v.string())
+    name: v.nullish(v.string()),
   }),
 );
 
-export type ProfileSearchResult = v.InferOutput<typeof search_api_profile_schema>;
+export type ProfileSearchResult = v.InferOutput<
+  typeof search_api_profile_schema
+>;
 
 export const search_api_chat_schema = v.array(
   v.object({
@@ -333,19 +337,18 @@ export const search_api_chat_schema = v.array(
     chatName: v.string(),
     sender: v.string(),
     rank: v.number(),
-  })
-)
+  }),
+);
 
 export type ChatSearchResult = v.InferOutput<typeof search_api_chat_schema>;
 
 export const search_api_data_schema = v.object({
   profile: search_api_profile_schema,
   dm: search_api_dm_schema,
-  chat: search_api_chat_schema
+  chat: search_api_chat_schema,
 });
 
 export type SearchApiDataSchema = v.InferOutput<typeof search_api_data_schema>;
-
 
 export const create_room_api_resp_schema = v.object({
   msg: v.string(),
@@ -357,5 +360,5 @@ export const create_room_api_resp_schema = v.object({
     deleted: v.boolean(),
     description: v.string(),
     conn_id: v.number(),
-  })
-})
+  }),
+});
