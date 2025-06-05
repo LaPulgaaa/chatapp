@@ -41,7 +41,7 @@ function ProfileSearchResults({profiles}:{ profiles: ProfileSearchResult}){
           return (
             <div 
             key={profile.id} 
-            className="w-full flex space-x-4 m-2 dark:bg-slate-950 bg-slate-200 cursor-pointer"
+            className="flex flex-row space-x-2 dark:bg-slate-900 bg-slate-200 hover:dark:bg-slate-800 hover:bg-slate-300 p-2 rounded-sm cursor-pointer m-2"
             onClick={() => {
                 router.push(`/dm/${profile.username}`);
             }}
