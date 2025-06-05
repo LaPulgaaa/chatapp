@@ -3,7 +3,8 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useSession } from "next-auth/react";
 import { useForm } from "react-hook-form";
-import { useRecoilRefresher_UNSTABLE } from "recoil";
+import { useRecoilStateLoadable } from "recoil";
+import * as v from "valibot";
 
 import { Button } from "./ui/button";
 import {
@@ -26,13 +27,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { fetch_user_chats } from "@/lib/store/selector/fetch_chats";
-import { room_details_schema } from "@/packages/valibot";
+import { subscribed_chats_state } from "@/lib/store/atom/subscribed_chats_state";
 import type { RoomType } from "@/packages/valibot";
+import { create_room_api_resp_schema, room_details_schema } from "@/packages/valibot";
 
 export default function CreateRoom() {
   const session = useSession();
-  const refresh_chats = useRecoilRefresher_UNSTABLE(fetch_user_chats);
+  const [roomsStateData, setRoomsStateData] = useRecoilStateLoadable(
+    subscribed_chats_state,
+  );
   const form = useForm<RoomType>({
     resolver: valibotResolver(room_details_schema),
     defaultValues: {
@@ -58,12 +61,25 @@ export default function CreateRoom() {
           },
           credentials: "include",
         });
-        if (resp.status === 400) alert("Error creating chat.");
-        else {
-          const { created_chat } = await resp.json();
-          Signal.get_instance().ADD_ROOM(session.data.id!, created_chat.id);
-          refresh_chats();
+        
+        if (resp.status === 400) return alert("Error creating chat.");
+
+        const raw_data = await resp.json();
+        const data = v.parse(create_room_api_resp_schema,raw_data);
+
+        Signal.get_instance().ADD_ROOM(session.data.id!, data.chat.id);
+
+        if(roomsStateData.state === "hasValue"){
+          setRoomsStateData((rooms) => {
+            return [{
+              ...data.chat,
+              messages: [],
+              draft: undefined,
+              unreads: undefined
+            },...rooms]
+          });
         }
+
       } catch (err) {
         console.log(err);
       }
