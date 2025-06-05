@@ -1,3 +1,4 @@
+import {Analytics} from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import { Inter as FontSans } from "next/font/google";
 import React from "react";
@@ -44,6 +45,7 @@ export default function RootLayout({
                 disableTransitionOnChange
               >
                 {children}
+                <Analytics/>
                 <Toaster />
               </ThemeProvider>
             </AuthProvider>
