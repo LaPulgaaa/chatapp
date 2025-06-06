@@ -13,6 +13,7 @@ import { ComposeBox } from "../../dm/typing_status";
 import ChatMessageHistory from "../../history";
 import { PinnedMessages } from "../../pinned_msg_ui";
 import EditRoomDetails from "../edit_room_details";
+import HeaderDropdown from "../header_dropdown";
 
 import { Signal } from "@/app/home/signal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -240,8 +241,8 @@ export default function Chat({ params }: { params: { slug: string[] } }) {
       <div className="flex justify-between mt-2 mx-1">
         {roomDetails && session.status === "authenticated" && (
           <>
-            <div className="w-full flex justify-between mx-2 mr-4 border-[1.5px] border-slate-800 rounded">
-              <div className="w-full flex px-3 pt-1 mx-2 ">
+            <div className="w-full flex justify-between mx-2 border-[1.5px] border-slate-800 rounded">
+              <div className="w-full flex px-3 pt-1">
                 <h4 className="truncate scroll-m-20 text-xl pb-1 font-semibold tracking-tight mr-3">
                   {roomDetails.name}
                 </h4>
@@ -250,11 +251,8 @@ export default function Chat({ params }: { params: { slug: string[] } }) {
                 </p>
               </div>
               <div className="space-x-2 hidden md:flex">
-                <Button className="px-1" size={"icon"} variant={"ghost"}>
-                  <Dialog>
-                    <DialogTrigger>
-                      <Edit />
-                    </DialogTrigger>
+              <Dialog >
+                    <DialogTrigger><Edit/></DialogTrigger>
                     <EditRoomDetails
                       room_details={{
                         name: roomDetails!.name,
@@ -263,19 +261,23 @@ export default function Chat({ params }: { params: { slug: string[] } }) {
                       chat_id={params.slug[0]}
                     />
                   </Dialog>
-                </Button>
-                <Button
-                  className="px-1"
+                <HeaderDropdown room_details={{
+                  id: params.slug[0],
+                  name: roomDetails.name,
+                  description: roomDetails.description
+                }} />
+              </div>
+            </div>
+          </>
+        )}
+        <Button
+                  className=""
                   onClick={() => setIshidden(!ishidden)}
                   size={"icon"}
                   variant={"ghost"}
                 >
                   <Sidebar/>
                 </Button>
-              </div>
-            </div>
-          </>
-        )}
       </div>
 
       <div className="mt-2 h-[100%] flex w-full">
