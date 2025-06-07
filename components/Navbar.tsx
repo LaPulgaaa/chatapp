@@ -11,11 +11,11 @@ export default function Navbar() {
   const session = useSession();
   return (
     <div className="p-4 font-bold flex justify-between cursor-pointer mx-4 mt-1">
-      <Link href="/">
-        <h2>chat</h2>
+      <Link className="" href="/">
+        <Button className="font-bold" variant={"ghost"}>chat</Button>
       </Link>
-      <div className="flex justify-between">
-        {session.status === "authenticated" && (
+      <div className="flex flex-row justify-between space-x-2">
+        {session.status === "authenticated" ? (
           <Link href={"/"}>
             <Button
               onClick={async () => {
@@ -27,14 +27,13 @@ export default function Navbar() {
               Logout
             </Button>
           </Link>
-        )}
-        {session.status === "unauthenticated" && (
-          <div>
+        ) : (
+          <div className="flex flex-row">
             <Link href={"/login"}>
               <Button variant="ghost">LogIn</Button>
             </Link>
             <Link href={"/signup"}>
-              <Button className="px-2 mx-6" variant={"ghost"}>
+              <Button className="" variant={"ghost"}>
                 Signup
               </Button>
             </Link>
