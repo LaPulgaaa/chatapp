@@ -96,7 +96,7 @@ export default function Sidebar() {
               tooltip_msg="Press 'r' to open join room dialog"
             />
           </DialogTrigger>
-          <JoinRoomDialog />
+          <JoinRoomDialog onOpenChange={setJoinRoomDialog} />
         </Dialog>
         <TabButton
           tab_name="Settings"

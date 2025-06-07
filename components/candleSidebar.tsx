@@ -9,6 +9,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { useState } from "react";
 
 import CreateRoom from "./CreateRoom";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
@@ -20,6 +21,9 @@ import JoinRoomDialog from "@/components/JoinRoom";
 export default function CandleSidebar() {
   const router = useRouter();
   const session = useSession();
+
+  const [openRoomDialog, setOpenRoomDialog] = useState<boolean>(false);
+  const [joinRoomDialog, setJoinRoomDialog] = useState<boolean>(false);
 
   function get_initials() {
     const names = session.data!.user?.name?.split(" ");
@@ -44,21 +48,21 @@ export default function CandleSidebar() {
         <Button className="mt-1 p-1" variant={"ghost"} size={"icon"}>
           <HeartPulseIcon />
         </Button>
-        <Dialog>
+        <Dialog open={openRoomDialog} onOpenChange={setOpenRoomDialog}>
           <DialogTrigger>
             <div className="mt-1 p-2 hover:bg-gray-800 rounded-md ease-out duration-300 transition-all">
               <PlusSquare />
             </div>
           </DialogTrigger>
-          <CreateRoom />
+          <CreateRoom onOpenChange={setOpenRoomDialog}/>
         </Dialog>
-        <Dialog>
+        <Dialog open={joinRoomDialog} onOpenChange={setJoinRoomDialog}>
           <DialogTrigger>
             <div className="mt-1 p-2 hover:bg-gray-800 rounded-md ease-out duration-300 transition-all">
               <MessageSquareDotIcon />
             </div>
           </DialogTrigger>
-          <JoinRoomDialog />
+          <JoinRoomDialog onOpenChange={setJoinRoomDialog}/>
         </Dialog>
         <Button
           size={"icon"}
