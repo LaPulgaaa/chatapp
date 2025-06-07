@@ -102,7 +102,7 @@ const RoomTabs = memo(function ({
               }}
             >
               <div className="flex justify-between">
-                <h5 className="border-l-2 text-xl font-semibold scroll-m-20 tracking-light pl-2">
+                <h5 className="truncate border-l-2 text-xl font-semibold scroll-m-20 tracking-light pl-2">
                   {convo.name}
                 </h5>
                 <p className="hidden md:block">
@@ -159,7 +159,7 @@ const RoomTabs = memo(function ({
             }}
           >
             <div className="flex justify-between">
-              <h5 className="border-l-2 text-xl font-semibold scroll-m-20 tracking-light pl-2">
+              <h5 className="truncate border-l-2 text-xl font-semibold scroll-m-20 tracking-light pl-2">
                 {convo.to.username}
               </h5>
               <p className="hidden md:block">
