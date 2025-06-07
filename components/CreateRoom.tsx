@@ -2,6 +2,7 @@
 
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useSession } from "next-auth/react";
+import type { Dispatch, SetStateAction } from "react";
 import { useForm } from "react-hook-form";
 import { useRecoilStateLoadable } from "recoil";
 import * as v from "valibot";
@@ -20,13 +21,13 @@ import { Textarea } from "./ui/textarea";
 
 import { Signal } from "@/app/home/signal";
 import {
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { toast } from "@/hooks/use-toast";
 import { subscribed_chats_state } from "@/lib/store/atom/subscribed_chats_state";
 import type { RoomType } from "@/packages/valibot";
 import {
@@ -34,7 +35,7 @@ import {
   room_details_schema,
 } from "@/packages/valibot";
 
-export default function CreateRoom() {
+export default function CreateRoom({onOpenChange}: {onOpenChange: Dispatch<SetStateAction<boolean>>}) {
   const session = useSession();
   const [roomsStateData, setRoomsStateData] = useRecoilStateLoadable(
     subscribed_chats_state,
@@ -70,6 +71,9 @@ export default function CreateRoom() {
         const raw_data = await resp.json();
         const data = v.parse(create_room_api_resp_schema, raw_data);
 
+        toast({ title: "Successfully created room!", duration: 2000});
+        onOpenChange(false);
+
         Signal.get_instance().ADD_ROOM(session.data.username, data.chat.id);
 
         if (roomsStateData.state === "hasValue") {
@@ -86,6 +90,7 @@ export default function CreateRoom() {
           });
         }
       } catch (err) {
+        toast({ variant: "destructive", title: "Error creating room!"})
         console.log(err);
       }
     } else console.log("member_id is not defined");
@@ -127,15 +132,13 @@ export default function CreateRoom() {
             )}
           />
           <DialogFooter className="mt-3">
-            <DialogClose asChild>
-              <Button
+          <Button
                 disabled={!isDirty || isLoading || isSubmitting}
                 type="submit"
                 className="w-full"
               >
                 Create room
               </Button>
-            </DialogClose>
           </DialogFooter>
         </form>
       </Form>
