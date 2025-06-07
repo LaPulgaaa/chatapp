@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  HeartPulseIcon,
   MessageSquareDotIcon,
   PlusSquare,
   SettingsIcon,
@@ -45,9 +44,6 @@ export default function CandleSidebar() {
             </Avatar>
           </Link>
         )}
-        <Button className="mt-1 p-1" variant={"ghost"} size={"icon"}>
-          <HeartPulseIcon />
-        </Button>
         <Dialog open={openRoomDialog} onOpenChange={setOpenRoomDialog}>
           <DialogTrigger>
             <div className="mt-1 p-2 hover:bg-gray-800 rounded-md ease-out duration-300 transition-all">
