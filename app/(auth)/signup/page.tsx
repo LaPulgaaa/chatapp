@@ -91,22 +91,22 @@ export default function Signup() {
   }
 
   return (
-    <div>
+    <div className="h-screen flex flex-col">
       <Navbar />
-      <div className="flex flex-col items-center p-6 ">
-        {/* register form */}
-        <h2 className="scroll-m-20 border-b pb-2 m-6 text-3xl font-semibold tracking-tight first:mt-0 ">
+      <div className="flex-1 flex items-center justify-center ">
+        <div className="flex flex-col">
+          {/* register form */}
+        <h2 className="flex justify-center">
           Welcome to chat.city !
         </h2>
 
-        <Card className="px-6 divide-y divide-stone-800">
-          <div className=" w-[500px] ">
+        <Card className="sm:w-[500px] divide-y space-y-2">
             <CardHeader>
-              <CardTitle>Sign Up to start chatting</CardTitle>
+              <CardTitle className="truncate">Sign up to start chatting!</CardTitle>
               <CardDescription>Your peers are waiting for you!</CardDescription>
             </CardHeader>
             <Form {...form}>
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 p-4">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-4">
                 <CardContent>
                   <FormField
                     control={control}
@@ -165,15 +165,14 @@ export default function Signup() {
                   <Button
                     disabled={!isDirty || isLoading || isSubmitting}
                     type="submit"
-                    className="w-full mx-4"
+                    className="w-full"
                   >
                     Sign up
                   </Button>
                 </CardFooter>
               </form>
             </Form>
-          </div>
-          <div className="mx-10 mb-4">
+          <div className="mx-10 mb-2">
             <Button
               onClick={async () => {
                 await signIn("github", {
@@ -207,6 +206,7 @@ export default function Signup() {
         <Button variant={"link"} onClick={() => router.push("/login")}>
           Already have an account?
         </Button>
+        </div>
       </div>
     </div>
   );

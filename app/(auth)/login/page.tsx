@@ -64,15 +64,14 @@ export default function Login() {
   }
 
   return (
-    <div>
+    <div className="h-screen flex flex-col">
       <Navbar />
-      <div className="m-18 flex flex-col items-center">
-        <h2 className="scroll-m-20 border-b pb-2 m-6 text-3xl font-semibold tracking-tight first:mt-0">
+      <div className="flex-1 flex items-center justify-center">
+        <div className="flex flex-col"><h2 className="flex justify-center">
           Welcome Back !
         </h2>
-        <Card className="w-[500px] divide-y space-y-2">
-          <div className="w-full">
-            <CardHeader>
+        <Card className="sm:w-[500px] divide-y space-y-2">
+        <CardHeader>
               <CardTitle>Login</CardTitle>
               <CardDescription>
                 Fill in the details to join your peers!{" "}
@@ -110,7 +109,6 @@ export default function Login() {
                 Log in
               </Button>
             </CardFooter>
-          </div>
           <div className="w-full px-6">
             <Button
               onClick={async () => {
@@ -141,9 +139,10 @@ export default function Login() {
             </Button>
           </div>
         </Card>
-        <Button variant={"link"} onClick={() => router.push("/signup")}>
+        <Button className="" variant={"link"} onClick={() => router.push("/signup")}>
           Don&apos;t have an account ?
         </Button>
+        </div>
       </div>
     </div>
   );

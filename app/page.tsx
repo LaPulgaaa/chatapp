@@ -16,15 +16,16 @@ export default function Home() {
     if (session.status === "authenticated") router.push("/home");
   }, [session.status, router]);
   return (
-    <div>
+    <div className="h-screen flex flex-col">
       <Navbar />
-      <div className="grid justify-items-center m-48">
+      <div className="flex-1 flex items-center justify-center">
+        <div className="flex flex-col items-center space-y-2">
         <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-7xl">
           chat.varuncodes.com
         </h1>
-        <h2 className="scroll-m-20 border-b pb-2 m-12 text-3xl font-semibold tracking-tight first:mt-0 italic">
+        <p className="truncate flex justify-center pb-2 italic">
           Open Source Chat Application for better convos.
-        </h2>
+        </p>
         <div className="flex px-4">
           <Link href={"/signup"}>
             <Button variant={"outline"} className="mx-4">
@@ -35,6 +36,7 @@ export default function Home() {
           <Link href={"https://github.com/LaPulgaaa/chatapp"}>
             <Button variant={"secondary"}>Checkout code</Button>
           </Link>
+        </div>
         </div>
       </div>
     </div>
