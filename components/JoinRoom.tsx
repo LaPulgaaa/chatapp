@@ -1,7 +1,8 @@
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import type { Dispatch, SetStateAction} from "react";
 import { useEffect, useState } from "react";
-import { useRecoilRefresher_UNSTABLE, useRecoilState } from "recoil";
+import { useRecoilState, useRecoilStateLoadable } from "recoil";
 import * as v from "valibot";
 
 import { Button } from "./ui/button";
@@ -16,17 +17,21 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 
 import { Signal } from "@/app/home/signal";
+import { toast } from "@/hooks/use-toast";
 import { UserStateChats } from "@/lib/store/atom/chats";
-import { fetch_user_chats } from "@/lib/store/selector/fetch_chats";
+import { subscribed_chats_state } from "@/lib/store/atom/subscribed_chats_state";
 import { user_chat_schema } from "@/packages/valibot";
 
-export default function JoinRoomDialog() {
+export default function JoinRoomDialog({onOpenChange}:{onOpenChange: Dispatch<SetStateAction<boolean>>}) {
   const [roomid, setRoomId] = useState<string>("");
   const [rooms, setRooms] = useRecoilState(UserStateChats);
   const session = useSession();
   const router = useRouter();
   const [disable, setDisable] = useState(true);
-  const refresh_chats = useRecoilRefresher_UNSTABLE(fetch_user_chats);
+  // const refresh_chats = useRecoilRefresher_UNSTABLE(fetch_user_chats);
+  const [roomsStateData, setRoomsStateData] = useRecoilStateLoadable(
+    subscribed_chats_state,
+  );
 
   useEffect(() => {
     if (roomid.trim() === "") setDisable(true);
@@ -55,18 +60,20 @@ export default function JoinRoomDialog() {
 
       const raw_resp = await resp.json();
 
-      if (resp.status === 200) {
-        console.log("room found");
-        const room_info = v.parse(user_chat_schema, raw_resp.raw_data);
-        refresh_chats();
-        setRooms([...rooms, room_info]);
-        Signal.get_instance().ADD_ROOM(session.data.id, room_info.id);
-      } else {
-        alert("Room not found. Make sure the id is correct!!");
-      }
+      if(resp.status === 404 || roomsStateData.state !== "hasValue")
+        return alert("Room not found. Make sure the room code is correct!");
+
+      const room_info = v.parse(user_chat_schema, raw_resp.raw_data);
+
+      onOpenChange(false);
+      toast({ title: "Joined room successfully!", duration: 2000});
+
+      setRooms([...rooms, room_info]);
+      setRoomsStateData((rooms) => [room_info,...rooms])
+      Signal.get_instance().ADD_ROOM(session.data.username, room_info.id);
     } catch (err) {
       console.log(err);
-      alert(err);
+      toast({ title: "Error creating room!"});
     }
   }
 
