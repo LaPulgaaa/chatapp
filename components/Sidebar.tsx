@@ -86,7 +86,7 @@ export default function Sidebar() {
               tooltip_msg="Press 'a' to open create room dialog"
             />
           </DialogTrigger>
-          <CreateRoom />
+          <CreateRoom onOpenChange={setOpenRoomDialog} />
         </Dialog>
         <Dialog open={joinRoomDialog} onOpenChange={setJoinRoomDialog}>
           <DialogTrigger>
