@@ -23,7 +23,12 @@ export async function POST(req: NextRequest) {
         id: roomId,
       },
     });
-    if (room !== null) {
+
+    if(room === null)
+    return Response.json({
+      msg: 'ROOM DOES NOT EXIST',
+    },{ status: 404 });
+
       const room_opcode = await prisma.message.create({
         data: {
           content: `chat_${memberId}`,
@@ -51,13 +56,7 @@ export async function POST(req: NextRequest) {
         },
         { status: 200 },
       );
-    }
-    Response.json(
-      {
-        msg: "Room not found",
-      },
-      { status: 404 },
-    );
+
   } catch (err) {
     return Response.json(
       {
