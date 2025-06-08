@@ -20,6 +20,8 @@ export const user_signup_form_schema = v.object({
   ),
 });
 
+export const user_login_form_schema = v.pick(user_signup_form_schema,["email","password"])
+
 export type Join = v.InferOutput<typeof user_signup_form_schema>;
 
 export const message_schema = v.object({
