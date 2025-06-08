@@ -84,7 +84,7 @@ export default function Signup() {
     } catch (err) {
       console.log(err);
       toast({
-        title: "Signin failed!!",
+        title: "Signup failed!!",
         variant: "destructive",
       });
     }
@@ -117,11 +117,11 @@ export default function Signup() {
                         <FormControl>
                           <div className="flex border-[1.5px] rounded-md">
                             <p className="text-sm text-muted-foreground px-2 mt-3">
-                              chat.city/
+                              chat/
                             </p>
                             <Input
                               type="text"
-                              placeholder="Username"
+                              placeholder="johndoe123"
                               {...field}
                             />
                           </div>
@@ -137,7 +137,7 @@ export default function Signup() {
                       <FormItem>
                         <FormLabel>Email</FormLabel>
                         <FormControl>
-                          <Input type="text" placeholder="Email" {...field} />
+                          <Input type="text" placeholder="johndoe@example.com" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -152,7 +152,7 @@ export default function Signup() {
                         <FormControl>
                           <Input
                             type="password"
-                            placeholder="Password"
+                            placeholder="your super secret password"
                             {...field}
                           />
                         </FormControl>
@@ -172,7 +172,7 @@ export default function Signup() {
                 </CardFooter>
               </form>
             </Form>
-          <div className="mx-10 mb-2">
+          <div className="mx-10 mb-2 py-2">
             <Button
               onClick={async () => {
                 await signIn("github", {
