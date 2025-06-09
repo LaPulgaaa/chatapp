@@ -12,7 +12,7 @@ export default function Navbar() {
   return (
     <div className="p-4 font-bold flex justify-between cursor-pointer mx-4 mt-1">
       <Link className="" href="/">
-        <Button className="font-bold" variant={"ghost"}>chat</Button>
+        <Button className="font-bold hover:bg-transparent" variant={"ghost"}>chat</Button>
       </Link>
       <div className="flex flex-row justify-between space-x-2">
         {session.status === "authenticated" ? (
