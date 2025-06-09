@@ -1,7 +1,8 @@
 "use client";
 
-import { Edit, Sidebar } from "lucide-react";
+import { ArrowLeft, Edit, Sidebar } from "lucide-react";
 import assert from "minimalistic-assert";
+import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useTheme } from "next-themes";
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -45,6 +46,8 @@ export type RecievedMessage = {
 
 export default function Chat({ params }: { params: { slug: string[] } }) {
   const segments = params.slug;
+
+  const router = useRouter();
 
   const { theme } = useTheme();
   const compose_ref = useRef<string | null>(null);
@@ -243,6 +246,10 @@ export default function Chat({ params }: { params: { slug: string[] } }) {
           <>
             <div className="w-full flex justify-between mx-2 border-[1.5px] border-slate-800 rounded">
               <div className="w-full flex px-3 pt-1">
+                <Button 
+                className="sm:hidden pb-2 hover:bg-transparent"
+                onClick={() => router.back()}
+                variant={"ghost"} size={"icon"}><ArrowLeft/></Button>
                 <h4 className="truncate scroll-m-20 text-xl pb-1 font-semibold tracking-tight mr-3">
                   {roomDetails.name}
                 </h4>
@@ -271,7 +278,7 @@ export default function Chat({ params }: { params: { slug: string[] } }) {
           </>
         )}
         <Button
-                  className=""
+                  className="hidden md:block"
                   onClick={() => setIshidden(!ishidden)}
                   size={"icon"}
                   variant={"ghost"}
