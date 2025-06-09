@@ -117,10 +117,10 @@ function DirectMessageSearchResults({ query }: { query: string }) {
               </AvatarFallback>
             </Avatar>
             <div className="mx-1 px-1">
-              <div>{item.to.name || item.to.username}</div>
-              <div className="italic text-muted-foreground truncate w-[124px] text-[15px]">
+              <p className="truncate">{item.to.name || item.to.username}</p>
+              <p className="italic text-muted-foreground truncate">
                 {`@${item.to.username}`}
-              </div>
+              </p>
             </div>
           </div>
         );
@@ -191,7 +191,7 @@ export function Search() {
   }
 
   return (
-    <div className="flex justify-end items-center shadow z-10">
+    <div className="flex justify-end items-center z-10">
       <div className="relative w-full md:w-1/2 space-y-2 mx-4">
         <SearchBox
           search={search}
