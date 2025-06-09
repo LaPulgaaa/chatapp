@@ -46,7 +46,7 @@ export function ToggleMode() {
   return (
     <TooltipProvider>
       <Tooltip>
-      <TooltipTrigger className="sm:block hidden p-2" asChild>
+      <TooltipTrigger className="p-2" asChild>
         <Button
           variant={"outline"}
           size={"icon"}
