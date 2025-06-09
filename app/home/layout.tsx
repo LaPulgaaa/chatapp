@@ -18,7 +18,7 @@ export default function ChatLayout({
     <div>
       <div>
         <Navbar />
-        <div className="flex divide-x h-full ml-4 my-4 mr-12 pb-24">
+        <div className="flex divide-x h-full ml-4 my-4 sm:mr-12 pb-24">
           <div>
             <CandleSidebar />
             <Sidebar />
