@@ -105,7 +105,7 @@ function DirectMessageSearchResults({ query }: { query: string }) {
         return (
           <div
             key={item.id}
-            className="w-full flex space-x-4 m-2 bg-slate-950 cursor-pointer"
+            className="w-full flex space-x-4 m-2 dark:bg-slate-950 cursor-pointer"
             onClick={() => {
               router.push(`/dm/${item.to.username}`);
             }}
@@ -159,17 +159,17 @@ function GroupChatSearchResults({ query }: { query: string }) {
               router.push(`/chat/${item.id}`);
             }}
             key={item.id}
-            className="w-full flex space-x-4 m-2 bg-slate-950 cursor-pointer"
+            className="w-full flex space-x-4 m-2 dark:bg-slate-950 cursor-pointer"
           >
             <Avatar className="mr-1">
               <AvatarImage src={""} />
               <AvatarFallback>{item.name.substring(0, 2)}</AvatarFallback>
             </Avatar>
-            <div className="mx-1 px-1">
-              <div>{item.name}</div>
-              <div className="italic text-muted-foreground truncate w-[124px] text-[15px]">
+            <div className="mx-1 px-1 w-3/4">
+              <p className="truncate">{item.name}</p>
+              <p className="italic text-muted-foreground truncate">
                 {item.description}
-              </div>
+              </p>
             </div>
           </div>
         );
@@ -203,7 +203,7 @@ export function Search() {
           <div
             onMouseEnter={() => setOverResults(true)}
             onMouseLeave={() => setOverResults(false)}
-            className="bg-slate-950 absolute z-50 shadow w-full rounded-md border-2"
+            className="dark:bg-slate-950 bg-slate-200 absolute z-50 shadow w-full rounded-md border-2"
           >
             <div
               onClick={handle_click}
