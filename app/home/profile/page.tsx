@@ -173,15 +173,15 @@ export default function Profile() {
   return (
     <div>
       {user_state.state === "hasValue" && (
-        <div className="flex flex-col m-12 mx-24 p-4 border-2 rounded-md divide-y">
+        <div className="w-full flex flex-col p-4 border-2 rounded-md divide-y">
           <div className="p-2 m-2">
-            <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
+            <h3 className="scroll-m-20 md:text-2xl text-lg font-semibold tracking-tight">
               Profile
             </h3>
-            <p className="text-muted-foreground">Manage your chat profile</p>
+            <p className="text-sm md:text-md text-muted-foreground ">Manage your chat profile</p>
           </div>
           <div className="">
-            <div className="flex space-x-8 pt-4 m-4">
+            <div className="flex sm:flex-row flex-col items-center gap-4 m-3">
               <Avatar className="mt-2 w-[74px] h-[74px]">
                 <AvatarImage
                   className="contain"
@@ -192,7 +192,7 @@ export default function Profile() {
                 </AvatarFallback>
               </Avatar>
               <div className="flex flex-col space-y-2">
-                <div>
+                <div className="flex flex-row gap-2">
                   {favs.map((fav, _index) => {
                     return (
                       <Badge key={_index} className="m-1">
@@ -201,10 +201,10 @@ export default function Profile() {
                     );
                   })}
                 </div>
-                <div className="flex space-x-2">
+                <div className="flex lg:flex-row flex-col gap-4">
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button>Upload Avatar</Button>
+                      <Button className="w-full">Upload Avatar</Button>
                     </DialogTrigger>
                     <DialogContent>
                       <DialogTitle>Upload avatar</DialogTitle>
@@ -227,6 +227,7 @@ export default function Profile() {
                     </DialogContent>
                   </Dialog>
                   <Button
+                    className="w-full"
                     onClick={() => {
                       setAvatar("");
                     }}
@@ -303,25 +304,6 @@ export default function Profile() {
                 />
                 <div className="space-y-2">
                   <Label>Favorite</Label>
-                  <div className="rounded-md border-2 flex">
-                    <div className="flex space-x-1 mr-1">
-                      {favs.length > 0 &&
-                        favs.map((fav: string) => {
-                          return (
-                            <Badge
-                              onDoubleClick={() => {
-                                setFavs((old_favs) => {
-                                  return old_favs.filter((f) => f !== fav);
-                                });
-                              }}
-                              className="m-1 p-2"
-                              key={fav}
-                            >
-                              {fav}
-                            </Badge>
-                          );
-                        })}
-                    </div>
                     <Input
                       onChange={(e) => {
                         setFav(e.target.value);
@@ -335,9 +317,9 @@ export default function Profile() {
                         }
                       }}
                       type="text"
-                      placeholder="Add your favs... anything you like .."
+                      placeholder="Write your favorites and press space"
                     />
-                  </div>
+
                 </div>
                 <div className="flex justify-end">
                   <Button
