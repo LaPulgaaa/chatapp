@@ -25,7 +25,7 @@ export default function ProfileDialog({
         <Avatar className="h-[148px] w-[148px]">
           <AvatarImage
             loading="lazy"
-            src={`${`https://avatar.varuncodes.com/${profile_info.username}`}`}
+            src={profile_info.avatarurl ?? ""}
           />
         </Avatar>
       </div>

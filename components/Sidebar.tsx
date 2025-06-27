@@ -63,7 +63,7 @@ export default function Sidebar() {
           <Link href={"/home"} className="flex w-full">
             <Avatar className="">
               <AvatarImage
-                src={`https://avatar.varuncodes.com/${session.data.username}`}
+                src={session.data.avatar_url ?? ""}
               />
               <AvatarFallback>{get_initials()}</AvatarFallback>
             </Avatar>
