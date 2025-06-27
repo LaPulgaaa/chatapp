@@ -8,6 +8,9 @@ import { useForm } from "react-hook-form";
 import { useRecoilRefresher_UNSTABLE, useRecoilValueLoadable } from "recoil";
 import * as v from "valibot";
 
+import { update_avatar_url } from "./actions";
+import { handle_file_upload } from "./util";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -33,8 +36,6 @@ import { UserDetails } from "@/lib/store/atom/userDetails";
 import { user_details_edit_form_schema } from "@/packages/valibot";
 
 type FormValue = v.InferOutput<typeof user_details_edit_form_schema>;
-
-const AVATAR_PROD_URL = "https://avatar.varuncodes.com";
 
 export default function Profile() {
   const { update, data, status } = useSession();
@@ -96,9 +97,7 @@ export default function Profile() {
         method: "PATCH",
         body: JSON.stringify({
           ...form_data,
-          favorite: favs,
-          avatarurl:
-            avatar === "" ? "" : `${AVATAR_PROD_URL}/${form_data.username}`,
+          favorite: favs
         }),
         credentials: "include",
       });
@@ -128,43 +127,25 @@ export default function Profile() {
 
     const uploaded_avatar_file = uploaded_files[0];
 
-    const uploaded_avatar_url = URL.createObjectURL(uploaded_avatar_file);
+    const resp = await handle_file_upload(uploaded_avatar_file,username,"avatar");
 
-    setAvatar(uploaded_avatar_url);
-
-    const resp = await fetch("/api/avatar", {
-      method: "POST",
-      body: JSON.stringify({
-        key: username,
-        content_type: uploaded_avatar_file.type,
-      }),
-    });
-
-    const {
-      raw_data: { presigned_url },
-    }: { raw_data: { presigned_url: string } } = await resp.json();
-
-    console.log(presigned_url);
-    const upload_to_s3_resp = await fetch(presigned_url, {
-      method: "PUT",
-      headers: {
-        "Content-Type": uploaded_avatar_file.type,
-      },
-      body: uploaded_avatar_file,
-      mode: "cors",
-    });
-
-    if (upload_to_s3_resp.ok) {
+    if(!resp?.error){
+      console.log(username)
+      const has_updated = await update_avatar_url(username,resp.url);
+      if(has_updated)
+      setAvatar(resp.url)
+      else
       toast({
-        title: "Avatar changed successfully!!",
-      });
-    } else {
-      setAvatar("");
+        title: "Image upload failed",
+        variant: "destructive"
+      })
+    }
+    else{
       toast({
-        variant: "destructive",
-        title: "Avatar upload failed!",
-        description: "Please try to upload once again.",
-      });
+        title: "Image upload failed",
+        description: resp.error,
+        variant: "destructive"
+      })
     }
   }
 
@@ -185,7 +166,7 @@ export default function Profile() {
               <Avatar className="mt-2 w-[74px] h-[74px]">
                 <AvatarImage
                   className="contain"
-                  src={`https://avatar.varuncodes.com/${user_details?.username}`}
+                  src={user_details?.avatarurl ?? ""}
                 />
                 <AvatarFallback>
                   {user_details?.username?.substring(0, 2) ?? ""}
