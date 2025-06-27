@@ -86,7 +86,6 @@ export async function PATCH(req: NextRequest) {
         name: form_body.name,
         about: form_body.about,
         status: form_body.status,
-        avatarurl: form_body.avatarurl,
         favorite: form_body.favorite,
       },
     });

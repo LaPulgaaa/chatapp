@@ -290,7 +290,7 @@ export default function Direct({ params }: { params: { slug: string[] } }) {
                 <div className="flex item-center p-2 ml-2">
                   <Avatar className="mr-1 mt-1">
                     <AvatarImage
-                      src={`https://avatar.varuncodes.com/${params.slug[0]}`}
+                      src={session.data.avatar_url ?? ""}
                     />
                     <AvatarFallback>
                       {params.slug[0].substring(0, 2)}
