@@ -49,7 +49,7 @@ export default function DmRender({
               }`}
             >
               <AvatarImage
-                src={`https://avatar.varuncodes.com/${msg.sendBy.username}`}
+                src={`/uploads/avatar/${msg.sendBy.username}`}
               />
               <AvatarFallback>{initials}</AvatarFallback>
             </Avatar>
