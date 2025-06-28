@@ -47,6 +47,7 @@ export default function Profile() {
   const [favs, setFavs] = useState<string[]>([]);
   const user_details = user_state.getValue();
   const [avatar, setAvatar] = useState<string>("");
+  const [avatarDirty,setAvatarDirty] = useState<boolean>(false);
 
   const { toast } = useToast();
 
@@ -132,7 +133,10 @@ export default function Profile() {
     if(!resp?.error){
       const has_updated = await update_avatar_url(username,resp.url);
       if(has_updated)
-      setAvatar(resp.url)
+      {
+        setAvatar(resp.url);
+        setAvatarDirty(true);
+      }
       else
       toast({
         title: "Image upload failed",
@@ -304,7 +308,7 @@ export default function Profile() {
                 <div className="flex justify-end">
                   <Button
                     disabled={
-                      (!isDirty || isLoading || isSubmitting) && !favsdirty
+                      (!isDirty || isLoading || isSubmitting) && !favsdirty && !avatarDirty
                     }
                     type="submit"
                     className=""
