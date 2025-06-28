@@ -25,7 +25,7 @@ export default function ProfileDialog({
         <Avatar className="h-[148px] w-[148px]">
           <AvatarImage
             loading="lazy"
-            src={profile_info.avatarurl ?? ""}
+            src={profile_info.avatarurl ?? `${process.env.NEXT_PUBLIC_STORE_URL!}/avatar/avatar.svg`}
           />
         </Avatar>
       </div>

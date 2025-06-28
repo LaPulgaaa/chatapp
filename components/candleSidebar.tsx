@@ -39,7 +39,7 @@ export default function CandleSidebar() {
         {session.status === "authenticated" && (
           <Link href={"/home"}>
             <Avatar>
-              <AvatarImage src={session.data.avatar_url ?? undefined} />
+              <AvatarImage className="contain" src={session.data.avatar_url ?? `${process.env.NEXT_PUBLIC_STORE_URL!}/avatar/avatar.svg`} />
               <AvatarFallback>{get_initials()}</AvatarFallback>
             </Avatar>
           </Link>
