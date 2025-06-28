@@ -130,7 +130,6 @@ export default function Profile() {
     const resp = await handle_file_upload(uploaded_avatar_file,username,"avatar");
 
     if(!resp?.error){
-      console.log(username)
       const has_updated = await update_avatar_url(username,resp.url);
       if(has_updated)
       setAvatar(resp.url)

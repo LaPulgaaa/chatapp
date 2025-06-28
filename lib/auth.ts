@@ -104,7 +104,6 @@ export const NEXTAUTH_CONFIG: NextAuthOptions = {
               email: params.token.email,
               //@ts-expect-error to be removed soon
               username: params.profile?.login ?? params.user.email,
-              avatarurl: params.token.picture,
               name: params.token.name,
             },
             select: {

@@ -7,13 +7,7 @@ import { get_s3_signed_url } from "@/lib/storage/util";
 
 export async function GET(_req: NextRequest, {params}:{params: { slug: string[] }}){
     const segments = params.slug;
-
-    if(segments.length < 4){
-        return new Response(null,{
-            status: 404
-        })
-    }
-
+    
     const session = await getServerSession();
 
     if(session === null){

@@ -63,7 +63,7 @@ export default function Sidebar() {
           <Link href={"/home"} className="flex w-full">
             <Avatar className="">
               <AvatarImage
-                src={session.data.avatar_url ?? ""}
+                src={session.data.avatar_url ?? `${process.env.NEXT_PUBLIC_STORE_URL!}/avatar/avatar.svg`}
               />
               <AvatarFallback>{get_initials()}</AvatarFallback>
             </Avatar>

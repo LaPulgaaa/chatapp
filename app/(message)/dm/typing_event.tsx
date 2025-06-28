@@ -86,7 +86,7 @@ export function TypingEvent({
                 key={member}
                 className="w-[35px] h-[35px] mt- 2"
               >
-                <AvatarImage src={`https://avatar.varuncodes.com/${member}`} />
+                <AvatarImage src={`/uploads/avatar/${member}`} />
                 <AvatarFallback>{member.substring(0, 2)}</AvatarFallback>
               </Avatar>
             );
