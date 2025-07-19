@@ -8,14 +8,22 @@
     "build": "next build",
     "start": "NODE_ENV=production ts-node server.ts",
     "format": "npx prettier . --write",
+    "format:check": "npx prettier . --check",
     "lint": "npx eslint .",
+    "lint:fix": "npx eslint . --fix",
     "test": "vitest",
+    "test:coverage": "vitest --coverage",
+    "test:ui": "vitest --ui",
+    "type-check": "tsc --noEmit",
     "dev:combined": "npm run dev & npx next dev",
     "prisma:migrate": "npx prisma migrate dev --schema=./packages/prisma/schema.prisma",
     "prisma:generate": "npx prisma generate --schema=./packages/prisma/schema.prisma",
+    "prisma:validate": "npx prisma validate --schema=./packages/prisma/schema.prisma",
     "dev:docker": "npm run prisma:migrate & npm run server",
     "prisma:prod": "npx prisma migrate deploy --schema=./packages/prisma/schema.prisma",
-    "postinstall": "npm run prisma:prod & npm run prisma:generate"
+    "postinstall": "npm run prisma:prod & npm run prisma:generate",
+    "ci:check": "npm run format:check && npm run lint && npm run type-check",
+    "ci:test": "npm run test:coverage"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.4.2",
@@ -78,6 +86,7 @@
     "@types/supertest": "^6.0.2",
     "@types/ws": "^8.5.10",
     "autoprefixer": "^10.0.1",
+    "depcheck": "^1.4.7",
     "eslint": "^8.57.1",
     "eslint-config-next": "14.1.0",
     "eslint-config-prettier": "^10.0.1",
@@ -91,7 +100,13 @@
     "supertest": "^7.0.0",
     "tailwindcss": "^3.3.0",
     "typescript": "^5",
-    "typescript-eslint": "^8.23.0"
+    "typescript-eslint": "^8.23.0",
+    "vitest": "^1.0.0",
+    "@vitest/ui": "^1.0.0",
+    "@vitest/coverage-v8": "^1.0.0",
+    "@testing-library/jest-dom": "^6.1.0",
+    "@testing-library/react": "^14.0.0",
+    "@testing-library/user-event": "^14.5.0"
   },
   "engines": {
     "node": "18.x"
